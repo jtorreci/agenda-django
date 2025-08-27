@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required, user_passes_test
 from .forms import StudentSubjectForm, NotificationForm
-from schedule.models import Actividad
+from schedule.models import Actividad, VistaCalendario
 from academics.models import Titulacion, Asignatura
 from django.core.mail import send_mail
 from .models import CustomUser
@@ -47,8 +47,9 @@ def register(request):
 @login_required
 @user_passes_test(is_teacher)
 def teacher_dashboard(request):
-    titulaciones = Titulacion.objects.all()
-    return render(request, 'users/teacher_dashboard.html', {'titulaciones': titulaciones})
+    teacher_subjects = request.user.subjects.all().order_by('titulacion__nombre', 'curso', 'semestre')
+    calendar_views = VistaCalendario.objects.filter(usuario=request.user)
+    return render(request, 'users/teacher_dashboard.html', {'teacher_subjects': teacher_subjects, 'calendar_views': calendar_views})
 
 @login_required
 @user_passes_test(is_student)

@@ -135,3 +135,4 @@ AGENDA_CLOSING_DATE = '2025-12-31' # Example date, change as needed
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 LOGIN_REDIRECT_URL = '/users/dashboard_redirect/'
+LOGIN_URL = '/login/'

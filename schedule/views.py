@@ -6,33 +6,34 @@ from .models import Actividad, VistaCalendario
 from icalendar import Calendar, Event
 from django.http import HttpResponse, JsonResponse
 from academics.models import Asignatura
+from django.core import serializers
 
 @login_required
 @user_passes_test(is_teacher)
 def activity_form(request, pk=None):
+    activity = None # Initialize activity to None
     if pk:
         activity = get_object_or_404(Actividad, pk=pk)
-        asignatura = activity.asignatura
+        initial_subjects = activity.asignaturas.all()
     else:
-        activity = None
-        asignatura_id = request.GET.get('asignatura')
-        if asignatura_id:
-            asignatura = get_object_or_404(Asignatura, pk=asignatura_id)
-        else:
-            return redirect('teacher_dashboard')
+        subject_ids_str = request.GET.get('subjects')
+        initial_subjects = []
+        if subject_ids_str:
+            subject_ids = [int(s_id) for s_id in subject_ids_str.split(',') if s_id.isdigit()]
+            initial_subjects = Asignatura.objects.filter(id__in=subject_ids)
 
     if request.method == 'POST':
-        form = ActividadForm(request.POST, instance=activity)
+        form = ActividadForm(request.POST, instance=activity, user=request.user)
         if form.is_valid():
-            form.save()
+            activity = form.save()
             return redirect('teacher_dashboard')
-    else:
-        initial_data = {}
-        if not pk:
-            initial_data['asignatura'] = asignatura.id
-        form = ActividadForm(instance=activity, initial=initial_data)
+    else: # GET request
+        if activity: # If editing an existing activity
+            form = ActividadForm(instance=activity, user=request.user)
+        else: # If creating a new activity
+            form = ActividadForm(initial={'asignaturas': initial_subjects}, user=request.user)
 
-    return render(request, 'schedule/activity_form.html', {'form': form, 'asignatura': asignatura})
+    return render(request, 'schedule/activity_form.html', {'form': form})
 
 @login_required
 @user_passes_test(is_teacher)
@@ -42,6 +43,40 @@ def activity_delete(request, pk):
         activity.delete()
         return redirect('teacher_dashboard')
     return render(request, 'schedule/activity_confirm_delete.html', {'activity': activity})
+
+@login_required
+@user_passes_test(is_teacher)
+def get_filtered_activities(request):
+    subject_ids_str = request.GET.get('subject_ids')
+    if not subject_ids_str:
+        return JsonResponse({'activities': []})
+
+    subject_ids = [int(s_id) for s_id in subject_ids_str.split(',') if s_id.isdigit()]
+    
+    # Get all activities that are linked to any of the selected subjects
+    # Use a dictionary to maintain order and uniqueness by ID
+    unique_activities = {}
+    for activity in Actividad.objects.filter(asignaturas__id__in=subject_ids).order_by('fecha_inicio'):
+        unique_activities[activity.id] = activity
+
+    activities_to_serialize = list(unique_activities.values())
+
+    # Manually serialize the data to include related fields
+    activities_data = []
+    for activity in activities_to_serialize:
+        activities_data.append({
+            'id': activity.id,
+            'nombre': activity.nombre,
+            'fecha_inicio': activity.fecha_inicio.isoformat(),
+            'fecha_fin': activity.fecha_fin.isoformat(),
+            'descripcion': activity.descripcion,
+            'tipo_actividad': activity.tipo_actividad.nombre,
+            'asignaturas': [a.nombre for a in activity.asignaturas.all()],
+            'evaluable': activity.evaluable,
+            'aprobada': activity.aprobada
+        })
+    
+    return JsonResponse({'activities': activities_data})
 
 @login_required
 @user_passes_test(is_teacher)
@@ -57,15 +92,15 @@ def calendar_view_panel(request):
 @login_required
 def create_calendar_view(request):
     if request.method == 'POST':
-        form = VistaCalendarioForm(request.POST)
+        form = VistaCalendarioForm(request.POST, user=request.user)
         if form.is_valid():
             calendar_view = form.save(commit=False)
             calendar_view.usuario = request.user
             calendar_view.save()
             form.save_m2m() # Save ManyToMany relationships
-            return redirect('calendar_view_panel')
+            return redirect('teacher_dashboard')
     else:
-        form = VistaCalendarioForm()
+        form = VistaCalendarioForm(user=request.user)
     return render(request, 'schedule/create_calendar_view.html', {'form': form})
 
 @login_required
@@ -86,11 +121,11 @@ def ical_feed(request, token):
     activities = Actividad.objects.all()
 
     if calendar_view.asignaturas.exists():
-        activities = activities.filter(asignatura__in=calendar_view.asignaturas.all())
+        activities = activities.filter(asignaturas__in=calendar_view.asignaturas.all())
     if calendar_view.tipos_actividad.exists():
         activities = activities.filter(tipo_actividad__in=calendar_view.tipos_actividad.all())
 
-    for activity in activities:
+    for activity in activities_to_serialize:
         event = Event()
         event.add('summary', activity.nombre)
         event.add('dtstart', activity.fecha_inicio)

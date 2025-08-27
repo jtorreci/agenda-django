@@ -28,6 +28,7 @@ urlpatterns = [
     path('ajax/get_cursos/', schedule_views.get_cursos, name='get_cursos'),
     path('ajax/get_semestres/', schedule_views.get_semestres, name='get_semestres'),
     path('ajax/get_asignaturas/', schedule_views.get_asignaturas, name='get_asignaturas'),
+    path('ajax/get_filtered_activities/', schedule_views.get_filtered_activities, name='get_filtered_activities'),
     path('activity/new/', schedule_views.activity_form, name='activity_new'),
     path('activity/edit/<int:pk>/', schedule_views.activity_form, name='activity_edit'),
     path('activity/delete/<int:pk>/', schedule_views.activity_delete, name='activity_delete'),

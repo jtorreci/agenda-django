@@ -2,6 +2,25 @@
 <html>
 <head>
     <title>Teacher Dashboard</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+            vertical-align: top;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .button-container {
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
     <h2>Teacher Dashboard</h2>
@@ -9,105 +28,184 @@
     <p><a href="{% url 'teacher_select_subjects' %}">Select My Subjects</a></p>
     <p><a href="{% url 'teacher_student_view' %}">View as Student</a></p>
     
-    <h3>Create a New Activity</h3>
-    <form action="{% url 'activity_new' %}" method="get">
-        <label for="titulacion">Titulacion:</label>
-        <select name="titulacion" id="titulacion">
-            <option value="">Select a Titulacion</option>
-            {% for titulacion in titulaciones %}
-                <option value="{{ titulacion.id }}">{{ titulacion.nombre }}</option>
+    <h3>My Assigned Subjects</h3>
+    {% if teacher_subjects %}
+    <table id="subjectsTable">
+        <thead>
+            <tr>
+                <th>Select</th>
+                <th>Titulacion</th>
+                <th>Curso</th>
+                <th>Semestre</th>
+                <th>Subject Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for subject in teacher_subjects %}
+            <tr>
+                <td><input type="checkbox" name="selected_subjects" value="{{ subject.id }}"></td>
+                <td>{{ subject.titulacion.nombre }}</td>
+                <td>{{ subject.curso }}</td>
+                <td>{{ subject.semestre }}</td>
+                <td>{{ subject.nombre }}</td>
+            </tr>
             {% endfor %}
-        </select>
-        <br>
-        <label for="curso">Curso:</label>
-        <select name="curso" id="curso">
-            <option value="">Select a Curso</option>
-        </select>
-        <br>
-        <label for="semestre">Semestre:</label>
-        <select name="semestre" id="semestre">
-            <option value="">Select a Semestre</option>
-        </select>
-        <br>
-        <label for="asignatura">Asignatura:</label>
-        <select name="asignatura" id="asignatura">
-            <option value="">Select an Asignatura</option>
-        </select>
-        <br>
-        <button type="submit">Add Activity</button>
-    </form>
+        </tbody>
+    </table>
+    <div class="button-container">
+        <button id="createActivityBtn">Create Activity</button>
+    </div>
+
+    <h3 style="margin-top: 30px;">Activities for Selected Subjects</h3>
+    <div id="activitiesTableContainer">
+        <!-- Activities table will be loaded here by JavaScript -->
+    </div>
+
+    <h3 style="margin-top: 30px;">iCal Feed Configurations</h3>
+    <p><a href="{% url 'create_calendar_view' %}">Create New iCal Feed</a></p>
+    {% if calendar_views %}
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Subjects</th>
+                <th>Activity Types</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for view in calendar_views %}
+            <tr>
+                <td>{{ view.nombre }}</td>
+                <td>
+                    {% for asignatura in view.asignaturas.all %}
+                        {{ asignatura.nombre }}{% if not forloop.last %}, {% endif %}
+                    {% endfor %}
+                </td>
+                <td>
+                    {% for tipo in view.tipos_actividad.all %}
+                        {{ tipo.nombre }}{% if not forloop.last %}, {% endif %}
+                    {% endfor %}
+                </td>
+                <td>
+                    <button class="copyIcalLinkBtn" data-ical-url="{% url 'ical_feed' view.token %}">Copy iCal Link</button>
+                    <a href="{% url 'delete_calendar_view' view.pk %}">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No iCal feed configurations found. Create one above.</p>
+    {% endif %}
+
+    {% else %}
+    <p>No subjects assigned to you. Please <a href="{% url 'teacher_select_subjects' %}">select your subjects</a>.</p>
+    {% endif %}
 
     <p><a href="{% url 'logout' %}">Logout</a></p>
 
     <script>
-    document.getElementById('titulacion').addEventListener('change', function() {
-        const titulacionId = this.value;
-        const cursoSelect = document.getElementById('curso');
-        const semestreSelect = document.getElementById('semestre');
-        const asignaturaSelect = document.getElementById('asignatura');
+        function getSelectedSubjectIds() {
+            const checkboxes = document.querySelectorAll('input[name="selected_subjects"]:checked');
+            return Array.from(checkboxes).map(cb => cb.value);
+        }
 
-        cursoSelect.innerHTML = '<option value="">Select a Curso</option>';
-        semestreSelect.innerHTML = '<option value="">Select a Semestre</option>';
-        asignaturaSelect.innerHTML = '<option value="">Select an Asignatura</option>';
+        function loadActivities() {
+            const selectedSubjectIds = getSelectedSubjectIds();
+            const activitiesTableContainer = document.getElementById('activitiesTableContainer');
 
-        if (titulacionId) {
-            fetch(`/ajax/get_cursos/?titulacion_id=${titulacionId}`)
+            if (selectedSubjectIds.length === 0) {
+                activitiesTableContainer.innerHTML = '<p>Select subjects above to see their activities.</p>';
+                return;
+            }
+
+            fetch(`{% url 'get_filtered_activities' %}?subject_ids=${selectedSubjectIds.join(',')}`)
                 .then(response => response.json())
                 .then(data => {
-                    data.forEach(curso => {
-                        const option = document.createElement('option');
-                        option.value = curso;
-                        option.textContent = curso;
-                        cursoSelect.appendChild(option);
-                    });
+                    let tableHtml = '';
+                    if (data.activities.length > 0) {
+                        tableHtml = `
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Activity Name</th>
+                                        <th>Subjects</th>
+                                        <th>Type</th>
+                                        <th>Start Date</th>
+                                        <th>End Date</th>
+                                        <th>Description</th>
+                                        <th>Evaluable</th>
+                                        <th>Aprobada</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                        `;
+                        data.activities.forEach(activity => {
+                            console.log("Activity ID:", activity.id); // <--- ADD THIS LINE
+                            tableHtml += `
+                                <tr>
+                                    <td>${activity.nombre}</td>
+                                    <td>${activity.asignaturas.join(', ')}</td>
+                                    <td>${activity.tipo_actividad}</td>
+                                    <td>${new Date(activity.fecha_inicio).toLocaleString()}</td>
+                                    <td>${new Date(activity.fecha_fin).toLocaleString()}</td>
+                                    <td>${activity.descripcion || '-'}</td>
+                                    <td><input type="checkbox" ${activity.evaluable ? 'checked' : ''} disabled></td>
+                                    <td><input type="checkbox" ${activity.aprobada ? 'checked' : ''} disabled></td>
+                                    <td>
+                                        <a href="/activity/edit/${activity.id}/">Edit</a>
+                                        <a href="/activity/delete/${activity.id}/">Delete</a>
+                                    </td>
+                                </tr>
+                            `;
+                        });
+                        tableHtml += `
+                                </tbody>
+                            </table>
+                        `;
+                    } else {
+                        tableHtml = '<p>No activities found for the selected subjects.</p>';
+                    }
+                    activitiesTableContainer.innerHTML = tableHtml;
+                })
+                .catch(error => {
+                    console.error('Error loading activities:', error);
+                    activitiesTableContainer.innerHTML = '<p>Error loading activities.</p>';
                 });
         }
-    });
 
-    document.getElementById('curso').addEventListener('change', function() {
-        const titulacionId = document.getElementById('titulacion').value;
-        const curso = this.value;
-        const semestreSelect = document.getElementById('semestre');
-        const asignaturaSelect = document.getElementById('asignatura');
+        // Event listener for Create Activity button
+        document.getElementById('createActivityBtn').addEventListener('click', function() {
+            const selectedSubjectIds = getSelectedSubjectIds();
+            if (selectedSubjectIds.length === 0) {
+                alert('Please select at least one subject to create an activity.');
+            } else {
+                window.location.href = `{% url 'activity_new' %}?subjects=${selectedSubjectIds.join(',')}`;
+            }
+        });
 
-        semestreSelect.innerHTML = '<option value="">Select a Semestre</option>';
-        asignaturaSelect.innerHTML = '<option value="">Select an Asignatura</option>';
+        // Event listener for subject checkboxes
+        document.querySelectorAll('input[name="selected_subjects"]').forEach(checkbox => {
+            checkbox.addEventListener('change', loadActivities);
+        });
 
-        if (titulacionId && curso) {
-            fetch(`/ajax/get_semestres/?titulacion_id=${titulacionId}&curso=${curso}`)
-                .then(response => response.json())
-                .then(data => {
-                    data.forEach(semestre => {
-                        const option = document.createElement('option');
-                        option.value = semestre;
-                        option.textContent = semestre;
-                        semestreSelect.appendChild(option);
-                    });
+        // Load activities on page load based on initially checked subjects (if any)
+        document.addEventListener('DOMContentLoaded', loadActivities);
+
+        // iCal link copy functionality
+        document.querySelectorAll('.copyIcalLinkBtn').forEach(button => {
+            button.addEventListener('click', function() {
+                const icalUrl = this.dataset.icalUrl;
+                navigator.clipboard.writeText(icalUrl).then(() => {
+                    alert('iCal link copied to clipboard!');
+                }).catch(err => {
+                    console.error('Failed to copy iCal link:', err);
+                    alert('Failed to copy iCal link. Please copy manually: ' + icalUrl);
                 });
-        }
-    });
-
-    document.getElementById('semestre').addEventListener('change', function() {
-        const titulacionId = document.getElementById('titulacion').value;
-        const curso = document.getElementById('curso').value;
-        const semestre = this.value;
-        const asignaturaSelect = document.getElementById('asignatura');
-
-        asignaturaSelect.innerHTML = '<option value="">Select an Asignatura</option>';
-
-        if (titulacionId && curso && semestre) {
-            fetch(`/ajax/get_asignaturas/?titulacion_id=${titulacionId}&curso=${curso}&semestre=${semestre}`)
-                .then(response => response.json())
-                .then(data => {
-                    data.forEach(asignatura => {
-                        const option = document.createElement('option');
-                        option.value = asignatura.id;
-                        option.textContent = asignatura.nombre;
-                        asignaturaSelect.appendChild(option);
-                    });
-                });
-        }
-    });
-</script>
+            });
+        });
+    </script>
 </body>
 </html>

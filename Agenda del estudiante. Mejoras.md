@@ -12,3 +12,19 @@ En rol de profesor:
 - La vista de selección de asignaturas no debería ser un listado desordenado. Propongo que se elija titulación y se obtenga una tabla ordenada por curso y semestre de asignaturas, cada una con un checkbox para marcarla.
 - Una vez que un profesor ha elegido sus asignaturas, en su vista se deben mostrar esas asignaturas con un checkbox, de modo que al pulsar el botón "Añadir nueva actividad" se añada a esas asignaturas (eso permite añadir una actividad de forma simultánea a más de una asignatura). De este modo no es necesario elegir curso y semestre, porque se opera sobre las asignaturas del profesor.
 - Cuando tenemos un selector de curso, en lugar de mostrar 1,2,3,4,10,1000 sería bueno mostrar "Primer Curso", "Segundo Curso", "Tercer Curso", "Cuarto Curso", "Optativa", y no mostrar la correspondiente a 1000 si estamos en vista profesor, ya que es el TFG, pero si mostrarlo si somos coordinador, y en este caso en el selector mostrar "TFE" (porque en realidad puede ser TFG o TFM).
+
+## 250827-13.30
+Hay cambios muy sustanciales que hacer al modelo de actividad y hay que añadir una tabla de log de actividades.
+### Campos a añadir a tabla actividades:
+- campo si/no "Evaluable" para indicar si la actividad cuenta en la nota; 
+- campo numéricto "Porcentaje evaluacion" que indica cuánto cuenta; 
+- campo si/no "No recuperable", 
+- Campo si/no "Aprobada"
+- Campo si/no "Activa". Siempre es si, salvo que se borre. Al borrar no desaparece de la base de datos sino que este campo se pone a "no"  y deja de ser visible para profesores y estudiantes. Los coordinadores y administradores la podrán ver en una lista separada de actividades borradas y en su caso cambiar su estado a activa
+
+### Campos en la tabla de log de actividades
+- IdLog
+- IdActividad (la actividad a la que se refiere el log)
+- Timestamp
+- Usuario (el usuario activo)
+- Tipo Log: Creación, modificación, borrado, aprobación

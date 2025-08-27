@@ -9,7 +9,7 @@
     <ul>
         {% for activity in activities %}
             <li>
-                {{ activity.nombre }} ({{ activity.asignatura.nombre }}) - {{ activity.fecha_inicio }} to {{ activity.fecha_fin }}
+                {{ activity.nombre }} ({% for asignatura in activity.asignaturas.all %}{{ asignatura.nombre }}{% if not forloop.last %}, {% endif %}{% endfor %}) - {{ activity.fecha_inicio }} to {{ activity.fecha_fin }}
                 <a href="{% url 'activity_edit' activity.pk %}">Edit</a>
                 <a href="{% url 'activity_delete' activity.pk %}">Delete</a>
             </li>
