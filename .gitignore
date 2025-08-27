@@ -1,0 +1,49 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.pyc
+*.pyd
+*.pyo
+*.exe
+*.dll
+*.so
+*.dylib
+
+# C extensions
+*.c
+*.cpp
+*.h
+
+# Distribution / packaging
+.Python
+build/
+dist/
+eggs/
+*.egg-info/
+.env/
+.venv/
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Editors
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS generated files
+.DS_Store
+.Trashes
+Thumbs.db
+
+# Django stuff:
+*.log
+*.pot
+*.mo
+*.sqlite3
+media/
+
+# My stuff
+*.csv
