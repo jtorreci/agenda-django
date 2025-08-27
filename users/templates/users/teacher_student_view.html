@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student View</title>
+</head>
+<body>
+    <h2>Student View</h2>
+    <h3>Your Activities:</h3>
+    <ul>
+        {% for activity in activities %}
+            <li>
+                {{ activity.nombre }} ({{ activity.asignatura.nombre }}) - {{ activity.fecha_inicio }} to {{ activity.fecha_fin }}
+            </li>
+        {% empty %}
+            <li>No activities found for your selected subjects.</li>
+        {% endfor %}
+    </ul>
+    <p><a href="{% url 'teacher_dashboard' %}">Back to Dashboard</a></p>
+</body>
+</html>

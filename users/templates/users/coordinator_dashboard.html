@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Coordinator Dashboard</title>
+</head>
+<body>
+    <h2>Coordinator Dashboard</h2>
+    <p>Welcome, Coordinator!</p>
+
+    <form method="get" action="{% url 'coordinator_dashboard' %}">
+        <label for="titulacion">Filter by Titulacion:</label>
+        <select name="titulacion" id="titulacion">
+            <option value="">All Titulaciones</option>
+            {% for titulacion in titulaciones %}
+                <option value="{{ titulacion.id }}" {% if selected_titulacion_id == titulacion.id|stringformat:"s" %}selected{% endif %}>{{ titulacion.nombre }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="semestre">Filter by Semestre:</label>
+        <select name="semestre" id="semestre">
+            <option value="">All Semestres</option>
+            <option value="1" {% if selected_semestre == "1" %}selected{% endif %}>1</option>
+            <option value="2" {% if selected_semestre == "2" %}selected{% endif %}>2</option>
+            <option value="3" {% if selected_semestre == "3" %}selected{% endif %}>3</option>
+        </select>
+
+        <button type="submit">Filter</button>
+    </form>
+
+    <h3>Activities:</h3>
+    <ul>
+        {% for activity in activities %}
+            <li>
+                {{ activity.nombre }} ({{ activity.asignatura.nombre }}) - {{ activity.fecha_inicio }} to {{ activity.fecha_fin }}
+            </li>
+        {% empty %}
+            <li>No activities found.</li>
+        {% endfor %}
+    </ul>
+
+    <p><a href="{% url 'logout' %}">Logout</a></p>
+</body>
+</html>

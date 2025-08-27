@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Calendar View</title>
+</head>
+<body>
+    <h2>Create New Calendar View</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Create</button>
+    </form>
+    <p><a href="{% url 'calendar_view_panel' %}">Back to Calendar Views</a></p>
+</body>
+</html>

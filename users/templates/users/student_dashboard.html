@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student Dashboard</title>
+</head>
+<body>
+    <h2>Student Dashboard</h2>
+    <p>Welcome, Student!</p>
+    <p><a href="{% url 'select_subjects' %}">Select/Update Your Subjects</a></p>
+    <h3>Your Activities:</h3>
+    <ul>
+        {% for activity in activities %}
+            <li>
+                {{ activity.nombre }} ({{ activity.asignatura.nombre }}) - {{ activity.fecha_inicio }} to {{ activity.fecha_fin }}
+            </li>
+        {% empty %}
+            <li>No activities found for your selected subjects.</li>
+        {% endfor %}
+    </ul>
+    <p><a href="{% url 'logout' %}">Logout</a></p>
+</body>
+</html>

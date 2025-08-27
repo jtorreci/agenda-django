@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Activity List</title>
+</head>
+<body>
+    <h2>Activity List</h2>
+    <p><a href="{% url 'activity_new' %}">Create New Activity</a></p>
+    <ul>
+        {% for activity in activities %}
+            <li>
+                {{ activity.nombre }} ({{ activity.asignatura.nombre }}) - {{ activity.fecha_inicio }} to {{ activity.fecha_fin }}
+                <a href="{% url 'activity_edit' activity.pk %}">Edit</a>
+                <a href="{% url 'activity_delete' activity.pk %}">Delete</a>
+            </li>
+        {% empty %}
+            <li>No activities found.</li>
+        {% endfor %}
+    </ul>
+    <p><a href="{% url 'teacher_dashboard' %}">Back to Dashboard</a></p>
+</body>
+</html>

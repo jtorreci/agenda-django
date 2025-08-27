@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Select Dashboard</title>
+</head>
+<body>
+    <h2>Select a Dashboard</h2>
+    <ul>
+        {% for name, url_name in dashboards.items %}
+            <li><a href="{% url url_name %}">{{ name }}</a></li>
+        {% endfor %}
+    </ul>
+    <p><a href="{% url 'logout' %}">Logout</a></p>
+</body>
+</html>

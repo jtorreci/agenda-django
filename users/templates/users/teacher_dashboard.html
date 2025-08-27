@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Teacher Dashboard</title>
+</head>
+<body>
+    <h2>Teacher Dashboard</h2>
+    <p>Welcome, Teacher!</p>
+    <p><a href="{% url 'teacher_select_subjects' %}">Select My Subjects</a></p>
+    <p><a href="{% url 'teacher_student_view' %}">View as Student</a></p>
+    
+    <h3>Create a New Activity</h3>
+    <form action="{% url 'activity_new' %}" method="get">
+        <label for="titulacion">Titulacion:</label>
+        <select name="titulacion" id="titulacion">
+            <option value="">Select a Titulacion</option>
+            {% for titulacion in titulaciones %}
+                <option value="{{ titulacion.id }}">{{ titulacion.nombre }}</option>
+            {% endfor %}
+        </select>
+        <br>
+        <label for="curso">Curso:</label>
+        <select name="curso" id="curso">
+            <option value="">Select a Curso</option>
+        </select>
+        <br>
+        <label for="semestre">Semestre:</label>
+        <select name="semestre" id="semestre">
+            <option value="">Select a Semestre</option>
+        </select>
+        <br>
+        <label for="asignatura">Asignatura:</label>
+        <select name="asignatura" id="asignatura">
+            <option value="">Select an Asignatura</option>
+        </select>
+        <br>
+        <button type="submit">Add Activity</button>
+    </form>
+
+    <p><a href="{% url 'logout' %}">Logout</a></p>
+
+    <script>
+    document.getElementById('titulacion').addEventListener('change', function() {
+        const titulacionId = this.value;
+        const cursoSelect = document.getElementById('curso');
+        const semestreSelect = document.getElementById('semestre');
+        const asignaturaSelect = document.getElementById('asignatura');
+
+        cursoSelect.innerHTML = '<option value="">Select a Curso</option>';
+        semestreSelect.innerHTML = '<option value="">Select a Semestre</option>';
+        asignaturaSelect.innerHTML = '<option value="">Select an Asignatura</option>';
+
+        if (titulacionId) {
+            fetch(`/ajax/get_cursos/?titulacion_id=${titulacionId}`)
+                .then(response => response.json())
+                .then(data => {
+                    data.forEach(curso => {
+                        const option = document.createElement('option');
+                        option.value = curso;
+                        option.textContent = curso;
+                        cursoSelect.appendChild(option);
+                    });
+                });
+        }
+    });
+
+    document.getElementById('curso').addEventListener('change', function() {
+        const titulacionId = document.getElementById('titulacion').value;
+        const curso = this.value;
+        const semestreSelect = document.getElementById('semestre');
+        const asignaturaSelect = document.getElementById('asignatura');
+
+        semestreSelect.innerHTML = '<option value="">Select a Semestre</option>';
+        asignaturaSelect.innerHTML = '<option value="">Select an Asignatura</option>';
+
+        if (titulacionId && curso) {
+            fetch(`/ajax/get_semestres/?titulacion_id=${titulacionId}&curso=${curso}`)
+                .then(response => response.json())
+                .then(data => {
+                    data.forEach(semestre => {
+                        const option = document.createElement('option');
+                        option.value = semestre;
+                        option.textContent = semestre;
+                        semestreSelect.appendChild(option);
+                    });
+                });
+        }
+    });
+
+    document.getElementById('semestre').addEventListener('change', function() {
+        const titulacionId = document.getElementById('titulacion').value;
+        const curso = document.getElementById('curso').value;
+        const semestre = this.value;
+        const asignaturaSelect = document.getElementById('asignatura');
+
+        asignaturaSelect.innerHTML = '<option value="">Select an Asignatura</option>';
+
+        if (titulacionId && curso && semestre) {
+            fetch(`/ajax/get_asignaturas/?titulacion_id=${titulacionId}&curso=${curso}&semestre=${semestre}`)
+                .then(response => response.json())
+                .then(data => {
+                    data.forEach(asignatura => {
+                        const option = document.createElement('option');
+                        option.value = asignatura.id;
+                        option.textContent = asignatura.nombre;
+                        asignaturaSelect.appendChild(option);
+                    });
+                });
+        }
+    });
+</script>
+</body>
+</html>

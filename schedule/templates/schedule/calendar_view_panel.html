@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Calendar View Panel</title>
+</head>
+<body>
+    <h2>Your Calendar Views</h2>
+    <p><a href="{% url 'create_calendar_view' %}">Create New Calendar View</a></p>
+    <ul>
+        {% for view in calendar_views %}
+            <li>
+                {{ view.nombre }} - <a href="{% url 'delete_calendar_view' view.pk %}">Delete</a>
+                (iCal URL: <a href="{% url 'ical_feed' view.token %}">{% url 'ical_feed' view.token %}</a>)
+            </li>
+        {% empty %}
+            <li>No calendar views found.</li>
+        {% endfor %}
+    </ul>
+    <p><a href="{% url 'student_dashboard' %}">Back to Student Dashboard</a></p>
+</body>
+</html>

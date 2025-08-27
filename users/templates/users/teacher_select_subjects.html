@@ -1,0 +1,123 @@
+<body>
+    <h2>Select Your Subjects</h2>
+
+    <form id="titulacionForm" method="get" action="{% url 'teacher_select_subjects' %}">
+        <label for="titulacion">Titulacion:</label>
+        <select name="titulacion" id="titulacion">
+            <option value="">Select a Titulacion</option>
+            {% for titulacion in titulaciones %}
+                <option value="{{ titulacion.id }}" {% if titulacion.id|stringformat:"s" == selected_titulacion_id %}selected{% endif %}>{{ titulacion.nombre }}</option>
+            {% endfor %}
+        </select>
+    </form>
+
+    {% if asignaturas_by_curso %}
+        <form id="subjectsForm" method="post">
+            {% csrf_token %}
+            {% for curso_display, semestres in asignaturas_by_curso.items %}
+                {% if semestres.primer_semestre or semestres.segundo_semestre or semestres.optativas %}
+                    <h3>{{ curso_display }}</h3>
+                    <table border="1" style="width:100%; border-collapse: collapse;">
+                        <thead>
+                            <tr>
+                                <th style="width:50%;">Primer Semestre</th>
+                                <th style="width:50%;">Segundo Semestre</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="vertical-align: top; padding: 5px;">
+                                    {% for a in semestres.primer_semestre %}
+                                        <input type="checkbox" name="subjects" value="{{ a.id }}" onchange="handleCheckboxChange(this)" {% if a.id in user_subjects_ids %}checked{% endif %}> {{ a.nombre }}<br>
+                                    {% endfor %}
+                                </td>
+                                <td style="vertical-align: top; padding: 5px;">
+                                    {% for a in semestres.segundo_semestre %}
+                                        <input type="checkbox" name="subjects" value="{{ a.id }}" onchange="handleCheckboxChange(this)" {% if a.id in user_subjects_ids %}checked{% endif %}> {{ a.nombre }}<br>
+                                    {% endfor %}
+                                </td>
+                            </tr>
+                            {% if semestres.optativas %}
+                            <tr>
+                                <td colspan="2" style="padding: 5px;">
+                                    <b>Optativas:</b><br>
+                                    {% for a in semestres.optativas %}
+                                        <input type="checkbox" name="subjects" value="{{ a.id }}" onchange="handleCheckboxChange(this)" {% if a.id in user_subjects_ids %}checked{% endif %}> {{ a.nombre }}<br>
+                                    {% endfor %}
+                                </td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                {% endif %}
+            {% endfor %}
+            <button type="submit">Save All Selections</button>
+        </form>
+    {% endif %}
+
+    <p><a href="{% url 'teacher_dashboard' %}">Back to Dashboard</a></p>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            let selectedSubjects = new Set({{ user_subjects_ids|safe }});
+
+            // Restore from session storage if available
+            const storedSubjects = sessionStorage.getItem('selectedSubjects');
+            if (storedSubjects) {
+                selectedSubjects = new Set(JSON.parse(storedSubjects));
+            }
+
+            // Function to handle checkbox changes
+            window.handleCheckboxChange = function(checkbox) {
+                const subjectId = parseInt(checkbox.value, 10);
+                if (checkbox.checked) {
+                    selectedSubjects.add(subjectId);
+                } else {
+                    selectedSubjects.delete(subjectId);
+                }
+            };
+
+            // Check checkboxes based on the selectedSubjects set
+            document.querySelectorAll('input[type=checkbox][name=subjects]').forEach(checkbox => {
+                const subjectId = parseInt(checkbox.value, 10);
+                if (selectedSubjects.has(subjectId)) {
+                    checkbox.checked = true;
+                }
+            });
+
+            // Handle form submission for subjects
+            const subjectsForm = document.getElementById('subjectsForm');
+            if (subjectsForm) {
+                subjectsForm.addEventListener('submit', (event) => {
+                    event.preventDefault(); // Stop the form from submitting normally
+                    
+                    // Clear previous hidden inputs
+                    const existingInputs = subjectsForm.querySelectorAll('input[type=hidden][name=subjects]');
+                    existingInputs.forEach(input => input.remove());
+
+                    // Add hidden inputs for all selected subjects
+                    for (const subjectId of selectedSubjects) {
+                        const input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = 'subjects';
+                        input.value = subjectId;
+                        subjectsForm.appendChild(input);
+                    }
+                    
+                    // Clean up session storage before submitting
+                    sessionStorage.removeItem('selectedSubjects');
+                    
+                    subjectsForm.submit();
+                });
+            }
+
+            // Handle titulacion change
+            const titulacionSelect = document.getElementById('titulacion');
+            titulacionSelect.addEventListener('change', () => {
+                // Save current selections to session storage
+                sessionStorage.setItem('selectedSubjects', JSON.stringify(Array.from(selectedSubjects)));
+                document.getElementById('titulacionForm').submit();
+            });
+        });
+    </script>
+</body>
