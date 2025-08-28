@@ -2,42 +2,315 @@
 <html>
 <head>
     <title>Coordinator Dashboard</title>
+    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css' rel='stylesheet' />
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'></script>
+    <style>
+        /* Add some basic styling for the filter form */
+        form {
+            margin-bottom: 20px;
+        }
+        form div {
+            margin-bottom: 10px;
+        }
+        label {
+            display: block;
+            font-weight: bold;
+        }
+        select[multiple] {
+            width: 100%;
+            min-height: 100px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+            vertical-align: top;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
 </head>
 <body>
     <h2>Coordinator Dashboard</h2>
     <p>Welcome, Coordinator!</p>
 
-    <form method="get" action="{% url 'coordinator_dashboard' %}">
-        <label for="titulacion">Filter by Titulacion:</label>
-        <select name="titulacion" id="titulacion">
-            <option value="">All Titulaciones</option>
-            {% for titulacion in titulaciones %}
-                <option value="{{ titulacion.id }}" {% if selected_titulacion_id == titulacion.id|stringformat:"s" %}selected{% endif %}>{{ titulacion.nombre }}</option>
-            {% endfor %}
-        </select>
+    {% if show_no_titulaciones_message %}
+        <p>You are not assigned to coordinate any titulaciones. Please contact an administrator.</p>
+    {% else %}
+        <!-- Filtered Activities Table -->
+        <h3>Filtered Activities</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Activity Name</th>
+                    <th>Subjects</th>
+                    <th>Type</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Evaluable</th>
+                    <th>Percentage</th>
+                    <th>Approved</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for activity in activities %}
+                <tr>
+                    <td>{{ activity.nombre }}</td>
+                    <td>
+                        {% for asignatura in activity.asignaturas.all %}
+                            {{ asignatura.nombre }}{% if not forloop.last %}, {% endif %}
+                        {% endfor %}
+                    </td>
+                    <td>{{ activity.tipo_actividad.nombre }}</td>
+                    <td>{{ activity.fecha_inicio }}</td>
+                    <td>{{ activity.fecha_fin }}</td>
+                    <td><input type="checkbox" {% if activity.evaluable %}checked{% endif %} disabled></td>
+                    <td>{{ activity.porcentaje_evaluacion }}%</td>
+                    <td>
+                        {% with can_edit=False %}
+                            {% for asignatura in activity.asignaturas.all %}
+                                {% if asignatura.titulacion.id|stringformat:"s" in user_coordinated_titulaciones_ids %}
+                                    {% with can_edit=True %}{% endwith %}
+                                {% endif %}
+                            {% endfor %}
+                        {% endwith %}
+                        <input type="checkbox" class="approval-checkbox" data-activity-id="{{ activity.id }}" {% if activity.aprobada %}checked{% endif %} {% if not can_edit %}disabled{% endif %}>
+                    </td>
+                    <td>
+                        <a href="{% url 'activity_edit' activity.id %}">Edit</a> |
+                        <a href="{% url 'activity_delete' activity.id %}">Delete</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="9">No activities found matching your criteria.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
 
-        <label for="semestre">Filter by Semestre:</label>
-        <select name="semestre" id="semestre">
-            <option value="">All Semestres</option>
-            <option value="1" {% if selected_semestre == "1" %}selected{% endif %}>1</option>
-            <option value="2" {% if selected_semestre == "2" %}selected{% endif %}>2</option>
-            <option value="3" {% if selected_semestre == "3" %}selected{% endif %}>3</option>
-        </select>
+        <!-- Filter Form -->
+        <form method="get" action="{% url 'coordinator_dashboard' %}">
+            <div>
+                <label for="titulacion">Filter by Titulacion:</label>
+                <select name="titulacion" id="titulacion" multiple>
+                    {% for titulacion in titulaciones %}
+                        <option value="{{ titulacion.id }}" {% if titulacion.id|stringformat:"s" in selected_titulaciones %}selected{% endif %}>{{ titulacion.nombre }}</option>
+                    {% endfor %}
+                </select>
+                <button type="button" class="select-all" data-target="titulacion">All</button>
+                <button type="button" class="select-none" data-target="titulacion">None</button>
+                <button type="button" class="select-invert" data-target="titulacion">Invert</button>
+            </div>
+
+            <div>
+                <label for="curso">Filter by Curso:</label>
+                <select name="curso" id="curso" multiple>
+                    {% for curso in cursos %}
+                        <option value="{{ curso }}" {% if curso|stringformat:"s" in selected_cursos %}selected{% endif %}>{{ curso }}</option>
+                {% endfor %}
+            </select>
+            <button type="button" class="select-all" data-target="curso">All</button>
+            <button type="button" class="select-none" data-target="curso">None</button>
+            <button type="button" class="select-invert" data-target="curso">Invert</button>
+        </div>
+
+        <div>
+            <label for="semestre">Filter by Semestre:</label>
+            <select name="semestre" id="semestre" multiple>
+                {% for semestre in semestres %}
+                    <option value="{{ semestre }}" {% if semestre|stringformat:"s" in selected_semestres %}selected{% endif %}>{{ semestre }}</option>
+                {% endfor %}
+            </select>
+            <button type="button" class="select-all" data-target="semestre">All</button>
+            <button type="button" class="select-none" data-target="semestre">None</button>
+            <button type="button" class="select-invert" data-target="semestre">Invert</button>
+        </div>
+
+        <div>
+            <label for="asignatura">Filter by Asignatura:</label>
+            <select name="asignatura" id="asignatura" multiple>
+                {% for asignatura in asignaturas %}
+                    <option value="{{ asignatura.id }}" {% if asignatura.id|stringformat:"s" in selected_asignaturas %}selected{% endif %}>{{ asignatura.nombre }}</option>
+                {% endfor %}
+            </select>
+            <button type="button" class="select-all" data-target="asignatura">All</button>
+            <button type="button" class="select-none" data-target="asignatura">None</button>
+            <button type="button" class="select-invert" data-target="asignatura">Invert</button>
+        </div>
+
+        <div>
+            <label for="tipo_actividad">Filter by Activity Type:</label>
+            <select name="tipo_actividad" id="tipo_actividad" multiple>
+                {% for tipo in tipos_actividad %}
+                    <option value="{{ tipo.id }}" {% if tipo.id|stringformat:"s" in selected_tipos_actividad %}selected{% endif %}>{{ tipo.nombre }}</option>
+                {% endfor %}
+            </select>
+            <button type="button" class="select-all" data-target="tipo_actividad">All</button>
+            <button type="button" class="select-none" data-target="tipo_actividad">None</button>
+            <button type="button" class="select-invert" data-target="tipo_actividad">Invert</button>
+        </div>
+
+        <div>
+            <input type="checkbox" id="filter_evaluable" name="filter_evaluable" {% if filter_evaluable %}checked{% endif %}>
+            <label for="filter_evaluable">Show Evaluable Activities</label>
+        </div>
+        <div>
+            <label for="min_percentage">Min. Evaluation Percentage:</label>
+            <input type="number" id="min_percentage" name="min_percentage" value="{{ min_percentage|default:'' }}" step="0.01" min="0" max="100">
+        </div>
+
+        <div>
+            <label for="approval_status">Approval Status:</label>
+            <select name="approval_status" id="approval_status">
+                <option value="all" {% if approval_status == 'all' %}selected{% endif %}>All</option>
+                <option value="approved" {% if approval_status == 'approved' %}selected{% endif %}>Approved</option>
+                <option value="unapproved" {% if approval_status == 'unapproved' %}selected{% endif %}>Unapproved</option>
+            </select>
+        </div>
 
         <button type="submit">Filter</button>
     </form>
 
-    <h3>Activities:</h3>
-    <ul>
-        {% for activity in activities %}
-            <li>
-                {{ activity.nombre }} ({{ activity.asignatura.nombre }}) - {{ activity.fecha_inicio }} to {{ activity.fecha_fin }}
-            </li>
-        {% empty %}
-            <li>No activities found.</li>
-        {% endfor %}
-    </ul>
+    <div id='calendar'></div>
+    {% endif %}
 
     <p><a href="{% url 'logout' %}">Logout</a></p>
+
+    <script>
+      // Helper function to handle select all/none/invert
+      function setupSelectButtons() {
+        document.querySelectorAll('.select-all').forEach(button => {
+          button.addEventListener('click', () => {
+            const targetId = button.dataset.target;
+            const select = document.getElementById(targetId);
+            Array.from(select.options).forEach(option => option.selected = true);
+          });
+        });
+
+        document.querySelectorAll('.select-none').forEach(button => {
+          button.addEventListener('click', () => {
+            const targetId = button.dataset.target;
+            const select = document.getElementById(targetId);
+            Array.from(select.options).forEach(option => option.selected = false);
+          });
+        });
+
+        document.querySelectorAll('.select-invert').forEach(button => {
+          button.addEventListener('click', () => {
+            const targetId = button.dataset.target;
+            const select = document.getElementById(targetId);
+            Array.from(select.options).forEach(option => option.selected = !option.selected);
+          });
+        });
+      }
+
+      document.addEventListener('DOMContentLoaded', function() {
+        setupSelectButtons();
+
+        var calendarEl = document.getElementById('calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+          initialView: 'dayGridMonth',
+          headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,timeGridDay'
+          },
+          events: function(fetchInfo, successCallback, failureCallback) {
+            const formData = new FormData(document.querySelector('form'));
+            const params = new URLSearchParams();
+            for (const [key, value] of formData.entries()) {
+              params.append(key, value);
+            }
+            
+            fetch(`/all_activities/?${params.toString()}`)
+              .then(response => response.json())
+              .then(data => successCallback(data))
+              .catch(error => {
+                console.error('Error fetching activities:', error);
+                failureCallback(error);
+              });
+          }
+        });
+        calendar.render();
+
+        document.querySelector('form').addEventListener('submit', function(e) {
+          // Removed e.preventDefault() and calendar.refetchEvents() to allow full page reload
+        });
+
+        // Approval checkbox functionality
+        document.querySelectorAll('.approval-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const activityId = this.dataset.activityId;
+                const isApproved = this.checked;
+                
+                fetch(`/activity/toggle_approval_from_dashboard/${activityId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 'aprobada': isApproved })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log('Approval status updated successfully.');
+                        // Optionally, update UI or re-render table/calendar
+                    } else {
+                        console.error('Failed to update approval status:', data.error);
+                        alert('Failed to update approval status: ' + data.error);
+                        this.checked = !isApproved; // Revert checkbox state
+                    }
+                })
+                .catch(error => {
+                    console.error('Error toggling approval status:', error);
+                    alert('Error toggling approval status.');
+                    this.checked = !isApproved; // Revert checkbox state
+                });
+            });
+        });
+
+        // Dynamic filtering for Asignaturas
+        const titulacionSelect = document.getElementById('titulacion');
+        const cursoSelect = document.getElementById('curso');
+        const asignaturaSelect = document.getElementById('asignatura');
+
+        function updateAsignaturas() {
+            const selectedTitulaciones = Array.from(titulacionSelect.selectedOptions).map(option => option.value);
+            const selectedCursos = Array.from(cursoSelect.selectedOptions).map(option => option.value);
+
+            const params = new URLSearchParams();
+            selectedTitulaciones.forEach(id => params.append('titulacion_ids[]', id));
+            selectedCursos.forEach(id => params.append('curso_ids[]', id));
+
+            fetch(`/ajax/get_filtered_asignaturas/?${params.toString()}`)
+                .then(response => response.json())
+                .then(data => {
+                    asignaturaSelect.innerHTML = ''; // Clear current options
+                    data.forEach(asignatura => {
+                        const option = document.createElement('option');
+                        option.value = asignatura.id;
+                        option.textContent = asignatura.nombre;
+                        asignaturaSelect.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Error fetching filtered asignaturas:', error));
+        }
+
+        titulacionSelect.addEventListener('change', updateAsignaturas);
+        cursoSelect.addEventListener('change', updateAsignaturas);
+
+        // Initial call to populate asignaturas based on initial selections
+        updateAsignaturas();
+      });
+    </script>
 </body>
 </html>
