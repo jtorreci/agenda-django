@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Student iCal Configuration</h2>
+
+    <h3>Create New iCal Feed</h3>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Create iCal Feed</button>
+    </form>
+
+    <h3 class="mt-5">Your Existing iCal Feeds</h3>
+    {% if calendar_views %}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>iCal URL</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for view in calendar_views %}
+            <tr>
+                <td>{{ view.nombre }}</td>
+                <td>
+                    <input type="text" class="form-control" value="{{ request.scheme }}://{{ request.get_host }}{% url 'ical_feed' view.token %}" readonly>
+                    <button class="btn btn-sm btn-outline-secondary mt-1 copy-btn" data-clipboard-target="#ical-url-{{ view.pk }}">Copy</button>
+                </td>
+                <td>
+                    <a href="{% url 'delete_calendar_view' view.pk %}" class="btn btn-danger btn-sm">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>You have no iCal feeds configured yet.</p>
+    {% endif %}
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.8/clipboard.min.js"></script>
+<script>
+    new ClipboardJS('.copy-btn', {
+        text: function(trigger) {
+            return trigger.previousElementSibling.value;
+        }
+    });
+</script>
+{% endblock %}

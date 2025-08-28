@@ -2,22 +2,29 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required, user_passes_test
 from .forms import StudentSubjectForm, NotificationForm
-from schedule.models import Actividad, VistaCalendario
+from schedule.models import Actividad, VistaCalendario, TipoActividad
+from schedule.forms import VistaCalendarioForm # New import
 from academics.models import Titulacion, Asignatura
 from django.core.mail import send_mail
+from django.utils.translation import gettext as _
 from .models import CustomUser
+from django.contrib import messages
+from django.http import JsonResponse
 
 def is_teacher(user):
-    return user.is_authenticated and user.role in ['TEACHER', 'COORDINATOR', 'ADMIN']
+    return user.is_authenticated and user.role in [CustomUser.ROLE_TEACHER, CustomUser.ROLE_COORDINATOR, CustomUser.ROLE_ADMIN]
 
 def is_student(user):
-    return user.is_authenticated and user.role == 'STUDENT'
+    return user.is_authenticated and user.role == CustomUser.ROLE_STUDENT
 
 def is_coordinator(user):
-    return user.is_authenticated and user.role in ['COORDINATOR', 'ADMIN']
+    return user.is_authenticated and user.role in [CustomUser.ROLE_COORDINATOR, CustomUser.ROLE_ADMIN]
 
 def is_admin(user):
-    return user.is_authenticated and user.role == 'ADMIN'
+    return user.role == CustomUser.ROLE_ADMIN or user.is_superuser
+
+def is_coordinator_or_admin(user):
+    return user.role == CustomUser.ROLE_COORDINATOR or user.role == CustomUser.ROLE_ADMIN or user.is_superuser
 
 def register(request):
     if request.method == 'POST':
@@ -26,15 +33,15 @@ def register(request):
             user = form.save(commit=False)
             email_domain = user.email.split('@')[-1]
             if email_domain == 'unex.es':
-                user.role = 'TEACHER'
+                user.role = CustomUser.ROLE_TEACHER
             elif email_domain == 'alumnos.unex.es':
-                user.role = 'STUDENT'
+                user.role = CustomUser.ROLE_STUDENT
             else:
-                user.role = 'STUDENT'
+                user.role = CustomUser.ROLE_STUDENT
             user.save()
             send_mail(
-                'Welcome to Agenda Academica',
-                'Thank you for registering. Your account has been created.',
+                _('Welcome to Agenda Academica'),
+                _('Thank you for registering. Your account has been created.'),
                 'from@example.com',
                 [user.email],
                 fail_silently=False,
@@ -47,48 +54,300 @@ def register(request):
 @login_required
 @user_passes_test(is_teacher)
 def teacher_dashboard(request):
-    teacher_subjects = request.user.subjects.all().order_by('titulacion__nombre', 'curso', 'semestre')
+    teacher_subjects = request.user.subjects.all()
+    
+    titulaciones = Titulacion.objects.filter(asignatura__in=teacher_subjects).distinct()
+    cursos = teacher_subjects.order_by('curso').values_list('curso', flat=True).distinct()
+    semestres = teacher_subjects.order_by('semestre').values_list('semestre', flat=True).distinct()
+    tipos_actividad = TipoActividad.objects.all() # Teachers can see all types of activities
+
+    selected_titulaciones = request.GET.getlist('titulacion')
+    selected_asignaturas = request.GET.getlist('asignatura')
+    selected_cursos = request.GET.getlist('curso')
+    selected_semestres = request.GET.getlist('semestre')
+    selected_tipos_actividad = request.GET.getlist('tipo_actividad')
+
+    activities = Actividad.objects.filter(asignaturas__in=teacher_subjects)
+
+    if selected_titulaciones:
+        activities = activities.filter(asignaturas__titulacion__id__in=selected_titulaciones)
+    if selected_asignaturas:
+        activities = activities.filter(asignaturas__id__in=selected_asignaturas)
+    if selected_cursos:
+        activities = activities.filter(asignaturas__curso__in=selected_cursos)
+    if selected_semestres:
+        activities = activities.filter(asignaturas__semestre__in=selected_semestres)
+    if selected_tipos_actividad:
+        activities = activities.filter(tipo_actividad__id__in=selected_tipos_actividad)
+
     calendar_views = VistaCalendario.objects.filter(usuario=request.user)
-    return render(request, 'users/teacher_dashboard.html', {'teacher_subjects': teacher_subjects, 'calendar_views': calendar_views})
+
+    return render(request, 'users/teacher_dashboard.html', {
+        'titulaciones': titulaciones,
+        'asignaturas': teacher_subjects,
+        'cursos': cursos,
+        'semestres': semestres,
+        'tipos_actividad': tipos_actividad,
+        'activities': activities.distinct(),
+        'selected_titulaciones': selected_titulaciones,
+        'selected_asignaturas': selected_asignaturas,
+        'selected_cursos': selected_cursos,
+        'selected_semestres': selected_semestres,
+        'selected_tipos_actividad': selected_tipos_actividad,
+        'teacher_subjects': teacher_subjects,
+        'calendar_views': calendar_views,
+    })
 
 @login_required
 @user_passes_test(is_student)
 def student_dashboard(request):
     user_subjects = request.user.subjects.all()
-    activities = Actividad.objects.filter(asignatura__in=user_subjects).order_by('fecha_inicio')
-    return render(request, 'users/student_dashboard.html', {'activities': activities})
+    
+    titulaciones = Titulacion.objects.filter(asignatura__in=user_subjects).distinct()
+    cursos = user_subjects.order_by('curso').values_list('curso', flat=True).distinct()
+    semestres = user_subjects.order_by('semestre').values_list('semestre', flat=True).distinct()
+    tipos_actividad = TipoActividad.objects.all() # Students can see all types of activities
+
+    selected_titulaciones = request.GET.getlist('titulacion')
+    selected_asignaturas = request.GET.getlist('asignatura')
+    selected_cursos = request.GET.getlist('curso')
+    selected_semestres = request.GET.getlist('semestre')
+    selected_tipos_actividad = request.GET.getlist('tipo_actividad')
+
+    # Only show active and approved activities
+    activities = Actividad.objects.filter(
+        asignaturas__in=user_subjects,
+        activa=True,
+        aprobada=True
+    )
+
+    # Filter by selected subjects (if any are selected)
+    if selected_asignaturas:
+        # Filter by selected subjects from user's enrolled subjects
+        selected_subjects = user_subjects.filter(id__in=selected_asignaturas)
+        activities = activities.filter(asignaturas__in=selected_subjects)
+    
+    if selected_titulaciones:
+        activities = activities.filter(asignaturas__titulacion__id__in=selected_titulaciones)
+    if selected_cursos:
+        activities = activities.filter(asignaturas__curso__in=selected_cursos)
+    if selected_semestres:
+        activities = activities.filter(asignaturas__semestre__in=selected_semestres)
+    if selected_tipos_actividad:
+        activities = activities.filter(tipo_actividad__id__in=selected_tipos_actividad)
+
+    # Get user's calendar views for iCal feeds section
+    calendar_views = VistaCalendario.objects.filter(usuario=request.user)
+
+    return render(request, 'users/student_dashboard.html', {
+        'titulaciones': titulaciones,
+        'asignaturas': user_subjects,
+        'enrolled_subjects': user_subjects,  # Add this for the sidebar
+        'cursos': cursos,
+        'semestres': semestres,
+        'tipos_actividad': tipos_actividad,
+        'activities': activities.distinct(),
+        'calendar_views': calendar_views,  # Add this for iCal feeds section
+        'selected_titulaciones': selected_titulaciones,
+        'selected_asignaturas': selected_asignaturas,
+        'selected_cursos': selected_cursos,
+        'selected_semestres': selected_semestres,
+        'selected_tipos_actividad': selected_tipos_actividad,
+    })
 
 @login_required
 @user_passes_test(is_student)
 def select_subjects(request):
+    # --- Lógica para guardar la selección (POST) ---
     if request.method == 'POST':
-        form = StudentSubjectForm(request.POST, instance=request.user)
+        # Obtenemos la lista de IDs de las asignaturas seleccionadas
+        subject_ids = request.POST.getlist('subjects')
+        
+        # Limpiamos las asignaturas anteriores del usuario
+        request.user.subjects.clear()
+        
+        # Añadimos las nuevas asignaturas seleccionadas
+        if subject_ids:
+            request.user.subjects.add(*subject_ids)
+            
+        return redirect('student_dashboard')
+
+    # --- Lógica para mostrar la página (GET) ---
+    # 1. Obtiene SIEMPRE todas las titulaciones para el menú desplegable.
+    todas_las_titulaciones = Titulacion.objects.all()
+
+    # 2. Comprueba si el usuario ha seleccionado una titulación desde el menú
+    selected_titulacion_id = request.GET.get('titulacion')
+    
+    asignaturas_by_curso = {}
+    
+    if selected_titulacion_id:
+        # 3. Si se seleccionó una titulación, busca y agrupa sus asignaturas
+        asignaturas = Asignatura.objects.filter(titulacion_id=selected_titulacion_id).order_by('curso', 'semestre', 'nombre')
+        
+        for a in asignaturas:
+            curso_key = f"Curso {a.curso}"
+            if curso_key not in asignaturas_by_curso:
+                asignaturas_by_curso[curso_key] = {'primer_semestre': [], 'segundo_semestre': [], 'optativas': []}
+            
+            if a.semestre == 1:
+                asignaturas_by_curso[curso_key]['primer_semestre'].append(a)
+            elif a.semestre == 2:
+                asignaturas_by_curso[curso_key]['segundo_semestre'].append(a)
+            else: # Asumimos que otros valores son optativas
+                 asignaturas_by_curso[curso_key]['optativas'].append(a)
+
+    # 4. Prepara el contexto con todos los datos que la plantilla necesita
+    context = {
+        'titulaciones': todas_las_titulaciones,
+        'selected_titulacion_id': selected_titulacion_id,
+        'asignaturas_by_curso': asignaturas_by_curso,
+        'student_enrolled_ids': list(request.user.subjects.all().values_list('id', flat=True)),
+    }
+
+    return render(request, 'users/select_subjects.html', context)
+
+@login_required
+@user_passes_test(is_student)
+def student_ical_config(request):
+    if request.method == 'POST':
+        form = VistaCalendarioForm(request.POST, user=request.user)
         if form.is_valid():
-            form.save()
-            return redirect('student_dashboard')
+            calendar_view = form.save(commit=False)
+            calendar_view.usuario = request.user
+            calendar_view.save()
+            form.save_m2m() # Save ManyToMany relationships
+            return redirect('student_dashboard') # Redirect to student dashboard after creating
     else:
-        form = StudentSubjectForm(instance=request.user)
-    return render(request, 'users/select_subjects.html', {'form': form})
+        form = VistaCalendarioForm(user=request.user)
+    
+    # Also display existing calendar views for the student
+    calendar_views = VistaCalendario.objects.filter(usuario=request.user)
+    
+    return render(request, 'users/student_ical_config.html', {
+        'form': form,
+        'calendar_views': calendar_views
+    })
+
+@login_required
+def student_calendar_events(request):
+    """
+    Esta vista devuelve los eventos del estudiante logueado en formato JSON
+    para que FullCalendar los pueda mostrar.
+    """
+    # 1. Obtener las asignaturas del estudiante actual
+    enrolled_subjects = request.user.subjects.all()
+
+    # 2. Check if specific subjects are selected for filtering
+    selected_asignaturas = request.GET.getlist('asignatura')
+    if selected_asignaturas:
+        # Filter by selected subjects from user's enrolled subjects
+        enrolled_subjects = enrolled_subjects.filter(id__in=selected_asignaturas)
+
+    # 3. Filtrar las actividades de esas asignaturas (sin duplicados)
+    # Solo mostrar actividades activas y aprobadas
+    activities = Actividad.objects.filter(
+        asignaturas__in=enrolled_subjects,
+        activa=True,
+        aprobada=True
+    ).distinct()
+
+    # 4. Formatear los datos para FullCalendar
+    events = []
+    for activity in activities:
+        events.append({
+            'title': activity.nombre,
+            'start': activity.fecha_inicio.isoformat(), # Formato estándar ISO 8601
+            'end': activity.fecha_fin.isoformat(),
+            # Opcional: puedes añadir un enlace para que se pueda hacer clic en el evento
+            # 'url': f'/ruta/a/la/actividad/{activity.id}/' 
+        })
+
+    # 4. Devolver los datos como una respuesta JSON
+    return JsonResponse(events, safe=False)
 
 @login_required
 @user_passes_test(is_coordinator)
 def coordinator_dashboard(request):
-    titulaciones = Titulacion.objects.all()
-    selected_titulacion_id = request.GET.get('titulacion')
-    selected_semestre = request.GET.get('semestre')
+    # Get titulaciones coordinated by the current user
+    user_coordinated_titulaciones = Titulacion.objects.filter(coordinador=request.user)
 
+    # Always show all titulaciones in the filter dropdown
+    titulaciones = Titulacion.objects.all()
+    asignaturas = Asignatura.objects.all() # All asignaturas for filter
+    cursos = Asignatura.objects.order_by('curso').values_list('curso', flat=True).distinct()
+    semestres = Asignatura.objects.order_by('semestre').values_list('semestre', flat=True).distinct()
+    tipos_actividad = TipoActividad.objects.all()
+
+    # Get selected filters from request
+    selected_titulaciones = request.GET.getlist('titulacion')
+    selected_asignaturas = request.GET.getlist('asignatura')
+    selected_cursos = request.GET.getlist('curso')
+    selected_semestres = request.GET.getlist('semestre')
+    selected_tipos_actividad = request.GET.getlist('tipo_actividad')
+    
+    # New filters
+    filter_evaluable = request.GET.get('filter_evaluable') == 'on'
+    min_percentage = request.GET.get('min_percentage')
+    approval_status = request.GET.get('approval_status') # 'approved', 'unapproved', 'all'
+
+    # Initial queryset: all activities
     activities = Actividad.objects.all()
 
-    if selected_titulacion_id:
-        activities = activities.filter(asignatura__titulacion__id=selected_titulacion_id)
-    if selected_semestre:
-        activities = activities.filter(asignatura__semestre=selected_semestre)
+    # Apply filters from the form
+    if selected_titulaciones:
+        activities = activities.filter(asignaturas__titulacion__id__in=selected_titulaciones)
+    if selected_asignaturas:
+        activities = activities.filter(asignaturas__id__in=selected_asignaturas)
+    if selected_cursos:
+        activities = activities.filter(asignaturas__curso__in=selected_cursos)
+    if selected_semestres:
+        activities = activities.filter(asignaturas__semestre__in=selected_semestres)
+    if selected_tipos_actividad:
+        activities = activities.filter(tipo_actividad__id__in=selected_tipos_actividad)
+
+    # Apply new filters
+    if filter_evaluable:
+        activities = activities.filter(evaluable=True)
+        if min_percentage:
+            try:
+                min_percentage = float(min_percentage)
+                activities = activities.filter(porcentaje_evaluacion__gte=min_percentage)
+            except ValueError:
+                pass # Ignore invalid percentage
+
+    if approval_status == 'approved':
+        activities = activities.filter(aprobada=True)
+    elif approval_status == 'unapproved':
+        activities = activities.filter(aprobada=False)
+    
+    # Filter activities by coordinator's assigned titulaciones for display in the table
+    # This ensures only activities related to coordinated titulaciones are shown in the table
+    # and their checkboxes are editable.
+    if not request.user.role == 'ADMIN': # Admins see all activities
+        activities = activities.filter(asignaturas__titulacion__in=user_coordinated_titulaciones).distinct()
+
+
+    # Check if user has any coordinated titulaciones
+    show_no_titulaciones_message = not user_coordinated_titulaciones.exists() and request.user.role != 'ADMIN'
 
     return render(request, 'users/coordinator_dashboard.html', {
-        'titulaciones': titulaciones,
-        'activities': activities,
-        'selected_titulacion_id': selected_titulacion_id,
-        'selected_semestre': selected_semestre,
+        'titulaciones': titulaciones, # All titulaciones for filter dropdown
+        'asignaturas': asignaturas, # All asignaturas for filter dropdown
+        'cursos': cursos,
+        'semestres': semestres,
+        'tipos_actividad': tipos_actividad,
+        'activities': activities.distinct(),
+        'selected_titulaciones': selected_titulaciones,
+        'selected_asignaturas': selected_asignaturas,
+        'selected_cursos': selected_cursos,
+        'selected_semestres': selected_semestres,
+        'selected_tipos_actividad': selected_tipos_actividad,
+        'filter_evaluable': filter_evaluable,
+        'min_percentage': min_percentage,
+        'approval_status': approval_status,
+        'user_coordinated_titulaciones_ids': [t.id for t in user_coordinated_titulaciones], # Pass IDs for frontend check
+        'show_no_titulaciones_message': show_no_titulaciones_message,
     })
 
 @login_required
@@ -131,14 +390,74 @@ def kpi_report(request):
     })
 
 @login_required
+@user_passes_test(is_admin)
+def assign_coordinators(request):
+    if request.method == 'POST':
+        # Get current coordinator assignments before changes
+        current_coordinators = set(Titulacion.objects.filter(
+            coordinador__isnull=False
+        ).values_list('coordinador', flat=True))
+        
+        new_coordinators = set()
+        
+        # Process form submission
+        for key, value in request.POST.items():
+            if key.startswith('coordinator_'):
+                titulacion_id = key.replace('coordinator_', '')
+                try:
+                    titulacion = Titulacion.objects.get(id=titulacion_id)
+                    if value:  # If a coordinator was selected
+                        coordinator = CustomUser.objects.get(id=value)
+                        titulacion.coordinador = coordinator
+                        new_coordinators.add(coordinator.id)
+                        
+                        # Ensure the assigned user has COORDINATOR role (unless they're ADMIN)
+                        if coordinator.role not in [CustomUser.ROLE_COORDINATOR, CustomUser.ROLE_ADMIN]:
+                            coordinator.role = CustomUser.ROLE_COORDINATOR
+                            coordinator.save()
+                    else:  # If no coordinator selected (empty option)
+                        titulacion.coordinador = None
+                    titulacion.save()
+                except (Titulacion.DoesNotExist, CustomUser.DoesNotExist):
+                    continue
+        
+        # Remove COORDINATOR role from users who are no longer coordinators
+        users_to_remove_role = current_coordinators - new_coordinators
+        for user_id in users_to_remove_role:
+            try:
+                user = CustomUser.objects.get(id=user_id)
+                # Only remove COORDINATOR role if they're not ADMIN and not coordinating any titulacion
+                if (user.role == CustomUser.ROLE_COORDINATOR and 
+                    not Titulacion.objects.filter(coordinador=user).exists()):
+                    # Demote to TEACHER role (or keep as STUDENT if they were STUDENT originally)
+                    # We'll default to TEACHER since coordinators are usually teachers
+                    user.role = CustomUser.ROLE_TEACHER
+                    user.save()
+            except CustomUser.DoesNotExist:
+                continue
+        
+        messages.success(request, 'Coordinadores asignados correctamente y roles actualizados.')
+        return redirect('assign_coordinators')
+    
+    # GET request - display the form
+    titulaciones = Titulacion.objects.all().order_by('nombre')
+    # Show all users for selection
+    all_users = CustomUser.objects.all().order_by('username')
+    
+    return render(request, 'users/assign_coordinators.html', {
+        'titulaciones': titulaciones,
+        'all_users': all_users,
+    })
+
+@login_required
 def dashboard_redirect(request):
-    if request.user.role == 'ADMIN':
+    if request.user.role == CustomUser.ROLE_ADMIN:
         return render(request, 'users/dashboard_selection.html', {'dashboards': {'Admin': 'admin:index', 'Coordinator': 'coordinator_dashboard', 'Teacher': 'teacher_dashboard'}})
-    elif request.user.role == 'COORDINATOR':
+    elif request.user.role == CustomUser.ROLE_COORDINATOR:
         return render(request, 'users/dashboard_selection.html', {'dashboards': {'Coordinator': 'coordinator_dashboard', 'Teacher': 'teacher_dashboard'}})
-    elif request.user.role == 'TEACHER':
+    elif request.user.role == CustomUser.ROLE_TEACHER:
         return redirect('teacher_dashboard')
-    elif request.user.role == 'STUDENT':
+    elif request.user.role == CustomUser.ROLE_STUDENT:
         return redirect('student_dashboard')
     else:
         return redirect('home')
@@ -194,5 +513,5 @@ def teacher_select_subjects(request):
 @user_passes_test(is_teacher)
 def teacher_student_view(request):
     user_subjects = request.user.subjects.all()
-    activities = Actividad.objects.filter(asignatura__in=user_subjects).order_by('fecha_inicio')
+    activities = Actividad.objects.filter(asignaturas__in=user_subjects).order_by('fecha_inicio')
     return render(request, 'users/teacher_student_view.html', {'activities': activities})

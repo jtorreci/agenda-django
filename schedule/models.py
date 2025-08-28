@@ -22,6 +22,35 @@ class Actividad(models.Model):
     aprobada = models.BooleanField(default=False)
     activa = models.BooleanField(default=True)
 
+    def save(self, *args, **kwargs):
+        # Apply automatic approval logic only when creating a new activity or when approval status hasn't been manually set
+        if not self.pk or not hasattr(self, '_approval_manually_set'):
+            self.aprobada = self._get_default_approval_status()
+        super().save(*args, **kwargs)
+
+    def _get_default_approval_status(self):
+        """
+        Determine default approval status based on evaluation criteria:
+        - Non-evaluable activities: approved by default
+        - Evaluable with <10% weight: approved by default  
+        - Evaluable with >=10% weight: not approved by default (requires coordinator approval)
+        """
+        if not self.evaluable:
+            return True  # Non-evaluable activities are approved by default
+        elif self.porcentaje_evaluacion < 10.0:
+            return True  # Evaluable with <10% weight are approved by default
+        else:
+            return False  # Evaluable with >=10% weight require manual approval
+
+    def set_approval_manually(self, approved_status):
+        """
+        Manually set approval status (used by coordinators)
+        This prevents automatic approval logic from overriding manual decisions
+        """
+        self._approval_manually_set = True
+        self.aprobada = approved_status
+        self.save()
+
     def __str__(self):
         return self.nombre
 

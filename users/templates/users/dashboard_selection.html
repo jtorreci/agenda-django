@@ -1,15 +1,43 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Select Dashboard</title>
-</head>
-<body>
-    <h2>Select a Dashboard</h2>
-    <ul>
-        {% for name, url_name in dashboards.items %}
-            <li><a href="{% url url_name %}">{{ name }}</a></li>
-        {% endfor %}
-    </ul>
-    <p><a href="{% url 'logout' %}">Logout</a></p>
-</body>
-</html>
+{% extends 'base.html' %}
+
+{% block title %}Select Dashboard{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow-lg">
+            <div class="card-body p-4">
+                <h2 class="card-title text-center mb-4">Select a Dashboard</h2>
+                <div class="list-group">
+                    {% for name, url_name in dashboards.items %}
+                        <a href="{% url url_name %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                            {{ name }}
+                            <i class="bi bi-arrow-right-circle"></i> {# Example icon, requires Bootstrap Icons #}
+                        </a>
+                    {% endfor %}
+                    {% if user.is_staff %}
+                        <a href="{% url 'tipoactividad_list' %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                            Manage Activity Types
+                            <i class="bi bi-gear"></i>
+                        </a>
+                        <a href="{% url 'agenda_settings' %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                            Agenda Settings
+                            <i class="bi bi-sliders"></i>
+                        </a>
+                        <a href="{% url 'assign_coordinators' %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                            Assign Coordinators
+                            <i class="bi bi-person-plus"></i>
+                        </a>
+                    {% endif %}
+                </div>
+                <p class="text-center mt-4">
+                    <form action="{% url 'logout' %}" method="post" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-outline-secondary">Logout</button>
+                    </form>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

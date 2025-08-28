@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block title %}Asignar Coordinadores{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+            <h2>Asignar Coordinadores a Titulaciones</h2>
+            
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <form method="post" id="coordinator-form">
+                {% csrf_token %}
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title">Titulaciones y Coordinadores</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Titulación</th>
+                                        <th>Coordinador Actual</th>
+                                        <th>Asignar Coordinador</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for titulacion in titulaciones %}
+                                    <tr>
+                                        <td>{{ titulacion.nombre }}</td>
+                                        <td>
+                                            {% if titulacion.coordinador %}
+                                                {{ titulacion.coordinador.username }} ({{ titulacion.coordinador.first_name }} {{ titulacion.coordinador.last_name }})
+                                            {% else %}
+                                                <em class="text-muted">Sin asignar</em>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <select name="coordinator_{{ titulacion.id }}" class="form-control">
+                                                <option value="">-- Sin coordinador --</option>
+                                                {% for user in all_users %}
+                                                    <option value="{{ user.id }}" 
+                                                            {% if titulacion.coordinador == user %}selected{% endif %}>
+                                                        {{ user.username }} - {{ user.first_name }} {{ user.last_name }} ({{ user.get_role_display }})
+                                                    </option>
+                                                {% endfor %}
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="3" class="text-center">No hay titulaciones registradas.</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <button type="submit" class="btn btn-success" onclick="return confirm('¿Está seguro de que desea guardar estos cambios?')">
+                            <i class="fas fa-save"></i> Guardar Asignaciones
+                        </button>
+                        <a href="{% url 'dashboard_redirect' %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Volver al Dashboard
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

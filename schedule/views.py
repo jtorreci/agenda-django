@@ -138,8 +138,7 @@ def toggle_activity_approval(request, pk):
     activity = get_object_or_404(Actividad, pk=pk)
     if request.method == 'POST':
         new_status = not activity.aprobada
-        activity.aprobada = new_status
-        activity.save()
+        activity.set_approval_manually(new_status)
         
         log_type = 'Aprobación' if new_status else 'Desaprobación'
         LogActividad.objects.create(
@@ -224,7 +223,7 @@ def toggle_activity_approval_from_dashboard(request, pk):
         new_status = data.get('aprobada')
 
         # Permission check: Coordinator can only approve activities for their coordinated titulaciones
-        user_coordinated_titulaciones = request.user.coordinated_titulaciones.all()
+        user_coordinated_titulaciones = Titulacion.objects.filter(coordinador=request.user)
         activity_titulaciones = Titulacion.objects.filter(asignatura__in=activity.asignaturas.all()).distinct()
 
         # Check if any of the activity's titulaciones are coordinated by the user
@@ -240,8 +239,7 @@ def toggle_activity_approval_from_dashboard(request, pk):
         if not can_approve:
             return JsonResponse({'success': False, 'error': 'You do not have permission to approve activities for this titulacion.'}, status=403)
 
-        activity.aprobada = new_status
-        activity.save()
+        activity.set_approval_manually(new_status)
 
         log_type = 'Aprobación desde Dashboard' if new_status else 'Desaprobación desde Dashboard'
         LogActividad.objects.create(

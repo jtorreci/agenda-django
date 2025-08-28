@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Confirmar Borrado de Tipo de Actividad</h2>
+  <p>El tipo de actividad "{{ object.nombre }}" tiene actividades asociadas. ¿Qué acción deseas realizar?</p>
+  
+  <form method="post">
+    {% csrf_token %}
+    
+    <div>
+      <input type="radio" id="action_reassign" name="action" value="reassign" checked>
+      <label for="action_reassign">Reasignar actividades a otro tipo:</label>
+      <select name="reassign_to" id="reassign_to">
+        {% for tipo in tipos_actividad %}
+          <option value="{{ tipo.pk }}">{{ tipo.nombre }}</option>
+        {% empty %}
+          <option value="">No hay otros tipos de actividad disponibles</option>
+        {% endfor %}
+      </select>
+    </div>
+    
+    <div>
+      <input type="radio" id="action_cascade" name="action" value="cascade">
+      <label for="action_cascade">Borrar en cascada todas las actividades asociadas.</label>
+    </div>
+    
+    <button type="submit">Confirmar</button>
+    <a href="{% url 'tipoactividad_list' %}">Cancelar</a>
+  </form>
+{% endblock %}

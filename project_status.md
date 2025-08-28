@@ -20,6 +20,10 @@ This document summarizes the current state of the Django application, highlighti
     *   Unique iCal links are generated for each configuration and can be copied to the clipboard.
     *   The iCal feeds are functional, allowing external calendar applications to subscribe (with the understanding that `localhost` links require tunneling for external access).
 
+### Coordinator Role Functionality
+
+*   **Dynamic Asignatura Filtering:** The coordinator dashboard now includes dynamic filtering for the 'asignatura' (subject) selector. When 'titulaciones' (degrees/qualifications) and 'cursos' (years/courses) are selected, the 'asignatura' dropdown automatically updates to show only relevant subjects.
+
 ### Model Changes
 
 *   **`Actividad` Model Enhancements:**

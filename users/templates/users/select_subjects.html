@@ -1,15 +1,163 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Select Subjects</title>
-</head>
-<body>
-    <h2>Select Your Subjects</h2>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Save Subjects</button>
-    </form>
-    <p><a href="{% url 'student_dashboard' %}">Back to Dashboard</a></p>
-</body>
-</html>
+{% extends 'base.html' %}
+
+{% block title %}Select Your Subjects{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="mb-0">Select Your Subjects</h2>
+                <a href="{% url 'student_dashboard' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                </a>
+            </div>
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <form id="titulacionForm" method="get" action="{% url 'select_subjects' %}">
+                        <label for="titulacion" class="form-label fs-5">Titulacion:</label>
+                        <p class="text-muted small">Select a degree to see its subjects below.</p>
+                        <select name="titulacion" id="titulacion" class="form-select form-select-lg">
+                            <option value="">-- Select a Titulacion --</option>
+                            {% for titulacion in titulaciones %}
+                                <option value="{{ titulacion.id }}" {% if titulacion.id|stringformat:"s" == selected_titulacion_id %}selected{% endif %}>{{ titulacion.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </form>
+                </div>
+            </div>
+
+            {% if asignaturas_by_curso %}
+                <form id="subjectsForm" method="post">
+                    {% csrf_token %}
+
+                    {% for curso_display, semestres in asignaturas_by_curso.items %}
+                        {% if semestres.primer_semestre or semestres.segundo_semestre or semestres.optativas %}
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-header bg-dark text-white">
+                                <h3 class="h5 mb-0">{{ curso_display }}</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6 border-end">
+                                        <h5>Primer Semestre</h5>
+                                        <hr>
+                                        {% for a in semestres.primer_semestre %}
+                                        <div class="form-check my-2">
+                                            <input class="form-check-input" type="checkbox" name="subjects" value="{{ a.id }}" id="subject_{{ a.id }}" onchange="handleCheckboxChange(this)" {% if a.id in student_enrolled_ids %}checked{% endif %}>
+                                            <label class="form-check-label" for="subject_{{ a.id }}">{{ a.nombre }}</label>
+                                        </div>
+                                        {% empty %}
+                                        <p class="text-muted">No subjects for this semester.</p>
+                                        {% endfor %}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h5>Segundo Semestre</h5>
+                                        <hr>
+                                        {% for a in semestres.segundo_semestre %}
+                                        <div class="form-check my-2">
+                                            <input class="form-check-input" type="checkbox" name="subjects" value="{{ a.id }}" id="subject_{{ a.id }}" onchange="handleCheckboxChange(this)" {% if a.id in student_enrolled_ids %}checked{% endif %}>
+                                            <label class="form-check-label" for="subject_{{ a.id }}">{{ a.nombre }}</label>
+                                        </div>
+                                        {% empty %}
+                                        <p class="text-muted">No subjects for this semester.</p>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                {% if semestres.optativas %}
+                                <div class="row mt-4">
+                                    <div class="col-12">
+                                        <h5>Optativas</h5>
+                                        <hr>
+                                        {% for a in semestres.optativas %}
+                                        <div class="form-check my-2">
+                                            <input class="form-check-input" type="checkbox" name="subjects" value="{{ a.id }}" id="subject_{{ a.id }}" onchange="handleCheckboxChange(this)" {% if a.id in student_enrolled_ids %}checked{% endif %}>
+                                            <label class="form-check-label" for="subject_{{ a.id }}">{{ a.nombre }}</label>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg">Save My Selections</button>
+                    </div>
+                </form>
+            {% elif selected_titulacion_id %}
+                <div class="alert alert-info">
+                    No subjects found for the selected Titulacion.
+                </div>
+            {% endif %}
+
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Usamos un Set para un manejo más eficiente de los IDs
+        let selectedSubjects = new Set({{ student_enrolled_ids|safe }});
+
+        // Restaurar selecciones de sessionStorage si el usuario cambia de titulación
+        const storedSubjects = sessionStorage.getItem('selectedSubjects');
+        if (storedSubjects) {
+            selectedSubjects = new Set(JSON.parse(storedSubjects));
+        }
+
+        // Marcar los checkboxes basados en el set de selecciones
+        document.querySelectorAll('input[type=checkbox][name=subjects]').forEach(checkbox => {
+            if (selectedSubjects.has(parseInt(checkbox.value, 10))) {
+                checkbox.checked = true;
+            }
+        });
+        
+        // Función global para manejar los cambios en los checkboxes
+        window.handleCheckboxChange = function(checkbox) {
+            const subjectId = parseInt(checkbox.value, 10);
+            if (checkbox.checked) {
+                selectedSubjects.add(subjectId);
+            } else {
+                selectedSubjects.delete(subjectId);
+            }
+        };
+
+        // Enviar el formulario de asignaturas
+        const subjectsForm = document.getElementById('subjectsForm');
+        if (subjectsForm) {
+            subjectsForm.addEventListener('submit', (event) => {
+                event.preventDefault();
+                
+                // Limpiar inputs ocultos previos para evitar duplicados
+                subjectsForm.querySelectorAll('input[type=hidden][name=subjects]').forEach(input => input.remove());
+
+                // Añadir un input oculto por cada ID en nuestro set de selecciones
+                for (const subjectId of selectedSubjects) {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'subjects';
+                    input.value = subjectId;
+                    subjectsForm.appendChild(input);
+                }
+                
+                sessionStorage.removeItem('selectedSubjects');
+                subjectsForm.submit();
+            });
+        }
+
+        // Enviar el formulario de titulación al cambiar la selección
+        document.getElementById('titulacion').addEventListener('change', () => {
+            // Guardar las selecciones actuales en sessionStorage antes de recargar
+            sessionStorage.setItem('selectedSubjects', JSON.stringify(Array.from(selectedSubjects)));
+            document.getElementById('titulacionForm').submit();
+        });
+    });
+</script>
+{% endblock %}

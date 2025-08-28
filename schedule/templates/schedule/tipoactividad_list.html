@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Tipos de Actividad</h2>
+  <a href="{% url 'tipoactividad_create' %}">Crear Nuevo Tipo de Actividad</a>
+  <ul>
+    {% for tipoactividad in object_list %}
+      <li>
+        {{ tipoactividad.nombre }}
+        <a href="{% url 'tipoactividad_update' tipoactividad.pk %}">Editar</a>
+        <a href="{% url 'tipoactividad_delete' tipoactividad.pk %}">Borrar</a>
+      </li>
+    {% endfor %}
+  </ul>
+{% endblock %}
