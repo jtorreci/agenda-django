@@ -164,8 +164,8 @@
     "last_login": null,
     "is_superuser": false,
     "username": "prof_mate",
-    "first_name": "Mar�a",
-    "last_name": "Matem�tica",
+    "first_name": "María",
+    "last_name": "Matemática",
     "email": "matematicas@unex.es",
     "is_staff": false,
     "is_active": true,
@@ -186,7 +186,7 @@
     "is_superuser": false,
     "username": "prof_fisica",
     "first_name": "Pedro",
-    "last_name": "F�sico",
+    "last_name": "Físico",
     "email": "fisica@unex.es",
     "is_staff": false,
     "is_active": true,
@@ -207,7 +207,7 @@
     "is_superuser": false,
     "username": "prof_quimica",
     "first_name": "Ana",
-    "last_name": "Qu�mica",
+    "last_name": "Química",
     "email": "quimica@unex.es",
     "is_staff": false,
     "is_active": true,
@@ -874,7 +874,7 @@
   "model": "academics.titulacion",
   "pk": 1,
   "fields": {
-    "nombre": "doble grado en ade / ingenier�a inform�tica en ingenier�a del software",
+    "nombre": "doble grado en ade / ingeniería informática en ingeniería del software",
     "coordinador": null
   }
 },
@@ -882,7 +882,7 @@
   "model": "academics.titulacion",
   "pk": 2,
   "fields": {
-    "nombre": "doble grado en ade / ingenier�a inform�tica en ingenier�a de computadores",
+    "nombre": "doble grado en ade / ingeniería informática en ingeniería de computadores",
     "coordinador": null
   }
 },
@@ -890,7 +890,7 @@
   "model": "academics.titulacion",
   "pk": 3,
   "fields": {
-    "nombre": "Grado En Edificaci�n",
+    "nombre": "Grado En Edificación",
     "coordinador": 30
   }
 },
@@ -898,7 +898,7 @@
   "model": "academics.titulacion",
   "pk": 4,
   "fields": {
-    "nombre": "Grado En Ingenier�a Civil",
+    "nombre": "Grado En Ingeniería Civil",
     "coordinador": 38
   }
 },
@@ -906,7 +906,7 @@
   "model": "academics.titulacion",
   "pk": 5,
   "fields": {
-    "nombre": "Grado En Ingenier�a De Sonido E Imagen En Telecomunicaci�n",
+    "nombre": "Grado En Ingeniería De Sonido E Imagen En Telecomunicación",
     "coordinador": 22
   }
 },
@@ -914,7 +914,7 @@
   "model": "academics.titulacion",
   "pk": 6,
   "fields": {
-    "nombre": "Grado En Ingenier�a Inform�tica En Ingenier�a De Computadores",
+    "nombre": "Grado En Ingeniería Informática En Ingeniería De Computadores",
     "coordinador": 26
   }
 },
@@ -922,7 +922,7 @@
   "model": "academics.titulacion",
   "pk": 7,
   "fields": {
-    "nombre": "Grado En Ingenier�a Inform�tica En Ingenier�a Del Software",
+    "nombre": "Grado En Ingeniería Informática En Ingeniería Del Software",
     "coordinador": 14
   }
 },
@@ -930,7 +930,7 @@
   "model": "academics.titulacion",
   "pk": 8,
   "fields": {
-    "nombre": "M�ster Universitario En Ingenier�a De Caminos",
+    "nombre": "Máster Universitario En Ingeniería De Caminos",
     "coordinador": 18
   }
 },
@@ -938,7 +938,7 @@
   "model": "academics.titulacion",
   "pk": 9,
   "fields": {
-    "nombre": "M�ster Universitario En Investigaci�n En Ingenier�a Y Arquitectura",
+    "nombre": "Máster Universitario En Investigación En Ingeniería Y Arquitectura",
     "coordinador": null
   }
 },
@@ -946,7 +946,7 @@
   "model": "academics.titulacion",
   "pk": 10,
   "fields": {
-    "nombre": "M�ster Universitario En Metodolog�a Para La Modelizaci�n De La Informaci�n De La Construcci�n (building Information Modeling Bim) En El Desarrollo Colaborativo De Proyectos",
+    "nombre": "Máster Universitario En Metodología Para La Modelización De La Información De La Construcción (building Information Modeling Bim) En El Desarrollo Colaborativo De Proyectos",
     "coordinador": null
   }
 },
@@ -954,7 +954,7 @@
   "model": "academics.titulacion",
   "pk": 11,
   "fields": {
-    "nombre": "M�ster Universitario En Ingenier�a De Caminos, Canales Y Puertos",
+    "nombre": "Máster Universitario En Ingeniería De Caminos, Canales Y Puertos",
     "coordinador": null
   }
 },
@@ -962,7 +962,7 @@
   "model": "academics.titulacion",
   "pk": 12,
   "fields": {
-    "nombre": "M�ster Universitario En Metodolog�a Para La Modelizaci�n De La Informaci�n De La Construcci�n (building Information Modeling BIM) En El Desarrollo Colaborativo De Proyectos",
+    "nombre": "Máster Universitario En Metodología Para La Modelización De La Información De La Construcción (building Information Modeling BIM) En El Desarrollo Colaborativo De Proyectos",
     "coordinador": null
   }
 },
@@ -970,7 +970,7 @@
   "model": "academics.asignatura",
   "pk": 1,
   "fields": {
-    "nombre": "C�LCULO PARA LA EDIFICACI�N",
+    "nombre": "CÁLCULO PARA LA EDIFICACIÓN",
     "titulacion": 3,
     "curso": 1,
     "semestre": 1,
@@ -981,7 +981,7 @@
   "model": "academics.asignatura",
   "pk": 2,
   "fields": {
-    "nombre": "ECONOM�A Y EMPRESA",
+    "nombre": "ECONOMÍA Y EMPRESA",
     "titulacion": 3,
     "curso": 1,
     "semestre": 1,
@@ -1003,7 +1003,7 @@
   "model": "academics.asignatura",
   "pk": 4,
   "fields": {
-    "nombre": "FUNDAMENTOS DE LA EXPRESI�N GR�FICA",
+    "nombre": "FUNDAMENTOS DE LA EXPRESIÓN GRÁFICA",
     "titulacion": 3,
     "curso": 1,
     "semestre": 1,
@@ -1025,7 +1025,7 @@
   "model": "academics.asignatura",
   "pk": 6,
   "fields": {
-    "nombre": "�LGEBRA LINEAL PARA LA EDIFICACI�N",
+    "nombre": "ÁLGEBRA LINEAL PARA LA EDIFICACIÓN",
     "titulacion": 3,
     "curso": 1,
     "semestre": 2,
@@ -1036,7 +1036,7 @@
   "model": "academics.asignatura",
   "pk": 7,
   "fields": {
-    "nombre": "CONSTRUCCI�N I",
+    "nombre": "CONSTRUCCIÓN I",
     "titulacion": 3,
     "curso": 1,
     "semestre": 2,
@@ -1058,7 +1058,7 @@
   "model": "academics.asignatura",
   "pk": 9,
   "fields": {
-    "nombre": "FUNDAMENTOS F�SICOS DE LAS INSTALACIONES",
+    "nombre": "FUNDAMENTOS FÍSICOS DE LAS INSTALACIONES",
     "titulacion": 3,
     "curso": 1,
     "semestre": 2,
@@ -1069,7 +1069,7 @@
   "model": "academics.asignatura",
   "pk": 10,
   "fields": {
-    "nombre": "GEOMETR�A DESCRIPTIVA",
+    "nombre": "GEOMETRÍA DESCRIPTIVA",
     "titulacion": 3,
     "curso": 1,
     "semestre": 2,
@@ -1080,7 +1080,7 @@
   "model": "academics.asignatura",
   "pk": 11,
   "fields": {
-    "nombre": "CONSTRUCCI�N II",
+    "nombre": "CONSTRUCCIÓN II",
     "titulacion": 3,
     "curso": 2,
     "semestre": 1,
@@ -1113,7 +1113,7 @@
   "model": "academics.asignatura",
   "pk": 14,
   "fields": {
-    "nombre": "INTRODUCCI�N AL DERECHO P�BLICO",
+    "nombre": "INTRODUCCIÓN AL DERECHO PÚBLICO",
     "titulacion": 3,
     "curso": 2,
     "semestre": 1,
@@ -1135,7 +1135,7 @@
   "model": "academics.asignatura",
   "pk": 16,
   "fields": {
-    "nombre": "CONSTRUCCI�N III Y CONTROL DE CALIDAD I",
+    "nombre": "CONSTRUCCIÓN III Y CONTROL DE CALIDAD I",
     "titulacion": 3,
     "curso": 2,
     "semestre": 2,
@@ -1179,7 +1179,7 @@
   "model": "academics.asignatura",
   "pk": 20,
   "fields": {
-    "nombre": "TOPOGRAF�A",
+    "nombre": "TOPOGRAFÍA",
     "titulacion": 3,
     "curso": 2,
     "semestre": 2,
@@ -1190,7 +1190,7 @@
   "model": "academics.asignatura",
   "pk": 21,
   "fields": {
-    "nombre": "CONSTRUCCI�N IV Y MANTENIMIENTO I",
+    "nombre": "CONSTRUCCIÓN IV Y MANTENIMIENTO I",
     "titulacion": 3,
     "curso": 3,
     "semestre": 1,
@@ -1223,7 +1223,7 @@
   "model": "academics.asignatura",
   "pk": 24,
   "fields": {
-    "nombre": "ORGANIZACI�N Y EQUIPOS DE OBRA",
+    "nombre": "ORGANIZACIÓN Y EQUIPOS DE OBRA",
     "titulacion": 3,
     "curso": 3,
     "semestre": 1,
@@ -1234,7 +1234,7 @@
   "model": "academics.asignatura",
   "pk": 25,
   "fields": {
-    "nombre": "CONSTRUCCI�N V Y PREFABRICACI�N",
+    "nombre": "CONSTRUCCIÓN V Y PREFABRICACIÓN",
     "titulacion": 3,
     "curso": 3,
     "semestre": 2,
@@ -1256,7 +1256,7 @@
   "model": "academics.asignatura",
   "pk": 27,
   "fields": {
-    "nombre": "LEGISLACI�N Y PREVENCI�N I",
+    "nombre": "LEGISLACIÓN Y PREVENCIÓN I",
     "titulacion": 3,
     "curso": 3,
     "semestre": 2,
@@ -1267,7 +1267,7 @@
   "model": "academics.asignatura",
   "pk": 28,
   "fields": {
-    "nombre": "OFICINA T�CNICA",
+    "nombre": "OFICINA TÉCNICA",
     "titulacion": 3,
     "curso": 3,
     "semestre": 2,
@@ -1300,7 +1300,7 @@
   "model": "academics.asignatura",
   "pk": 31,
   "fields": {
-    "nombre": "PATOLOG�A Y REHABILITACI�N",
+    "nombre": "PATOLOGÍA Y REHABILITACIÓN",
     "titulacion": 3,
     "curso": 4,
     "semestre": 1,
@@ -1333,7 +1333,7 @@
   "model": "academics.asignatura",
   "pk": 34,
   "fields": {
-    "nombre": "PERITACIONES Y GESTI�N URBAN�STICA",
+    "nombre": "PERITACIONES Y GESTIÓN URBANÍSTICA",
     "titulacion": 3,
     "curso": 4,
     "semestre": 2,
@@ -1344,7 +1344,7 @@
   "model": "academics.asignatura",
   "pk": 35,
   "fields": {
-    "nombre": "PREVENCI�N II",
+    "nombre": "PREVENCIÓN II",
     "titulacion": 3,
     "curso": 4,
     "semestre": 2,
@@ -1366,7 +1366,7 @@
   "model": "academics.asignatura",
   "pk": 37,
   "fields": {
-    "nombre": "AC�STICA EN LA EDIFICACI�N",
+    "nombre": "ACÚSTICA EN LA EDIFICACIÓN",
     "titulacion": 3,
     "curso": 10,
     "semestre": 1,
@@ -1377,7 +1377,7 @@
   "model": "academics.asignatura",
   "pk": 38,
   "fields": {
-    "nombre": "DOM�TICA",
+    "nombre": "DOMÓTICA",
     "titulacion": 3,
     "curso": 10,
     "semestre": 1,
@@ -1388,7 +1388,7 @@
   "model": "academics.asignatura",
   "pk": 39,
   "fields": {
-    "nombre": "GESTI�N FINANCIERA DE EMPRESAS DE EDIFICACI�N",
+    "nombre": "GESTIÓN FINANCIERA DE EMPRESAS DE EDIFICACIÓN",
     "titulacion": 3,
     "curso": 10,
     "semestre": 1,
@@ -1399,7 +1399,7 @@
   "model": "academics.asignatura",
   "pk": 40,
   "fields": {
-    "nombre": "LEVANTAMIENTO ARQUITECT�NICO Y DE ESTRUCTURAS",
+    "nombre": "LEVANTAMIENTO ARQUITECTÓNICO Y DE ESTRUCTURAS",
     "titulacion": 3,
     "curso": 10,
     "semestre": 1,
@@ -1421,7 +1421,7 @@
   "model": "academics.asignatura",
   "pk": 42,
   "fields": {
-    "nombre": "PR�CTICAS EN EMPRESA",
+    "nombre": "PRÁCTICAS EN EMPRESA",
     "titulacion": 3,
     "curso": 10,
     "semestre": 3,
@@ -1432,7 +1432,7 @@
   "model": "academics.asignatura",
   "pk": 43,
   "fields": {
-    "nombre": "�LGEBRA LINEAL",
+    "nombre": "ÁLGEBRA LINEAL",
     "titulacion": 4,
     "curso": 1,
     "semestre": 1,
@@ -1443,7 +1443,7 @@
   "model": "academics.asignatura",
   "pk": 44,
   "fields": {
-    "nombre": "C�LCULO INFINITESIMAL",
+    "nombre": "CÁLCULO INFINITESIMAL",
     "titulacion": 4,
     "curso": 1,
     "semestre": 1,
@@ -1465,7 +1465,7 @@
   "model": "academics.asignatura",
   "pk": 46,
   "fields": {
-    "nombre": "GEOLOG�A",
+    "nombre": "GEOLOGÍA",
     "titulacion": 4,
     "curso": 1,
     "semestre": 1,
@@ -1476,7 +1476,7 @@
   "model": "academics.asignatura",
   "pk": 47,
   "fields": {
-    "nombre": "INFORM�TICA",
+    "nombre": "INFORMÁTICA",
     "titulacion": 4,
     "curso": 1,
     "semestre": 1,
@@ -1487,7 +1487,7 @@
   "model": "academics.asignatura",
   "pk": 48,
   "fields": {
-    "nombre": "ECONOM�A Y EMPRESA",
+    "nombre": "ECONOMÍA Y EMPRESA",
     "titulacion": 4,
     "curso": 1,
     "semestre": 2,
@@ -1498,7 +1498,7 @@
   "model": "academics.asignatura",
   "pk": 49,
   "fields": {
-    "nombre": "ESTAD�STICA",
+    "nombre": "ESTADÍSTICA",
     "titulacion": 4,
     "curso": 1,
     "semestre": 2,
@@ -1509,7 +1509,7 @@
   "model": "academics.asignatura",
   "pk": 50,
   "fields": {
-    "nombre": "F�SICA",
+    "nombre": "FÍSICA",
     "titulacion": 4,
     "curso": 1,
     "semestre": 2,
@@ -1520,7 +1520,7 @@
   "model": "academics.asignatura",
   "pk": 51,
   "fields": {
-    "nombre": "MEC�NICA",
+    "nombre": "MECÁNICA",
     "titulacion": 4,
     "curso": 1,
     "semestre": 2,
@@ -1531,7 +1531,7 @@
   "model": "academics.asignatura",
   "pk": 52,
   "fields": {
-    "nombre": "M�TODOS NUM�RICOS Y ECUACIONES DIFERENCIALES",
+    "nombre": "MÉTODOS NUMÉRICOS Y ECUACIONES DIFERENCIALES",
     "titulacion": 4,
     "curso": 1,
     "semestre": 2,
@@ -1553,7 +1553,7 @@
   "model": "academics.asignatura",
   "pk": 54,
   "fields": {
-    "nombre": "HIDR�ULICA E HIDROLOG�A",
+    "nombre": "HIDRÁULICA E HIDROLOGÍA",
     "titulacion": 4,
     "curso": 2,
     "semestre": 1,
@@ -1564,7 +1564,7 @@
   "model": "academics.asignatura",
   "pk": 55,
   "fields": {
-    "nombre": "QU�MICA",
+    "nombre": "QUÍMICA",
     "titulacion": 4,
     "curso": 2,
     "semestre": 1,
@@ -1575,7 +1575,7 @@
   "model": "academics.asignatura",
   "pk": 56,
   "fields": {
-    "nombre": "SISTEMAS EL�CTRICOS DE POTENCIA",
+    "nombre": "SISTEMAS ELÉCTRICOS DE POTENCIA",
     "titulacion": 4,
     "curso": 2,
     "semestre": 1,
@@ -1586,7 +1586,7 @@
   "model": "academics.asignatura",
   "pk": 57,
   "fields": {
-    "nombre": "TOPOGRAF�A",
+    "nombre": "TOPOGRAFÍA",
     "titulacion": 4,
     "curso": 2,
     "semestre": 1,
@@ -1608,7 +1608,7 @@
   "model": "academics.asignatura",
   "pk": 59,
   "fields": {
-    "nombre": "HIDR�ULICA II",
+    "nombre": "HIDRÁULICA II",
     "titulacion": 4,
     "curso": 2,
     "semestre": 2,
@@ -1641,7 +1641,7 @@
   "model": "academics.asignatura",
   "pk": 62,
   "fields": {
-    "nombre": "TOPOGRAF�A EN OBRA CIVIL",
+    "nombre": "TOPOGRAFÍA EN OBRA CIVIL",
     "titulacion": 4,
     "curso": 2,
     "semestre": 2,
@@ -1685,7 +1685,7 @@
   "model": "academics.asignatura",
   "pk": 66,
   "fields": {
-    "nombre": "MEC�NICA DE SUELOS",
+    "nombre": "MECÁNICA DE SUELOS",
     "titulacion": 4,
     "curso": 3,
     "semestre": 1,
@@ -1696,7 +1696,7 @@
   "model": "academics.asignatura",
   "pk": 67,
   "fields": {
-    "nombre": "PROCEDIMIENTOS DE CONSTRUCCI�N",
+    "nombre": "PROCEDIMIENTOS DE CONSTRUCCIÓN",
     "titulacion": 4,
     "curso": 3,
     "semestre": 1,
@@ -1762,7 +1762,7 @@
   "model": "academics.asignatura",
   "pk": 73,
   "fields": {
-    "nombre": "TRABAJO FIN DE GRADO - MENCI�N CONSTRUCCIONES CIVILES",
+    "nombre": "TRABAJO FIN DE GRADO - MENCIÓN CONSTRUCCIONES CIVILES",
     "titulacion": 4,
     "curso": 1000,
     "semestre": 3,
@@ -1773,7 +1773,7 @@
   "model": "academics.asignatura",
   "pk": 74,
   "fields": {
-    "nombre": "TRABAJO FIN DE GRADO - MENCI�N EN HIDROLOG�A",
+    "nombre": "TRABAJO FIN DE GRADO - MENCIÓN EN HIDROLOGÍA",
     "titulacion": 4,
     "curso": 1000,
     "semestre": 3,
@@ -1784,7 +1784,7 @@
   "model": "academics.asignatura",
   "pk": 75,
   "fields": {
-    "nombre": "TRABAJO FIN DE GRADO - MENCI�N TRANSPORTES Y SERVICIOS URBANOS",
+    "nombre": "TRABAJO FIN DE GRADO - MENCIÓN TRANSPORTES Y SERVICIOS URBANOS",
     "titulacion": 4,
     "curso": 1000,
     "semestre": 3,
@@ -1795,7 +1795,7 @@
   "model": "academics.asignatura",
   "pk": 76,
   "fields": {
-    "nombre": "ECOLOG�A",
+    "nombre": "ECOLOGÍA",
     "titulacion": 4,
     "curso": 10,
     "semestre": 2,
@@ -1806,7 +1806,7 @@
   "model": "academics.asignatura",
   "pk": 77,
   "fields": {
-    "nombre": "INFRAESTRUCTURA HIDR�ULICA",
+    "nombre": "INFRAESTRUCTURA HIDRÁULICA",
     "titulacion": 4,
     "curso": 10,
     "semestre": 2,
@@ -1817,7 +1817,7 @@
   "model": "academics.asignatura",
   "pk": 78,
   "fields": {
-    "nombre": "OBRAS MAR�TIMAS",
+    "nombre": "OBRAS MARÍTIMAS",
     "titulacion": 4,
     "curso": 10,
     "semestre": 2,
@@ -1828,7 +1828,7 @@
   "model": "academics.asignatura",
   "pk": 79,
   "fields": {
-    "nombre": "TIPOLOG�A ESTRUCTURAL",
+    "nombre": "TIPOLOGÍA ESTRUCTURAL",
     "titulacion": 4,
     "curso": 10,
     "semestre": 2,
@@ -1839,7 +1839,7 @@
   "model": "academics.asignatura",
   "pk": 80,
   "fields": {
-    "nombre": "TR�FICO",
+    "nombre": "TRÁFICO",
     "titulacion": 4,
     "curso": 10,
     "semestre": 2,
@@ -1861,7 +1861,7 @@
   "model": "academics.asignatura",
   "pk": 82,
   "fields": {
-    "nombre": "EDIFICACI�N Y PREFABRICACI�N",
+    "nombre": "EDIFICACIÓN Y PREFABRICACIÓN",
     "titulacion": 4,
     "curso": 10,
     "semestre": 1,
@@ -1894,7 +1894,7 @@
   "model": "academics.asignatura",
   "pk": 85,
   "fields": {
-    "nombre": "INGENIER�A FLUVIAL",
+    "nombre": "INGENIERÍA FLUVIAL",
     "titulacion": 4,
     "curso": 10,
     "semestre": 1,
@@ -1905,7 +1905,7 @@
   "model": "academics.asignatura",
   "pk": 86,
   "fields": {
-    "nombre": "INGENIER�A SANITARIA",
+    "nombre": "INGENIERÍA SANITARIA",
     "titulacion": 4,
     "curso": 10,
     "semestre": 1,
@@ -1916,7 +1916,7 @@
   "model": "academics.asignatura",
   "pk": 87,
   "fields": {
-    "nombre": "OBRAS Y APROVECHAMIENTOS HIDR�ULICOS",
+    "nombre": "OBRAS Y APROVECHAMIENTOS HIDRÁULICOS",
     "titulacion": 4,
     "curso": 10,
     "semestre": 1,
@@ -1949,7 +1949,7 @@
   "model": "academics.asignatura",
   "pk": 90,
   "fields": {
-    "nombre": "AMPLIACI�N DE CAMINOS",
+    "nombre": "AMPLIACIÓN DE CAMINOS",
     "titulacion": 4,
     "curso": 10,
     "semestre": 2,
@@ -1971,7 +1971,7 @@
   "model": "academics.asignatura",
   "pk": 92,
   "fields": {
-    "nombre": "ENERG�TICA, CENTRALES Y REDES",
+    "nombre": "ENERGÉTICA, CENTRALES Y REDES",
     "titulacion": 4,
     "curso": 10,
     "semestre": 2,
@@ -1982,7 +1982,7 @@
   "model": "academics.asignatura",
   "pk": 93,
   "fields": {
-    "nombre": "HIDROLOG�A APLICADA",
+    "nombre": "HIDROLOGÍA APLICADA",
     "titulacion": 4,
     "curso": 10,
     "semestre": 2,
@@ -1993,7 +1993,7 @@
   "model": "academics.asignatura",
   "pk": 94,
   "fields": {
-    "nombre": "MODELIZACI�N HIDR�ULICA",
+    "nombre": "MODELIZACIÓN HIDRÁULICA",
     "titulacion": 4,
     "curso": 10,
     "semestre": 2,
@@ -2004,7 +2004,7 @@
   "model": "academics.asignatura",
   "pk": 95,
   "fields": {
-    "nombre": "PATOLOG�A",
+    "nombre": "PATOLOGÍA",
     "titulacion": 4,
     "curso": 10,
     "semestre": 2,
@@ -2048,7 +2048,7 @@
   "model": "academics.asignatura",
   "pk": 99,
   "fields": {
-    "nombre": "PR�CTICAS EXTERNAS",
+    "nombre": "PRÁCTICAS EXTERNAS",
     "titulacion": 4,
     "curso": 10,
     "semestre": 3,
@@ -2059,7 +2059,7 @@
   "model": "academics.asignatura",
   "pk": 100,
   "fields": {
-    "nombre": "�LGEBRA LINEAL",
+    "nombre": "ÁLGEBRA LINEAL",
     "titulacion": 5,
     "curso": 1,
     "semestre": 1,
@@ -2070,7 +2070,7 @@
   "model": "academics.asignatura",
   "pk": 101,
   "fields": {
-    "nombre": "C�LCULO",
+    "nombre": "CÁLCULO",
     "titulacion": 5,
     "curso": 1,
     "semestre": 1,
@@ -2081,7 +2081,7 @@
   "model": "academics.asignatura",
   "pk": 102,
   "fields": {
-    "nombre": "ECONOM�A Y EMPRESA",
+    "nombre": "ECONOMÍA Y EMPRESA",
     "titulacion": 5,
     "curso": 1,
     "semestre": 1,
@@ -2092,7 +2092,7 @@
   "model": "academics.asignatura",
   "pk": 103,
   "fields": {
-    "nombre": "F�SICA",
+    "nombre": "FÍSICA",
     "titulacion": 5,
     "curso": 1,
     "semestre": 1,
@@ -2103,7 +2103,7 @@
   "model": "academics.asignatura",
   "pk": 104,
   "fields": {
-    "nombre": "FUNDAMENTOS DE PROGRAMACI�N",
+    "nombre": "FUNDAMENTOS DE PROGRAMACIÓN",
     "titulacion": 5,
     "curso": 1,
     "semestre": 1,
@@ -2114,7 +2114,7 @@
   "model": "academics.asignatura",
   "pk": 105,
   "fields": {
-    "nombre": "AMPLIACI�N DEL C�LCULO",
+    "nombre": "AMPLIACIÓN DEL CÁLCULO",
     "titulacion": 5,
     "curso": 1,
     "semestre": 2,
@@ -2125,7 +2125,7 @@
   "model": "academics.asignatura",
   "pk": 106,
   "fields": {
-    "nombre": "AN�LISIS DE REDES",
+    "nombre": "ANÁLISIS DE REDES",
     "titulacion": 5,
     "curso": 1,
     "semestre": 2,
@@ -2136,7 +2136,7 @@
   "model": "academics.asignatura",
   "pk": 107,
   "fields": {
-    "nombre": "DISPOSITIVOS ELECTR�NICOS",
+    "nombre": "DISPOSITIVOS ELECTRÓNICOS",
     "titulacion": 5,
     "curso": 1,
     "semestre": 2,
@@ -2158,7 +2158,7 @@
   "model": "academics.asignatura",
   "pk": 109,
   "fields": {
-    "nombre": "SE�ALES ALEATORIAS",
+    "nombre": "SEÑALES ALEATORIAS",
     "titulacion": 5,
     "curso": 1,
     "semestre": 2,
@@ -2169,7 +2169,7 @@
   "model": "academics.asignatura",
   "pk": 110,
   "fields": {
-    "nombre": "AN�LISIS EN VARIABLE COMPLEJA",
+    "nombre": "ANÁLISIS EN VARIABLE COMPLEJA",
     "titulacion": 5,
     "curso": 2,
     "semestre": 1,
@@ -2180,7 +2180,7 @@
   "model": "academics.asignatura",
   "pk": 111,
   "fields": {
-    "nombre": "CAMPOS ELECTROMAGN�TICOS",
+    "nombre": "CAMPOS ELECTROMAGNÉTICOS",
     "titulacion": 5,
     "curso": 2,
     "semestre": 1,
@@ -2202,7 +2202,7 @@
   "model": "academics.asignatura",
   "pk": 113,
   "fields": {
-    "nombre": "FUNDAMENTOS DE ELECTR�NICA",
+    "nombre": "FUNDAMENTOS DE ELECTRÓNICA",
     "titulacion": 5,
     "curso": 2,
     "semestre": 1,
@@ -2213,7 +2213,7 @@
   "model": "academics.asignatura",
   "pk": 114,
   "fields": {
-    "nombre": "SE�ALES Y SISTEMAS",
+    "nombre": "SEÑALES Y SISTEMAS",
     "titulacion": 5,
     "curso": 2,
     "semestre": 1,
@@ -2224,7 +2224,7 @@
   "model": "academics.asignatura",
   "pk": 115,
   "fields": {
-    "nombre": "COMPUTACI�N AVANZADA",
+    "nombre": "COMPUTACIÓN AVANZADA",
     "titulacion": 5,
     "curso": 2,
     "semestre": 2,
@@ -2235,7 +2235,7 @@
   "model": "academics.asignatura",
   "pk": 116,
   "fields": {
-    "nombre": "ELECTR�NICA DIGITAL",
+    "nombre": "ELECTRÓNICA DIGITAL",
     "titulacion": 5,
     "curso": 2,
     "semestre": 2,
@@ -2246,7 +2246,7 @@
   "model": "academics.asignatura",
   "pk": 117,
   "fields": {
-    "nombre": "F�SICA DE LA AC�STICA",
+    "nombre": "FÍSICA DE LA ACÚSTICA",
     "titulacion": 5,
     "curso": 2,
     "semestre": 2,
@@ -2257,7 +2257,7 @@
   "model": "academics.asignatura",
   "pk": 118,
   "fields": {
-    "nombre": "RADIACI�N Y ONDAS GUIADAS",
+    "nombre": "RADIACIÓN Y ONDAS GUIADAS",
     "titulacion": 5,
     "curso": 2,
     "semestre": 2,
@@ -2268,7 +2268,7 @@
   "model": "academics.asignatura",
   "pk": 119,
   "fields": {
-    "nombre": "TEOR�A DE LA COMUNICACI�N",
+    "nombre": "TEORÍA DE LA COMUNICACIÓN",
     "titulacion": 5,
     "curso": 2,
     "semestre": 2,
@@ -2279,7 +2279,7 @@
   "model": "academics.asignatura",
   "pk": 120,
   "fields": {
-    "nombre": "FUNDAMENTOS DE INGENIER�A AC�STICA",
+    "nombre": "FUNDAMENTOS DE INGENIERÍA ACÚSTICA",
     "titulacion": 5,
     "curso": 3,
     "semestre": 1,
@@ -2290,7 +2290,7 @@
   "model": "academics.asignatura",
   "pk": 121,
   "fields": {
-    "nombre": "PROCESADO DISCRETO DE SE�ALES DE AUDIO Y V�DEO",
+    "nombre": "PROCESADO DISCRETO DE SEÑALES DE AUDIO Y VÍDEO",
     "titulacion": 5,
     "curso": 3,
     "semestre": 1,
@@ -2301,7 +2301,7 @@
   "model": "academics.asignatura",
   "pk": 122,
   "fields": {
-    "nombre": "SISTEMAS DE COMUNICACI�N POR L�NEA",
+    "nombre": "SISTEMAS DE COMUNICACIÓN POR LÍNEA",
     "titulacion": 5,
     "curso": 3,
     "semestre": 1,
@@ -2323,7 +2323,7 @@
   "model": "academics.asignatura",
   "pk": 124,
   "fields": {
-    "nombre": "S�NTESIS DE REDES",
+    "nombre": "SÍNTESIS DE REDES",
     "titulacion": 5,
     "curso": 3,
     "semestre": 2,
@@ -2334,7 +2334,7 @@
   "model": "academics.asignatura",
   "pk": 125,
   "fields": {
-    "nombre": "SISTEMAS DE COMUNICACI�N INAL�MBRICOS",
+    "nombre": "SISTEMAS DE COMUNICACIÓN INALÁMBRICOS",
     "titulacion": 5,
     "curso": 3,
     "semestre": 2,
@@ -2345,7 +2345,7 @@
   "model": "academics.asignatura",
   "pk": 126,
   "fields": {
-    "nombre": "TRATAMIENTO DIGITAL DE IM�GENES",
+    "nombre": "TRATAMIENTO DIGITAL DE IMÁGENES",
     "titulacion": 5,
     "curso": 3,
     "semestre": 2,
@@ -2367,7 +2367,7 @@
   "model": "academics.asignatura",
   "pk": 128,
   "fields": {
-    "nombre": "EQUIPOS DE AUDIO Y V�DEO",
+    "nombre": "EQUIPOS DE AUDIO Y VÍDEO",
     "titulacion": 5,
     "curso": 4,
     "semestre": 1,
@@ -2378,7 +2378,7 @@
   "model": "academics.asignatura",
   "pk": 129,
   "fields": {
-    "nombre": "REDES Y SERVICIOS DE TELECOMUNICACI�N",
+    "nombre": "REDES Y SERVICIOS DE TELECOMUNICACIÓN",
     "titulacion": 5,
     "curso": 4,
     "semestre": 1,
@@ -2400,7 +2400,7 @@
   "model": "academics.asignatura",
   "pk": 131,
   "fields": {
-    "nombre": "AISLAMIENTO Y ACONDICIONAMIENTO AC�STICO",
+    "nombre": "AISLAMIENTO Y ACONDICIONAMIENTO ACÚSTICO",
     "titulacion": 5,
     "curso": 4,
     "semestre": 2,
@@ -2411,7 +2411,7 @@
   "model": "academics.asignatura",
   "pk": 132,
   "fields": {
-    "nombre": "TELEVISI�N DIGITAL",
+    "nombre": "TELEVISIÓN DIGITAL",
     "titulacion": 5,
     "curso": 4,
     "semestre": 2,
@@ -2433,7 +2433,7 @@
   "model": "academics.asignatura",
   "pk": 134,
   "fields": {
-    "nombre": "PROYECTOS DE INFRAESTRUCTURAS COMUNES DE TELECOMUNICACI�N",
+    "nombre": "PROYECTOS DE INFRAESTRUCTURAS COMUNES DE TELECOMUNICACIÓN",
     "titulacion": 5,
     "curso": 10,
     "semestre": 1,
@@ -2444,7 +2444,7 @@
   "model": "academics.asignatura",
   "pk": 135,
   "fields": {
-    "nombre": "DISE�O MEDIANTE CIRCUITOS AN�LOGICOS INTEGRADOS",
+    "nombre": "DISEÑO MEDIANTE CIRCUITOS ANÁLOGICOS INTEGRADOS",
     "titulacion": 5,
     "curso": 10,
     "semestre": 1,
@@ -2455,7 +2455,7 @@
   "model": "academics.asignatura",
   "pk": 136,
   "fields": {
-    "nombre": "FOT�NICA",
+    "nombre": "FOTÓNICA",
     "titulacion": 5,
     "curso": 10,
     "semestre": 1,
@@ -2466,7 +2466,7 @@
   "model": "academics.asignatura",
   "pk": 137,
   "fields": {
-    "nombre": "M�TODOS NUM�RICOS DE LA INGENIER�A",
+    "nombre": "MÉTODOS NUMÉRICOS DE LA INGENIERÍA",
     "titulacion": 5,
     "curso": 10,
     "semestre": 1,
@@ -2477,7 +2477,7 @@
   "model": "academics.asignatura",
   "pk": 138,
   "fields": {
-    "nombre": "DOM�TICA",
+    "nombre": "DOMÓTICA",
     "titulacion": 5,
     "curso": 10,
     "semestre": 2,
@@ -2488,7 +2488,7 @@
   "model": "academics.asignatura",
   "pk": 139,
   "fields": {
-    "nombre": "ESTUDIOS Y CERTIFICACIONES DE EMISIONES RADIOEL�CTRICAS",
+    "nombre": "ESTUDIOS Y CERTIFICACIONES DE EMISIONES RADIOELÉCTRICAS",
     "titulacion": 5,
     "curso": 10,
     "semestre": 2,
@@ -2499,7 +2499,7 @@
   "model": "academics.asignatura",
   "pk": 140,
   "fields": {
-    "nombre": "INGENIER�A DEL SOFTWARE",
+    "nombre": "INGENIERÍA DEL SOFTWARE",
     "titulacion": 5,
     "curso": 10,
     "semestre": 2,
@@ -2510,7 +2510,7 @@
   "model": "academics.asignatura",
   "pk": 141,
   "fields": {
-    "nombre": "PROCESADORES DIGITALES DE SE�AL",
+    "nombre": "PROCESADORES DIGITALES DE SEÑAL",
     "titulacion": 5,
     "curso": 10,
     "semestre": 2,
@@ -2532,7 +2532,7 @@
   "model": "academics.asignatura",
   "pk": 143,
   "fields": {
-    "nombre": "PR�CTICAS EXTERNAS",
+    "nombre": "PRÁCTICAS EXTERNAS",
     "titulacion": 5,
     "curso": 10,
     "semestre": 3,
@@ -2543,7 +2543,7 @@
   "model": "academics.asignatura",
   "pk": 144,
   "fields": {
-    "nombre": "�LGEBRA LINEAL",
+    "nombre": "ÁLGEBRA LINEAL",
     "titulacion": 6,
     "curso": 1,
     "semestre": 1,
@@ -2554,7 +2554,7 @@
   "model": "academics.asignatura",
   "pk": 145,
   "fields": {
-    "nombre": "C�LCULO",
+    "nombre": "CÁLCULO",
     "titulacion": 6,
     "curso": 1,
     "semestre": 1,
@@ -2565,7 +2565,7 @@
   "model": "academics.asignatura",
   "pk": 146,
   "fields": {
-    "nombre": "F�SICA",
+    "nombre": "FÍSICA",
     "titulacion": 6,
     "curso": 1,
     "semestre": 1,
@@ -2576,7 +2576,7 @@
   "model": "academics.asignatura",
   "pk": 147,
   "fields": {
-    "nombre": "INTRODUCCI�N A LA PROGRAMACI�N",
+    "nombre": "INTRODUCCIÓN A LA PROGRAMACIÓN",
     "titulacion": 6,
     "curso": 1,
     "semestre": 1,
@@ -2587,7 +2587,7 @@
   "model": "academics.asignatura",
   "pk": 148,
   "fields": {
-    "nombre": "TECNOLOG�A DE COMPUTADORES",
+    "nombre": "TECNOLOGÍA DE COMPUTADORES",
     "titulacion": 6,
     "curso": 1,
     "semestre": 1,
@@ -2598,7 +2598,7 @@
   "model": "academics.asignatura",
   "pk": 149,
   "fields": {
-    "nombre": "AMPLIACI�N DE MATEM�TICAS",
+    "nombre": "AMPLIACIÓN DE MATEMÁTICAS",
     "titulacion": 6,
     "curso": 1,
     "semestre": 2,
@@ -2609,7 +2609,7 @@
   "model": "academics.asignatura",
   "pk": 150,
   "fields": {
-    "nombre": "ELECTR�NICA",
+    "nombre": "ELECTRÓNICA",
     "titulacion": 6,
     "curso": 1,
     "semestre": 2,
@@ -2620,7 +2620,7 @@
   "model": "academics.asignatura",
   "pk": 151,
   "fields": {
-    "nombre": "ESTAD�STICA",
+    "nombre": "ESTADÍSTICA",
     "titulacion": 6,
     "curso": 1,
     "semestre": 2,
@@ -2631,7 +2631,7 @@
   "model": "academics.asignatura",
   "pk": 152,
   "fields": {
-    "nombre": "ESTRUCTURA DE DATOS Y DE LA INFORMACI�N",
+    "nombre": "ESTRUCTURA DE DATOS Y DE LA INFORMACIÓN",
     "titulacion": 6,
     "curso": 1,
     "semestre": 2,
@@ -2642,7 +2642,7 @@
   "model": "academics.asignatura",
   "pk": 153,
   "fields": {
-    "nombre": "INTRODUCCI�N A LOS COMPUTADORES",
+    "nombre": "INTRODUCCIÓN A LOS COMPUTADORES",
     "titulacion": 6,
     "curso": 1,
     "semestre": 2,
@@ -2653,7 +2653,7 @@
   "model": "academics.asignatura",
   "pk": 154,
   "fields": {
-    "nombre": "ADMINISTRACI�N Y ORGANIZACI�N DE COMPUTADORES",
+    "nombre": "ADMINISTRACIÓN Y ORGANIZACIÓN DE COMPUTADORES",
     "titulacion": 6,
     "curso": 2,
     "semestre": 1,
@@ -2664,7 +2664,7 @@
   "model": "academics.asignatura",
   "pk": 155,
   "fields": {
-    "nombre": "AN�LISIS Y DISE�O DE ALGORITMOS",
+    "nombre": "ANÁLISIS Y DISEÑO DE ALGORITMOS",
     "titulacion": 6,
     "curso": 2,
     "semestre": 1,
@@ -2697,7 +2697,7 @@
   "model": "academics.asignatura",
   "pk": 158,
   "fields": {
-    "nombre": "ECONOM�A Y EMPRESA",
+    "nombre": "ECONOMÍA Y EMPRESA",
     "titulacion": 6,
     "curso": 2,
     "semestre": 1,
@@ -2730,7 +2730,7 @@
   "model": "academics.asignatura",
   "pk": 161,
   "fields": {
-    "nombre": "GESTI�N DE LAS ORGANIZACIONES",
+    "nombre": "GESTIÓN DE LAS ORGANIZACIONES",
     "titulacion": 6,
     "curso": 2,
     "semestre": 2,
@@ -2752,7 +2752,7 @@
   "model": "academics.asignatura",
   "pk": 163,
   "fields": {
-    "nombre": "PROGRAMACI�N CONCURRENTE Y DISTRIBUIDA",
+    "nombre": "PROGRAMACIÓN CONCURRENTE Y DISTRIBUIDA",
     "titulacion": 6,
     "curso": 2,
     "semestre": 2,
@@ -2763,7 +2763,7 @@
   "model": "academics.asignatura",
   "pk": 164,
   "fields": {
-    "nombre": "AUDITOR�A Y LEGISLACI�N INFORM�TICA",
+    "nombre": "AUDITORÍA Y LEGISLACIÓN INFORMÁTICA",
     "titulacion": 6,
     "curso": 3,
     "semestre": 1,
@@ -2774,7 +2774,7 @@
   "model": "academics.asignatura",
   "pk": 165,
   "fields": {
-    "nombre": "DISE�O E INTERACCI�N DE SISTEMAS DE INFORMACI�N",
+    "nombre": "DISEÑO E INTERACCIÓN DE SISTEMAS DE INFORMACIÓN",
     "titulacion": 6,
     "curso": 3,
     "semestre": 1,
@@ -2785,7 +2785,7 @@
   "model": "academics.asignatura",
   "pk": 166,
   "fields": {
-    "nombre": "INGENIER�A DE SOFTWARE",
+    "nombre": "INGENIERÍA DE SOFTWARE",
     "titulacion": 6,
     "curso": 3,
     "semestre": 1,
@@ -2829,7 +2829,7 @@
   "model": "academics.asignatura",
   "pk": 170,
   "fields": {
-    "nombre": "BIOMETR�A Y SEGURIDAD DE SISTEMAS",
+    "nombre": "BIOMETRÍA Y SEGURIDAD DE SISTEMAS",
     "titulacion": 6,
     "curso": 3,
     "semestre": 2,
@@ -2840,7 +2840,7 @@
   "model": "academics.asignatura",
   "pk": 171,
   "fields": {
-    "nombre": "COMPUTACI�N DISTRIBUIDA",
+    "nombre": "COMPUTACIÓN DISTRIBUIDA",
     "titulacion": 6,
     "curso": 3,
     "semestre": 2,
@@ -2851,7 +2851,7 @@
   "model": "academics.asignatura",
   "pk": 172,
   "fields": {
-    "nombre": "DISE�O DE PROCESADORES",
+    "nombre": "DISEÑO DE PROCESADORES",
     "titulacion": 6,
     "curso": 3,
     "semestre": 2,
@@ -2862,7 +2862,7 @@
   "model": "academics.asignatura",
   "pk": 173,
   "fields": {
-    "nombre": "DISE�O DE SISTEMAS OPERATIVOS",
+    "nombre": "DISEÑO DE SISTEMAS OPERATIVOS",
     "titulacion": 6,
     "curso": 3,
     "semestre": 2,
@@ -2884,7 +2884,7 @@
   "model": "academics.asignatura",
   "pk": 175,
   "fields": {
-    "nombre": "ROB�TICA",
+    "nombre": "ROBÓTICA",
     "titulacion": 6,
     "curso": 4,
     "semestre": 1,
@@ -2928,7 +2928,7 @@
   "model": "academics.asignatura",
   "pk": 179,
   "fields": {
-    "nombre": "COMPUTACI�N BIO-INSPIRADA",
+    "nombre": "COMPUTACIÓN BIO-INSPIRADA",
     "titulacion": 6,
     "curso": 4,
     "semestre": 1,
@@ -2950,7 +2950,7 @@
   "model": "academics.asignatura",
   "pk": 181,
   "fields": {
-    "nombre": "PROCESAMIENTO GR�FICO",
+    "nombre": "PROCESAMIENTO GRÁFICO",
     "titulacion": 6,
     "curso": 4,
     "semestre": 1,
@@ -2961,7 +2961,7 @@
   "model": "academics.asignatura",
   "pk": 182,
   "fields": {
-    "nombre": "COMPUTACI�N PARALELA",
+    "nombre": "COMPUTACIÓN PARALELA",
     "titulacion": 6,
     "curso": 4,
     "semestre": 2,
@@ -2972,7 +2972,7 @@
   "model": "academics.asignatura",
   "pk": 183,
   "fields": {
-    "nombre": "PROGRAMACI�N EN INTERNET",
+    "nombre": "PROGRAMACIÓN EN INTERNET",
     "titulacion": 6,
     "curso": 4,
     "semestre": 2,
@@ -2983,7 +2983,7 @@
   "model": "academics.asignatura",
   "pk": 184,
   "fields": {
-    "nombre": "ROB�TICA AVANZADA",
+    "nombre": "ROBÓTICA AVANZADA",
     "titulacion": 6,
     "curso": 4,
     "semestre": 2,
@@ -3005,7 +3005,7 @@
   "model": "academics.asignatura",
   "pk": 186,
   "fields": {
-    "nombre": "VIRTUALIZACI�N Y ESCALABILIDAD",
+    "nombre": "VIRTUALIZACIÓN Y ESCALABILIDAD",
     "titulacion": 6,
     "curso": 4,
     "semestre": 2,
@@ -3016,7 +3016,7 @@
   "model": "academics.asignatura",
   "pk": 187,
   "fields": {
-    "nombre": "VISI�N ARTIFICIAL",
+    "nombre": "VISIÓN ARTIFICIAL",
     "titulacion": 6,
     "curso": 4,
     "semestre": 2,
@@ -3027,7 +3027,7 @@
   "model": "academics.asignatura",
   "pk": 188,
   "fields": {
-    "nombre": "PR�CTICAS EXTERNAS",
+    "nombre": "PRÁCTICAS EXTERNAS",
     "titulacion": 6,
     "curso": 4,
     "semestre": 1,
@@ -3038,7 +3038,7 @@
   "model": "academics.asignatura",
   "pk": 189,
   "fields": {
-    "nombre": "�LGEBRA LINEAL",
+    "nombre": "ÁLGEBRA LINEAL",
     "titulacion": 7,
     "curso": 1,
     "semestre": 1,
@@ -3049,7 +3049,7 @@
   "model": "academics.asignatura",
   "pk": 190,
   "fields": {
-    "nombre": "C�LCULO",
+    "nombre": "CÁLCULO",
     "titulacion": 7,
     "curso": 1,
     "semestre": 1,
@@ -3060,7 +3060,7 @@
   "model": "academics.asignatura",
   "pk": 191,
   "fields": {
-    "nombre": "F�SICA",
+    "nombre": "FÍSICA",
     "titulacion": 7,
     "curso": 1,
     "semestre": 1,
@@ -3071,7 +3071,7 @@
   "model": "academics.asignatura",
   "pk": 192,
   "fields": {
-    "nombre": "INTRODUCCI�N A LA PROGRAMACI�N",
+    "nombre": "INTRODUCCIÓN A LA PROGRAMACIÓN",
     "titulacion": 7,
     "curso": 1,
     "semestre": 1,
@@ -3082,7 +3082,7 @@
   "model": "academics.asignatura",
   "pk": 193,
   "fields": {
-    "nombre": "TECNOLOG�A DE COMPUTADORES",
+    "nombre": "TECNOLOGÍA DE COMPUTADORES",
     "titulacion": 7,
     "curso": 1,
     "semestre": 1,
@@ -3093,7 +3093,7 @@
   "model": "academics.asignatura",
   "pk": 194,
   "fields": {
-    "nombre": "AMPLIACI�N DE MATEM�TICAS",
+    "nombre": "AMPLIACIÓN DE MATEMÁTICAS",
     "titulacion": 7,
     "curso": 1,
     "semestre": 2,
@@ -3104,7 +3104,7 @@
   "model": "academics.asignatura",
   "pk": 195,
   "fields": {
-    "nombre": "ELECTR�NICA",
+    "nombre": "ELECTRÓNICA",
     "titulacion": 7,
     "curso": 1,
     "semestre": 2,
@@ -3115,7 +3115,7 @@
   "model": "academics.asignatura",
   "pk": 196,
   "fields": {
-    "nombre": "ESTAD�STICA",
+    "nombre": "ESTADÍSTICA",
     "titulacion": 7,
     "curso": 1,
     "semestre": 2,
@@ -3126,7 +3126,7 @@
   "model": "academics.asignatura",
   "pk": 197,
   "fields": {
-    "nombre": "ESTRUCTURA DE DATOS Y DE LA INFORMACI�N",
+    "nombre": "ESTRUCTURA DE DATOS Y DE LA INFORMACIÓN",
     "titulacion": 7,
     "curso": 1,
     "semestre": 2,
@@ -3137,7 +3137,7 @@
   "model": "academics.asignatura",
   "pk": 198,
   "fields": {
-    "nombre": "INTRODUCCI�N A LOS COMPUTADORES",
+    "nombre": "INTRODUCCIÓN A LOS COMPUTADORES",
     "titulacion": 7,
     "curso": 1,
     "semestre": 2,
@@ -3148,7 +3148,7 @@
   "model": "academics.asignatura",
   "pk": 199,
   "fields": {
-    "nombre": "ADMINISTRACI�N Y ORGANIZACI�N DE COMPUTADORES",
+    "nombre": "ADMINISTRACIÓN Y ORGANIZACIÓN DE COMPUTADORES",
     "titulacion": 7,
     "curso": 2,
     "semestre": 1,
@@ -3159,7 +3159,7 @@
   "model": "academics.asignatura",
   "pk": 200,
   "fields": {
-    "nombre": "AN�LISIS Y DISE�O DE ALGORITMOS",
+    "nombre": "ANÁLISIS Y DISEÑO DE ALGORITMOS",
     "titulacion": 7,
     "curso": 2,
     "semestre": 1,
@@ -3192,7 +3192,7 @@
   "model": "academics.asignatura",
   "pk": 203,
   "fields": {
-    "nombre": "ECONOM�A Y EMPRESA",
+    "nombre": "ECONOMÍA Y EMPRESA",
     "titulacion": 7,
     "curso": 2,
     "semestre": 1,
@@ -3225,7 +3225,7 @@
   "model": "academics.asignatura",
   "pk": 206,
   "fields": {
-    "nombre": "GESTI�N DE LAS ORGANIZACIONES",
+    "nombre": "GESTIÓN DE LAS ORGANIZACIONES",
     "titulacion": 7,
     "curso": 2,
     "semestre": 2,
@@ -3247,7 +3247,7 @@
   "model": "academics.asignatura",
   "pk": 208,
   "fields": {
-    "nombre": "PROGRAMACI�N CONCURRENTE Y DISTRIBUIDA",
+    "nombre": "PROGRAMACIÓN CONCURRENTE Y DISTRIBUIDA",
     "titulacion": 7,
     "curso": 2,
     "semestre": 2,
@@ -3258,7 +3258,7 @@
   "model": "academics.asignatura",
   "pk": 209,
   "fields": {
-    "nombre": "AUDITOR�A Y LEGISLACI�N INFORM�TICA",
+    "nombre": "AUDITORÍA Y LEGISLACIÓN INFORMÁTICA",
     "titulacion": 7,
     "curso": 3,
     "semestre": 1,
@@ -3269,7 +3269,7 @@
   "model": "academics.asignatura",
   "pk": 210,
   "fields": {
-    "nombre": "DISE�O E INTERACCI�N DE SISTEMAS DE INFORMACI�N",
+    "nombre": "DISEÑO E INTERACCIÓN DE SISTEMAS DE INFORMACIÓN",
     "titulacion": 7,
     "curso": 3,
     "semestre": 1,
@@ -3280,7 +3280,7 @@
   "model": "academics.asignatura",
   "pk": 211,
   "fields": {
-    "nombre": "DISE�O Y ADMINISTRACI�N DE BASES DE DATOS",
+    "nombre": "DISEÑO Y ADMINISTRACIÓN DE BASES DE DATOS",
     "titulacion": 7,
     "curso": 3,
     "semestre": 1,
@@ -3291,7 +3291,7 @@
   "model": "academics.asignatura",
   "pk": 212,
   "fields": {
-    "nombre": "INGENIER�A DE SOFTWARE",
+    "nombre": "INGENIERÍA DE SOFTWARE",
     "titulacion": 7,
     "curso": 3,
     "semestre": 1,
@@ -3324,7 +3324,7 @@
   "model": "academics.asignatura",
   "pk": 215,
   "fields": {
-    "nombre": "DISE�O Y MODELADO DE SISTEMAS SOFTWARE",
+    "nombre": "DISEÑO Y MODELADO DE SISTEMAS SOFTWARE",
     "titulacion": 7,
     "curso": 3,
     "semestre": 2,
@@ -3335,7 +3335,7 @@
   "model": "academics.asignatura",
   "pk": 216,
   "fields": {
-    "nombre": "INGENIER�A DE REQUISITOS",
+    "nombre": "INGENIERÍA DE REQUISITOS",
     "titulacion": 7,
     "curso": 3,
     "semestre": 2,
@@ -3346,7 +3346,7 @@
   "model": "academics.asignatura",
   "pk": 217,
   "fields": {
-    "nombre": "PROGRAMACI�N EN INTERNET",
+    "nombre": "PROGRAMACIÓN EN INTERNET",
     "titulacion": 7,
     "curso": 3,
     "semestre": 2,
@@ -3357,7 +3357,7 @@
   "model": "academics.asignatura",
   "pk": 218,
   "fields": {
-    "nombre": "TEOR�A DE LENGUAJES",
+    "nombre": "TEORÍA DE LENGUAJES",
     "titulacion": 7,
     "curso": 3,
     "semestre": 2,
@@ -3379,7 +3379,7 @@
   "model": "academics.asignatura",
   "pk": 220,
   "fields": {
-    "nombre": "GESTI�N DE PROYECTOS SOFTWARE",
+    "nombre": "GESTIÓN DE PROYECTOS SOFTWARE",
     "titulacion": 7,
     "curso": 4,
     "semestre": 1,
@@ -3390,7 +3390,7 @@
   "model": "academics.asignatura",
   "pk": 221,
   "fields": {
-    "nombre": "PROGRAMACI�N DE BASES DE DATOS",
+    "nombre": "PROGRAMACIÓN DE BASES DE DATOS",
     "titulacion": 7,
     "curso": 4,
     "semestre": 1,
@@ -3412,7 +3412,7 @@
   "model": "academics.asignatura",
   "pk": 223,
   "fields": {
-    "nombre": "ADMINISTRACI�N DE REDES Y SERVICIOS",
+    "nombre": "ADMINISTRACIÓN DE REDES Y SERVICIOS",
     "titulacion": 7,
     "curso": 4,
     "semestre": 1,
@@ -3445,7 +3445,7 @@
   "model": "academics.asignatura",
   "pk": 226,
   "fields": {
-    "nombre": "SEGURIDAD EN REDES TELEM�TICAS",
+    "nombre": "SEGURIDAD EN REDES TELEMÁTICAS",
     "titulacion": 7,
     "curso": 4,
     "semestre": 1,
@@ -3456,7 +3456,7 @@
   "model": "academics.asignatura",
   "pk": 227,
   "fields": {
-    "nombre": "BIOMETR�A Y SEGURIDAD DE SISTEMAS",
+    "nombre": "BIOMETRÍA Y SEGURIDAD DE SISTEMAS",
     "titulacion": 7,
     "curso": 4,
     "semestre": 2,
@@ -3467,7 +3467,7 @@
   "model": "academics.asignatura",
   "pk": 228,
   "fields": {
-    "nombre": "INGENIER�A WEB",
+    "nombre": "INGENIERÍA WEB",
     "titulacion": 7,
     "curso": 4,
     "semestre": 2,
@@ -3478,7 +3478,7 @@
   "model": "academics.asignatura",
   "pk": 229,
   "fields": {
-    "nombre": "MINER�A DE DATOS Y ALMACENES DE DATOS",
+    "nombre": "MINERÍA DE DATOS Y ALMACENES DE DATOS",
     "titulacion": 7,
     "curso": 4,
     "semestre": 2,
@@ -3489,7 +3489,7 @@
   "model": "academics.asignatura",
   "pk": 230,
   "fields": {
-    "nombre": "PROCESAMIENTO DE LA INFORMACI�N MULTIMEDIA",
+    "nombre": "PROCESAMIENTO DE LA INFORMACIÓN MULTIMEDIA",
     "titulacion": 7,
     "curso": 4,
     "semestre": 2,
@@ -3500,7 +3500,7 @@
   "model": "academics.asignatura",
   "pk": 231,
   "fields": {
-    "nombre": "RECUPERACI�N DE LA INFORMACI�N Y B�SQUEDA EN LA WEB",
+    "nombre": "RECUPERACIÓN DE LA INFORMACIÓN Y BÚSQUEDA EN LA WEB",
     "titulacion": 7,
     "curso": 4,
     "semestre": 2,
@@ -3511,7 +3511,7 @@
   "model": "academics.asignatura",
   "pk": 232,
   "fields": {
-    "nombre": "REDES DE COMUNICACIONES M�VILES Y MULTIMEDIA",
+    "nombre": "REDES DE COMUNICACIONES MÓVILES Y MULTIMEDIA",
     "titulacion": 7,
     "curso": 4,
     "semestre": 2,
@@ -3522,7 +3522,7 @@
   "model": "academics.asignatura",
   "pk": 233,
   "fields": {
-    "nombre": "PR�CTICAS EXTERNAS",
+    "nombre": "PRÁCTICAS EXTERNAS",
     "titulacion": 7,
     "curso": 4,
     "semestre": 1,
@@ -3533,7 +3533,7 @@
   "model": "academics.asignatura",
   "pk": 234,
   "fields": {
-    "nombre": "CONSERVACI�N Y EXPLOTACI�N DE INFRAESTRUCTURAS DEL TRANSPORTE",
+    "nombre": "CONSERVACIÓN Y EXPLOTACIÓN DE INFRAESTRUCTURAS DEL TRANSPORTE",
     "titulacion": 11,
     "curso": 1,
     "semestre": 1,
@@ -3544,7 +3544,7 @@
   "model": "academics.asignatura",
   "pk": 235,
   "fields": {
-    "nombre": "MEC�NICA AVANZADA DE SUELOS Y ROCAS",
+    "nombre": "MECÁNICA AVANZADA DE SUELOS Y ROCAS",
     "titulacion": 11,
     "curso": 1,
     "semestre": 1,
@@ -3555,7 +3555,7 @@
   "model": "academics.asignatura",
   "pk": 236,
   "fields": {
-    "nombre": "MEC�NICA DE MEDIOS CONTINUOS",
+    "nombre": "MECÁNICA DE MEDIOS CONTINUOS",
     "titulacion": 11,
     "curso": 1,
     "semestre": 1,
@@ -3566,7 +3566,7 @@
   "model": "academics.asignatura",
   "pk": 237,
   "fields": {
-    "nombre": "M�TODOS NUM�RICOS DE LA INGENIER�A CIVIL",
+    "nombre": "MÉTODOS NUMÉRICOS DE LA INGENIERÍA CIVIL",
     "titulacion": 11,
     "curso": 1,
     "semestre": 1,
@@ -3577,7 +3577,7 @@
   "model": "academics.asignatura",
   "pk": 238,
   "fields": {
-    "nombre": "ORDENACI�N TERRITORIAL Y PLANEAMIENTO URBANO",
+    "nombre": "ORDENACIÓN TERRITORIAL Y PLANEAMIENTO URBANO",
     "titulacion": 11,
     "curso": 1,
     "semestre": 1,
@@ -3588,7 +3588,7 @@
   "model": "academics.asignatura",
   "pk": 239,
   "fields": {
-    "nombre": "CONSERVACI�N Y EXPLOTACI�N DE OBRAS HIDR�ULICAS",
+    "nombre": "CONSERVACIÓN Y EXPLOTACIÓN DE OBRAS HIDRÁULICAS",
     "titulacion": 11,
     "curso": 1,
     "semestre": 2,
@@ -3599,7 +3599,7 @@
   "model": "academics.asignatura",
   "pk": 240,
   "fields": {
-    "nombre": "INGENIER�A SANITARIA Y GESTI�N DE RESIDUOS",
+    "nombre": "INGENIERÍA SANITARIA Y GESTIÓN DE RESIDUOS",
     "titulacion": 11,
     "curso": 1,
     "semestre": 2,
@@ -3610,7 +3610,7 @@
   "model": "academics.asignatura",
   "pk": 241,
   "fields": {
-    "nombre": "MODELIZACI�N EN INGENIER�A",
+    "nombre": "MODELIZACIÓN EN INGENIERÍA",
     "titulacion": 11,
     "curso": 1,
     "semestre": 2,
@@ -3621,7 +3621,7 @@
   "model": "academics.asignatura",
   "pk": 242,
   "fields": {
-    "nombre": "TECNOLOG�A DE ESTRUCTURAS",
+    "nombre": "TECNOLOGÍA DE ESTRUCTURAS",
     "titulacion": 11,
     "curso": 1,
     "semestre": 2,
@@ -3632,7 +3632,7 @@
   "model": "academics.asignatura",
   "pk": 243,
   "fields": {
-    "nombre": "C�LCULO AVANZADO DE ESTRUCTURAS",
+    "nombre": "CÁLCULO AVANZADO DE ESTRUCTURAS",
     "titulacion": 11,
     "curso": 2,
     "semestre": 1,
@@ -3643,7 +3643,7 @@
   "model": "academics.asignatura",
   "pk": 244,
   "fields": {
-    "nombre": "INGENIER�A GEOT�CNICA",
+    "nombre": "INGENIERÍA GEOTÉCNICA",
     "titulacion": 11,
     "curso": 2,
     "semestre": 1,
@@ -3654,7 +3654,7 @@
   "model": "academics.asignatura",
   "pk": 245,
   "fields": {
-    "nombre": "LOG�STICA, INTERMODALIDAD Y MODELOS CONCESIONALES",
+    "nombre": "LOGÍSTICA, INTERMODALIDAD Y MODELOS CONCESIONALES",
     "titulacion": 11,
     "curso": 2,
     "semestre": 1,
@@ -3665,7 +3665,7 @@
   "model": "academics.asignatura",
   "pk": 246,
   "fields": {
-    "nombre": "PLANEAMIENTO Y GESTI�N DE RECURSOS H�DRICOS",
+    "nombre": "PLANEAMIENTO Y GESTIÓN DE RECURSOS HÍDRICOS",
     "titulacion": 11,
     "curso": 2,
     "semestre": 1,
@@ -3687,7 +3687,7 @@
   "model": "academics.asignatura",
   "pk": 248,
   "fields": {
-    "nombre": "TRABAJO FIN DE M�STER",
+    "nombre": "TRABAJO FIN DE MÁSTER",
     "titulacion": 11,
     "curso": 2,
     "semestre": 1,
@@ -3698,7 +3698,7 @@
   "model": "academics.asignatura",
   "pk": 249,
   "fields": {
-    "nombre": "ACTUACIONES DE LA INGENIER�A CIVIL FRENTE A LOS RIESGOS NATURALES",
+    "nombre": "ACTUACIONES DE LA INGENIERÍA CIVIL FRENTE A LOS RIESGOS NATURALES",
     "titulacion": 11,
     "curso": 2,
     "semestre": 2,
@@ -3709,7 +3709,7 @@
   "model": "academics.asignatura",
   "pk": 250,
   "fields": {
-    "nombre": "AMPLIACI�N DE MATERIALES",
+    "nombre": "AMPLIACIÓN DE MATERIALES",
     "titulacion": 11,
     "curso": 2,
     "semestre": 2,
@@ -3720,7 +3720,7 @@
   "model": "academics.asignatura",
   "pk": 251,
   "fields": {
-    "nombre": "AUSCULTACI�N MONITORIZACI�N Y PERITACI�N",
+    "nombre": "AUSCULTACIÓN MONITORIZACIÓN Y PERITACIÓN",
     "titulacion": 11,
     "curso": 2,
     "semestre": 2,
@@ -3731,7 +3731,7 @@
   "model": "academics.asignatura",
   "pk": 252,
   "fields": {
-    "nombre": "CONTAMINACI�N",
+    "nombre": "CONTAMINACIÓN",
     "titulacion": 11,
     "curso": 2,
     "semestre": 2,
@@ -3742,7 +3742,7 @@
   "model": "academics.asignatura",
   "pk": 253,
   "fields": {
-    "nombre": "EMPRENDIMIENTO I+D+I EN INGENIER�A",
+    "nombre": "EMPRENDIMIENTO I+D+I EN INGENIERÍA",
     "titulacion": 11,
     "curso": 2,
     "semestre": 2,
@@ -3753,7 +3753,7 @@
   "model": "academics.asignatura",
   "pk": 254,
   "fields": {
-    "nombre": "GESTI�N DE EMPRESAS",
+    "nombre": "GESTIÓN DE EMPRESAS",
     "titulacion": 11,
     "curso": 2,
     "semestre": 2,
@@ -3764,7 +3764,7 @@
   "model": "academics.asignatura",
   "pk": 255,
   "fields": {
-    "nombre": "GESTI�N DE PATRIMONIO",
+    "nombre": "GESTIÓN DE PATRIMONIO",
     "titulacion": 11,
     "curso": 2,
     "semestre": 2,
@@ -3775,7 +3775,7 @@
   "model": "academics.asignatura",
   "pk": 256,
   "fields": {
-    "nombre": "GESTI�N DE PROYECTOS",
+    "nombre": "GESTIÓN DE PROYECTOS",
     "titulacion": 11,
     "curso": 2,
     "semestre": 2,
@@ -3786,7 +3786,7 @@
   "model": "academics.asignatura",
   "pk": 257,
   "fields": {
-    "nombre": "LA PROFESI�N DEL ICCP",
+    "nombre": "LA PROFESIÓN DEL ICCP",
     "titulacion": 11,
     "curso": 2,
     "semestre": 2,
@@ -3808,7 +3808,7 @@
   "model": "academics.asignatura",
   "pk": 259,
   "fields": {
-    "nombre": "PATOLOG�A Y REHABILITACI�N",
+    "nombre": "PATOLOGÍA Y REHABILITACIÓN",
     "titulacion": 11,
     "curso": 2,
     "semestre": 2,
@@ -3863,7 +3863,7 @@
   "model": "academics.asignatura",
   "pk": 264,
   "fields": {
-    "nombre": "TELEDETECCI�N EN OBRAS DE INGENIER�A CIVIL",
+    "nombre": "TELEDETECCIÓN EN OBRAS DE INGENIERÍA CIVIL",
     "titulacion": 11,
     "curso": 2,
     "semestre": 2,
@@ -3874,7 +3874,7 @@
   "model": "academics.asignatura",
   "pk": 265,
   "fields": {
-    "nombre": "INICIACI�N A LA INVESTIGACI�N",
+    "nombre": "INICIACIÓN A LA INVESTIGACIÓN",
     "titulacion": 9,
     "curso": 1,
     "semestre": 1,
@@ -3885,7 +3885,7 @@
   "model": "academics.asignatura",
   "pk": 266,
   "fields": {
-    "nombre": "PROYECTOS DE INVESTIGACI�N",
+    "nombre": "PROYECTOS DE INVESTIGACIÓN",
     "titulacion": 9,
     "curso": 1,
     "semestre": 1,
@@ -3896,7 +3896,7 @@
   "model": "academics.asignatura",
   "pk": 267,
   "fields": {
-    "nombre": "T�CNICAS, PROCEDIMIENTOS E INSTRUMENTOS DE RECOGIDA Y AN�LISIS DE DATOS",
+    "nombre": "TÉCNICAS, PROCEDIMIENTOS E INSTRUMENTOS DE RECOGIDA Y ANÁLISIS DE DATOS",
     "titulacion": 9,
     "curso": 1,
     "semestre": 1,
@@ -3907,7 +3907,7 @@
   "model": "academics.asignatura",
   "pk": 268,
   "fields": {
-    "nombre": "TECNOLOG�AS DE LA COMUNICACION Y LA DOCUMENTACI�N CIENT�FICA",
+    "nombre": "TECNOLOGÍAS DE LA COMUNICACION Y LA DOCUMENTACIÓN CIENTÍFICA",
     "titulacion": 9,
     "curso": 1,
     "semestre": 1,
@@ -3918,7 +3918,7 @@
   "model": "academics.asignatura",
   "pk": 269,
   "fields": {
-    "nombre": "LABORATORIO DE INVESTIGACI�N",
+    "nombre": "LABORATORIO DE INVESTIGACIÓN",
     "titulacion": 9,
     "curso": 1,
     "semestre": 1,
@@ -3929,7 +3929,7 @@
   "model": "academics.asignatura",
   "pk": 270,
   "fields": {
-    "nombre": "TRABAJO FIN DE M�STER",
+    "nombre": "TRABAJO FIN DE MÁSTER",
     "titulacion": 9,
     "curso": 1,
     "semestre": 1,
@@ -3951,7 +3951,7 @@
   "model": "academics.asignatura",
   "pk": 272,
   "fields": {
-    "nombre": "INTRODUCCI�N AL BIM. INTRODUCCI�N A LAS PLATAFORMAS DE TRABAJO (BIM I)",
+    "nombre": "INTRODUCCIÓN AL BIM. INTRODUCCIÓN A LAS PLATAFORMAS DE TRABAJO (BIM I)",
     "titulacion": 12,
     "curso": 1,
     "semestre": 1,
@@ -3962,7 +3962,7 @@
   "model": "academics.asignatura",
   "pk": 273,
   "fields": {
-    "nombre": "METODOLOG�A Y MODELADO AVANZADO DE PROYECTOS DE CONSTRUCCI�N BIM (BIM II)",
+    "nombre": "METODOLOGÍA Y MODELADO AVANZADO DE PROYECTOS DE CONSTRUCCIÓN BIM (BIM II)",
     "titulacion": 12,
     "curso": 1,
     "semestre": 1,
@@ -3973,7 +3973,7 @@
   "model": "academics.asignatura",
   "pk": 274,
   "fields": {
-    "nombre": "MEDICIONES Y PRESUPUESTOS. PLANIFICACI�N DE LA CONSTRUCCI�N Y CONTROL DE LA EJECUCI�N (4D Y 5D)",
+    "nombre": "MEDICIONES Y PRESUPUESTOS. PLANIFICACIÓN DE LA CONSTRUCCIÓN Y CONTROL DE LA EJECUCIÓN (4D Y 5D)",
     "titulacion": 12,
     "curso": 1,
     "semestre": 2,
@@ -3984,7 +3984,7 @@
   "model": "academics.asignatura",
   "pk": 275,
   "fields": {
-    "nombre": "TRABAJO FIN DE M�STER (ESP. EDIFICACI�N)",
+    "nombre": "TRABAJO FIN DE MÁSTER (ESP. EDIFICACIÓN)",
     "titulacion": 12,
     "curso": 1,
     "semestre": 1,
@@ -3995,7 +3995,7 @@
   "model": "academics.asignatura",
   "pk": 276,
   "fields": {
-    "nombre": "TRABAJO FIN DE M�STER (ESP. INGENIER�A CIVIL)",
+    "nombre": "TRABAJO FIN DE MÁSTER (ESP. INGENIERÍA CIVIL)",
     "titulacion": 12,
     "curso": 1,
     "semestre": 1,
@@ -4006,7 +4006,7 @@
   "model": "academics.asignatura",
   "pk": 277,
   "fields": {
-    "nombre": "DISE�O, MODELADO Y C�LCULO DE ESTRUCTURAS DE EDIFICACI�N MEDIANTE BIM",
+    "nombre": "DISEÑO, MODELADO Y CÁLCULO DE ESTRUCTURAS DE EDIFICACIÓN MEDIANTE BIM",
     "titulacion": 12,
     "curso": 1,
     "semestre": 1,
@@ -4017,7 +4017,7 @@
   "model": "academics.asignatura",
   "pk": 278,
   "fields": {
-    "nombre": "DISE�O, MODELADO Y C�LCULO DE ESTRUCTURAS DE INGENIER�A CIVIL MEDIANTE BIM",
+    "nombre": "DISEÑO, MODELADO Y CÁLCULO DE ESTRUCTURAS DE INGENIERÍA CIVIL MEDIANTE BIM",
     "titulacion": 12,
     "curso": 1,
     "semestre": 1,
@@ -4028,7 +4028,7 @@
   "model": "academics.asignatura",
   "pk": 279,
   "fields": {
-    "nombre": "DISE�O, MODELADO Y C�LCULO OBRAS DE LINEALES MEDIANTE BIM",
+    "nombre": "DISEÑO, MODELADO Y CÁLCULO OBRAS DE LINEALES MEDIANTE BIM",
     "titulacion": 12,
     "curso": 1,
     "semestre": 1,
@@ -4039,7 +4039,7 @@
   "model": "academics.asignatura",
   "pk": 280,
   "fields": {
-    "nombre": "MODELADO, DISE�O Y TRABAJO COLABORATIVO EN LAS INSTALACIONES DE EDIFICACI�N Y EFICIENCIA ENERG�TICA",
+    "nombre": "MODELADO, DISEÑO Y TRABAJO COLABORATIVO EN LAS INSTALACIONES DE EDIFICACIÓN Y EFICIENCIA ENERGÉTICA",
     "titulacion": 12,
     "curso": 1,
     "semestre": 1,
@@ -4050,7 +4050,7 @@
   "model": "academics.asignatura",
   "pk": 281,
   "fields": {
-    "nombre": "AN�LISIS DEL PROYECTO Y SUS INTERFERENCIAS.GESTI�N:DOCUMENTAL Y GR�FICA.INICIACI�N A LA VISUALIZACI�",
+    "nombre": "ANÁLISIS DEL PROYECTO Y SUS INTERFERENCIAS.GESTIÓN:DOCUMENTAL Y GRÁFICA.INICIACIÓN A LA VISUALIZACIÓ",
     "titulacion": 12,
     "curso": 1,
     "semestre": 1,
@@ -4061,7 +4061,7 @@
   "model": "academics.asignatura",
   "pk": 282,
   "fields": {
-    "nombre": "GESTI�N INTEGRAL, COORDINACI�N Y SOSTENIBILIDAD DEL PROYECTO Y SU IMPLANTACI�N EN BIM",
+    "nombre": "GESTIÓN INTEGRAL, COORDINACIÓN Y SOSTENIBILIDAD DEL PROYECTO Y SU IMPLANTACIÓN EN BIM",
     "titulacion": 12,
     "curso": 1,
     "semestre": 1,
@@ -4072,7 +4072,7 @@
   "model": "academics.asignatura",
   "pk": 283,
   "fields": {
-    "nombre": "PR�CTICAS EXTERNAS",
+    "nombre": "PRÁCTICAS EXTERNAS",
     "titulacion": 12,
     "curso": 1,
     "semestre": 1,
@@ -4083,7 +4083,7 @@
   "model": "academics.asignatura",
   "pk": 284,
   "fields": {
-    "nombre": "SUPERFICIES COMPLEJAS, RENDERIZADO Y VISUALIZACI�N DE MODELOS BIM",
+    "nombre": "SUPERFICIES COMPLEJAS, RENDERIZADO Y VISUALIZACIÓN DE MODELOS BIM",
     "titulacion": 12,
     "curso": 1,
     "semestre": 1,
@@ -4094,7 +4094,7 @@
   "model": "schedule.tipoactividad",
   "pk": 1,
   "fields": {
-    "nombre": "Pr�ctica de Laboratorio"
+    "nombre": "Práctica de Laboratorio"
   }
 },
 {
@@ -4115,7 +4115,7 @@
   "model": "schedule.tipoactividad",
   "pk": 4,
   "fields": {
-    "nombre": "Exposici�n Oral en Clase"
+    "nombre": "Exposición Oral en Clase"
   }
 },
 {
@@ -4133,7 +4133,7 @@
     "tipo_actividad": 2,
     "fecha_inicio": "2025-08-27T18:00:00Z",
     "fecha_fin": "2025-08-27T20:30:00Z",
-    "descripcion": "Prueba de creaci�n de actividad",
+    "descripcion": "Prueba de creación de actividad",
     "evaluable": false,
     "porcentaje_evaluacion": "0.00",
     "no_recuperable": false,
@@ -4207,7 +4207,7 @@
     "object_id": 5,
     "timestamp": "2025-08-28T21:35:31.246Z",
     "usuario": 1,
-    "tipo_log": "Creaci�n",
+    "tipo_log": "Creación",
     "details": "Activity type \"Seminario\" created"
   }
 },
@@ -4221,7 +4221,7 @@
     "object_id": 4,
     "timestamp": "2025-08-29T09:29:47.181Z",
     "usuario": 1,
-    "tipo_log": "Creaci�n",
+    "tipo_log": "Creación",
     "details": "Activity \"Clase de repaso\" created for 1 subject(s)"
   }
 },
@@ -4235,7 +4235,7 @@
     "object_id": 4,
     "timestamp": "2025-08-29T09:30:54.772Z",
     "usuario": 1,
-    "tipo_log": "Modificaci�n",
+    "tipo_log": "Modificación",
     "details": "Activity \"Clase de repaso antes de parcial\" modified"
   }
 },
@@ -4245,12 +4245,12 @@
   "fields": {
     "actividad": null,
     "object_type": "coordinador",
-    "object_name": "Grado En Ingenier�a Civil",
+    "object_name": "Grado En Ingeniería Civil",
     "object_id": 4,
     "timestamp": "2025-08-29T10:31:02.032Z",
     "usuario": 1,
-    "tipo_log": "Modificaci�n",
-    "details": "Coordinator for \"Grado En Ingenier�a Civil\" changed from teacher to jose_1"
+    "tipo_log": "Modificación",
+    "details": "Coordinator for \"Grado En Ingeniería Civil\" changed from teacher to jose_1"
   }
 },
 {
@@ -4259,12 +4259,12 @@
   "fields": {
     "actividad": null,
     "object_type": "coordinador",
-    "object_name": "Grado En Ingenier�a De Sonido E Imagen En Telecomunicaci�n",
+    "object_name": "Grado En Ingeniería De Sonido E Imagen En Telecomunicación",
     "object_id": 5,
     "timestamp": "2025-08-29T10:31:15.393Z",
     "usuario": 1,
-    "tipo_log": "Asignaci�n",
-    "details": "Coordinator pedro_1 assigned to \"Grado En Ingenier�a De Sonido E Imagen En Telecomunicaci�n\""
+    "tipo_log": "Asignación",
+    "details": "Coordinator pedro_1 assigned to \"Grado En Ingeniería De Sonido E Imagen En Telecomunicación\""
   }
 },
 {
@@ -4273,12 +4273,12 @@
   "fields": {
     "actividad": null,
     "object_type": "coordinador",
-    "object_name": "Grado En Ingenier�a Inform�tica En Ingenier�a De Computadores",
+    "object_name": "Grado En Ingeniería Informática En Ingeniería De Computadores",
     "object_id": 6,
     "timestamp": "2025-08-29T10:31:28.965Z",
     "usuario": 1,
-    "tipo_log": "Asignaci�n",
-    "details": "Coordinator antonio_1 assigned to \"Grado En Ingenier�a Inform�tica En Ingenier�a De Computadores\""
+    "tipo_log": "Asignación",
+    "details": "Coordinator antonio_1 assigned to \"Grado En Ingeniería Informática En Ingeniería De Computadores\""
   }
 },
 {
@@ -4287,12 +4287,12 @@
   "fields": {
     "actividad": null,
     "object_type": "coordinador",
-    "object_name": "Grado En Ingenier�a Inform�tica En Ingenier�a Del Software",
+    "object_name": "Grado En Ingeniería Informática En Ingeniería Del Software",
     "object_id": 7,
     "timestamp": "2025-08-29T10:31:41.796Z",
     "usuario": 1,
-    "tipo_log": "Asignaci�n",
-    "details": "Coordinator pablo_1 assigned to \"Grado En Ingenier�a Inform�tica En Ingenier�a Del Software\""
+    "tipo_log": "Asignación",
+    "details": "Coordinator pablo_1 assigned to \"Grado En Ingeniería Informática En Ingeniería Del Software\""
   }
 },
 {
@@ -4301,12 +4301,12 @@
   "fields": {
     "actividad": null,
     "object_type": "coordinador",
-    "object_name": "M�ster Universitario En Ingenier�a De Caminos",
+    "object_name": "Máster Universitario En Ingeniería De Caminos",
     "object_id": 8,
     "timestamp": "2025-08-29T10:32:08.661Z",
     "usuario": 1,
-    "tipo_log": "Asignaci�n",
-    "details": "Coordinator marta_1 assigned to \"M�ster Universitario En Ingenier�a De Caminos\""
+    "tipo_log": "Asignación",
+    "details": "Coordinator marta_1 assigned to \"Máster Universitario En Ingeniería De Caminos\""
   }
 },
 {
@@ -4361,7 +4361,7 @@
     "object_id": null,
     "timestamp": "2025-08-29T10:41:59.157Z",
     "usuario": 1,
-    "tipo_log": "Desaprobaci�n desde Dashboard",
+    "tipo_log": "Desaprobación desde Dashboard",
     "details": null
   }
 },
@@ -4375,7 +4375,7 @@
     "object_id": null,
     "timestamp": "2025-08-29T10:42:01.526Z",
     "usuario": 1,
-    "tipo_log": "Aprobaci�n desde Dashboard",
+    "tipo_log": "Aprobación desde Dashboard",
     "details": null
   }
 },
@@ -4389,7 +4389,7 @@
     "object_id": null,
     "timestamp": "2025-08-29T10:42:03.503Z",
     "usuario": 1,
-    "tipo_log": "Desaprobaci�n desde Dashboard",
+    "tipo_log": "Desaprobación desde Dashboard",
     "details": null
   }
 },
@@ -4403,7 +4403,7 @@
     "object_id": null,
     "timestamp": "2025-08-29T10:42:04.665Z",
     "usuario": 1,
-    "tipo_log": "Aprobaci�n desde Dashboard",
+    "tipo_log": "Aprobación desde Dashboard",
     "details": null
   }
 },
@@ -4468,7 +4468,7 @@
     "version_numero": 1,
     "modificada_por": 1,
     "fecha_modificacion": "2025-08-29T09:30:54.750Z",
-    "comentario_version": "he cambiado el t�tulo",
+    "comentario_version": "he cambiado el título",
     "nombre": "Clase de repaso",
     "descripcion": "Clase antes del primer parcial",
     "fecha_inicio": "2025-11-12T11:29:00Z",
@@ -4481,7 +4481,7 @@
     "asignaturas_snapshot": [
       {
         "id": 1,
-        "nombre": "C�LCULO PARA LA EDIFICACI�N"
+        "nombre": "CÁLCULO PARA LA EDIFICACIÓN"
       }
     ],
     "tipo_actividad_snapshot": {
@@ -4511,7 +4511,7 @@
     "asignaturas_snapshot": [
       {
         "id": 1,
-        "nombre": "C�LCULO PARA LA EDIFICACI�N"
+        "nombre": "CÁLCULO PARA LA EDIFICACIÓN"
       }
     ],
     "tipo_actividad_snapshot": {
@@ -4541,7 +4541,7 @@
     "asignaturas_snapshot": [
       {
         "id": 1,
-        "nombre": "C�LCULO PARA LA EDIFICACI�N"
+        "nombre": "CÁLCULO PARA LA EDIFICACIÓN"
       }
     ],
     "tipo_actividad_snapshot": {
@@ -4560,7 +4560,7 @@
     "fecha_modificacion": "2025-08-29T10:42:03.487Z",
     "comentario_version": "Approval status changed to False",
     "nombre": "Prueba 02",
-    "descripcion": "Prueba de creaci�n de actividad",
+    "descripcion": "Prueba de creación de actividad",
     "fecha_inicio": "2025-08-27T18:00:00Z",
     "fecha_fin": "2025-08-27T20:30:00Z",
     "evaluable": false,
@@ -4571,7 +4571,7 @@
     "asignaturas_snapshot": [
       {
         "id": 1,
-        "nombre": "C�LCULO PARA LA EDIFICACI�N"
+        "nombre": "CÁLCULO PARA LA EDIFICACIÓN"
       }
     ],
     "tipo_actividad_snapshot": {
@@ -4590,7 +4590,7 @@
     "fecha_modificacion": "2025-08-29T10:42:04.646Z",
     "comentario_version": "Approval status changed to True",
     "nombre": "Prueba 02",
-    "descripcion": "Prueba de creaci�n de actividad",
+    "descripcion": "Prueba de creación de actividad",
     "fecha_inicio": "2025-08-27T18:00:00Z",
     "fecha_fin": "2025-08-27T20:30:00Z",
     "evaluable": false,
@@ -4601,7 +4601,7 @@
     "asignaturas_snapshot": [
       {
         "id": 1,
-        "nombre": "C�LCULO PARA LA EDIFICACI�N"
+        "nombre": "CÁLCULO PARA LA EDIFICACIÓN"
       }
     ],
     "tipo_actividad_snapshot": {
