@@ -33,6 +33,7 @@ urlpatterns = [
     path('ajax/get_filtered_asignaturas/', schedule_views.get_filtered_asignaturas, name='get_filtered_asignaturas'),
     path('activity/new/', schedule_views.activity_form, name='activity_new'),
     path('activity/edit/<int:pk>/', schedule_views.activity_form, name='activity_edit'),
+    path('activity/details/<int:pk>/', schedule_views.activity_form, {'read_only': True}, name='activity_details_readonly'),
     path('activity/delete/<int:pk>/', schedule_views.activity_delete, name='activity_delete'),
     path('activity/list/', schedule_views.activity_list, name='activity_list'),
     path('activity/logs/', schedule_views.activity_logs, name='activity_logs'),
@@ -46,9 +47,25 @@ urlpatterns = [
     path('tipoactividad/create/', schedule_views.TipoActividadCreateView.as_view(), name='tipoactividad_create'),
     path('tipoactividad/<int:pk>/update/', schedule_views.TipoActividadUpdateView.as_view(), name='tipoactividad_update'),
     path('tipoactividad/<int:pk>/delete/', schedule_views.TipoActividadDeleteView.as_view(), name='tipoactividad_delete'),
+    # AJAX endpoints for activity types
+    path('ajax/tipoactividad/create/', schedule_views.ajax_create_tipo_actividad, name='ajax_create_tipo_actividad'),
+    path('ajax/tipoactividad/<int:pk>/update/', schedule_views.ajax_update_tipo_actividad, name='ajax_update_tipo_actividad'),
+    path('ajax/tipoactividad/<int:pk>/delete/', schedule_views.ajax_delete_tipo_actividad, name='ajax_delete_tipo_actividad'),
+    path('ajax/tipoactividad/<int:pk>/activity_count/', schedule_views.ajax_get_activity_count, name='ajax_get_activity_count'),
     path('all_activities/', schedule_views.all_activities, name='all_activities'),
     path('activity/delete_misassigned/<int:pk>/', schedule_views.delete_misassigned_activity, name='delete_misassigned_activity'),
     path('activity/toggle_approval_from_dashboard/<int:pk>/', schedule_views.toggle_activity_approval_from_dashboard, name='toggle_activity_approval_from_dashboard'),
+    # Activity versioning URLs
+    path('activity/<int:pk>/versions/', schedule_views.activity_version_history, name='activity_version_history'),
+    path('activity/<int:pk>/versions/<int:version_id>/', schedule_views.activity_version_detail, name='activity_version_detail'),
+    path('activity/<int:pk>/versions/<int:version_id>/restore/', schedule_views.activity_restore_version, name='activity_restore_version'),
+    # PDF Reports
+    path('reports/agenda/<int:titulacion_id>/', schedule_views.generate_agenda_report, name='generate_agenda_report_titulacion'),
+    path('reports/agenda/', schedule_views.generate_agenda_report, name='generate_agenda_report_all'),
+    # iCal Management
+    path('ical/create_automatic/', schedule_views.create_automatic_icals, name='create_automatic_icals'),
+    path('ical/management/', schedule_views.ical_management, name='ical_management'),
     path('', agenda_views.home, name='home'),
     path('agenda_settings/', agenda_views.agenda_settings, name='agenda_settings'),
+    path('ajax/agenda_settings/update/', agenda_views.ajax_update_agenda_settings, name='ajax_update_agenda_settings'),
 ]

@@ -23,9 +23,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-=4qk(3frmnwbce5-2v5((hau&buak0@m0y-x)ncpz0!d-(ey$e'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['jtorreci.pythonanywhere.com', 'www.jtorreci.pythonanywhere.com'] # Replace with your PythonAnywhere domain
 
 
 # Application definition
@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'widget_tweaks',
     'agenda_academica.apps.AgendaAcademicaConfig',
     'users',
     'academics',
@@ -49,6 +50,7 @@ AUTH_USER_MODEL = 'users.CustomUser'
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',  # Add this for i18n support
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -111,6 +113,12 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'es'
 
+# Available languages
+LANGUAGES = [
+    ('en', 'English'),
+    ('es', 'Español'),
+]
+
 TIME_ZONE = 'UTC'
 
 USE_I18N = True
@@ -126,14 +134,14 @@ LOCALE_PATHS = [
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles' # Added for deployment
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Agenda Closing Date
-AGENDA_CLOSING_DATE = '2025-12-31' # Example date, change as needed
+# Agenda Closing Date is now managed via AgendaSettings model in DB, no longer needed here.
 
 # Email Backend Configuration
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

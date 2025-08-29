@@ -6,38 +6,69 @@
     <table class="table table-striped">
         <thead>
             <tr>
-                <th>Activity</th>
+                <th>Object Type</th>
+                <th>Object</th>
                 <th>User</th>
-                <th>Log Type</th>
-                <th>Titulacion(es)</th>
-                <th>Asignatura(s)</th>
+                <th>Action</th>
+                <th>Details</th>
                 <th>Timestamp</th>
             </tr>
         </thead>
         <tbody>
             {% for log in logs %}
             <tr>
-                <td>{{ log.actividad.nombre }}</td>
+                <td>
+                    {% if log.object_type == 'actividad' %}
+                        <span class="badge bg-primary">Activity</span>
+                    {% elif log.object_type == 'tipo_actividad' %}
+                        <span class="badge bg-secondary">Activity Type</span>
+                    {% elif log.object_type == 'coordinador' %}
+                        <span class="badge bg-warning text-dark">Coordinator</span>
+                    {% else %}
+                        <span class="badge bg-light text-dark">{{ log.object_type|title }}</span>
+                    {% endif %}
+                </td>
+                <td>{{ log.object_name }}</td>
                 <td>{{ log.usuario.username }}</td>
-                <td>{{ log.tipo_log }}</td>
                 <td>
-                    {% for asignatura in log.actividad.asignaturas.all %}
-                        {{ asignatura.titulacion.nombre }}{% if not forloop.last %}, {% endif %}
-                    {% endfor %}
+                    {% if log.tipo_log == 'Creación' or log.tipo_log == 'Asignación' %}
+                        <span class="badge bg-success">{{ log.tipo_log }}</span>
+                    {% elif log.tipo_log == 'Modificación' %}
+                        <span class="badge bg-info text-dark">{{ log.tipo_log }}</span>
+                    {% elif log.tipo_log == 'Eliminación' %}
+                        <span class="badge bg-danger">{{ log.tipo_log }}</span>
+                    {% else %}
+                        <span class="badge bg-secondary">{{ log.tipo_log }}</span>
+                    {% endif %}
                 </td>
                 <td>
-                    {% for asignatura in log.actividad.asignaturas.all %}
-                        {{ asignatura.nombre }}{% if not forloop.last %}, {% endif %}
-                    {% endfor %}
+                    {% if log.details %}
+                        {{ log.details|truncatechars:100 }}
+                    {% elif log.actividad %}
+                        <!-- Backward compatibility for old logs -->
+                        Activity: {{ log.actividad.nombre }}
+                        {% if log.actividad.asignaturas.exists %}
+                            <br><small class="text-muted">
+                                Subjects: {% for asignatura in log.actividad.asignaturas.all %}{{ asignatura.nombre }}{% if not forloop.last %}, {% endif %}{% endfor %}
+                            </small>
+                        {% endif %}
+                    {% else %}
+                        -
+                    {% endif %}
                 </td>
-                <td>{{ log.timestamp }}</td>
+                <td>{{ log.timestamp|date:"M d, Y H:i" }}</td>
             </tr>
             {% empty %}
             <tr>
-                <td colspan="6">No activity logs found.</td>
+                <td colspan="6" class="text-center text-muted">No activity logs found.</td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
+    <div class="mt-3">
+        <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Back to Dashboard
+        </a>
+    </div>
 </div>
 {% endblock %}

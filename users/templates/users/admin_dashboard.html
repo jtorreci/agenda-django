@@ -1,0 +1,1049 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Admin Dashboard</h2>
+                <div class="d-flex gap-2">
+                    <div class="dropdown">
+                        <button class="btn btn-outline-success dropdown-toggle" type="button" id="pdfReportSelector" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-file-pdf"></i> Generate PDF Report
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="pdfReportSelector">
+                            {% for titulacion in all_titulaciones %}
+                                <li><a class="dropdown-item" href="{% url 'generate_agenda_report_titulacion' titulacion.id %}">{{ titulacion.nombre }}</a></li>
+                            {% endfor %}
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'generate_agenda_report_all' %}"><strong>All Titulaciones</strong></a></li>
+                        </ul>
+                    </div>
+                    <a href="{% url 'ical_management' %}" class="btn btn-outline-warning">
+                        <i class="bi bi-calendar-event"></i> Manage iCal
+                    </a>
+                    <div class="dropdown">
+                        <button class="btn btn-outline-primary dropdown-toggle" type="button" id="roleSelector" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-person-gear"></i> Switch Role
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="roleSelector">
+                            <li><a class="dropdown-item" href="{% url 'admin_dashboard' %}">
+                                <i class="bi bi-shield-check"></i> Admin Dashboard
+                            </a></li>
+                            <li><a class="dropdown-item" href="{% url 'coordinator_dashboard' %}">
+                                <i class="bi bi-person-workspace"></i> Coordinator View
+                            </a></li>
+                            <li><a class="dropdown-item" href="{% url 'teacher_dashboard' %}">
+                                <i class="bi bi-book"></i> Teacher View
+                            </a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- KPI Report Card -->
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#kpiCard" aria-expanded="true">
+                    <h5 class="mb-0">
+                        <i class="bi bi-graph-up"></i> KPI Report
+                    </h5>
+                    <button class="btn btn-sm btn-outline-secondary toggle-card">
+                        <i class="bi bi-chevron-up"></i>
+                    </button>
+                </div>
+                <div id="kpiCard" class="collapse show">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-2 col-6 mb-3">
+                                <div class="card bg-light">
+                                    <div class="card-body text-center">
+                                        <h3 class="text-primary">{{ total_users }}</h3>
+                                        <p class="mb-0 small">Total Users</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-2 col-6 mb-3">
+                                <div class="card bg-light">
+                                    <div class="card-body text-center">
+                                        <h3 class="text-success">{{ total_teachers }}</h3>
+                                        <p class="mb-0 small">Teachers</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-2 col-6 mb-3">
+                                <div class="card bg-light">
+                                    <div class="card-body text-center">
+                                        <h3 class="text-info">{{ total_students }}</h3>
+                                        <p class="mb-0 small">Students</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-2 col-6 mb-3">
+                                <div class="card bg-light">
+                                    <div class="card-body text-center">
+                                        <h3 class="text-warning">{{ total_activities }}</h3>
+                                        <p class="mb-0 small">Total Activities</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-2 col-6 mb-3">
+                                <div class="card bg-light">
+                                    <div class="card-body text-center">
+                                        <h3 class="text-success">{{ active_activities }}</h3>
+                                        <p class="mb-0 small">Active Activities</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-2 col-6 mb-3">
+                                <div class="card bg-light">
+                                    <div class="card-body text-center">
+                                        <h3 class="text-dark">{{ total_asignaturas }}</h3>
+                                        <p class="mb-0 small">Asignaturas</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-3 col-6 mb-3">
+                                <div class="card bg-light">
+                                    <div class="card-body text-center">
+                                        <h3 class="text-secondary">{{ total_titulaciones }}</h3>
+                                        <p class="mb-0 small">Titulaciones</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Activity Types Management Card -->
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#activityTypesCard" aria-expanded="false">
+                    <h5 class="mb-0">
+                        <i class="bi bi-tags"></i> Manage Activity Types
+                    </h5>
+                    <button class="btn btn-sm btn-outline-secondary toggle-card">
+                        <i class="bi bi-chevron-down"></i>
+                    </button>
+                </div>
+                <div id="activityTypesCard" class="collapse">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h6>Current Activity Types</h6>
+                            <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#createActivityTypeModal">
+                                <i class="bi bi-plus-circle"></i> Create New Type
+                            </button>
+                        </div>
+                        
+                        <!-- Alert for messages -->
+                        <div id="activityTypeAlert" class="alert alert-dismissible fade" role="alert" style="display: none;">
+                            <span id="activityTypeAlertMessage"></span>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="activityTypesTableBody">
+                                    {% for tipo in tipos_actividad %}
+                                    <tr data-tipo-id="{{ tipo.id }}">
+                                        <td class="tipo-name">{{ tipo.nombre }}</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-primary edit-tipo-btn" data-tipo-id="{{ tipo.id }}" data-tipo-name="{{ tipo.nombre }}">
+                                                <i class="bi bi-pencil"></i> Edit
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-danger delete-tipo-btn" data-tipo-id="{{ tipo.id }}" data-tipo-name="{{ tipo.nombre }}">
+                                                <i class="bi bi-trash"></i> Delete
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr id="noActivityTypesRow">
+                                        <td colspan="2" class="text-center text-muted">No activity types found</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- Delete confirmation form (initially hidden) -->
+                        <div id="deleteConfirmationForm" class="card mt-3" style="display: none;">
+                            <div class="card-header bg-warning">
+                                <h6 class="mb-0">
+                                    <i class="bi bi-exclamation-triangle"></i> 
+                                    Confirm Deletion: <span id="deleteTypeName"></span>
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <div id="deleteOptionsContainer">
+                                    <!-- Content will be dynamically populated -->
+                                </div>
+                                <div class="mt-3">
+                                    <button id="confirmDeleteBtn" class="btn btn-danger me-2">
+                                        <i class="bi bi-trash"></i> Confirm Delete
+                                    </button>
+                                    <button id="cancelDeleteBtn" class="btn btn-secondary">
+                                        <i class="bi bi-x-circle"></i> Cancel
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Agenda Settings Card -->
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#settingsCard" aria-expanded="false">
+                    <h5 class="mb-0">
+                        <i class="bi bi-sliders"></i> Agenda Settings
+                    </h5>
+                    <button class="btn btn-sm btn-outline-secondary toggle-card">
+                        <i class="bi bi-chevron-down"></i>
+                    </button>
+                </div>
+                <div id="settingsCard" class="collapse">
+                    <div class="card-body">
+                        <!-- Alert for agenda settings messages -->
+                        <div id="agendaSettingsAlert" class="alert alert-dismissible fade" role="alert" style="display: none;">
+                            <span id="agendaSettingsAlertMessage"></span>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between align-items-center">
+                            {% if settings %}
+                                <div>
+                                    <p class="mb-1"><strong>Closing Date:</strong></p>
+                                    <p class="mb-0 text-muted" id="currentClosingDate">{{ settings.closing_date|date:"d/m/Y" }}</p>
+                                </div>
+                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#agendaSettingsModal" 
+                                        data-current-date="{{ settings.closing_date|date:'Y-m-d' }}">
+                                    <i class="bi bi-calendar-edit"></i> Change Date
+                                </button>
+                            {% else %}
+                                <div>
+                                    <p class="text-muted mb-0">No closing date configured yet.</p>
+                                </div>
+                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#agendaSettingsModal">
+                                    <i class="bi bi-calendar-plus"></i> Set Date
+                                </button>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mt-3">
+                            <small class="text-muted">
+                                <i class="bi bi-info-circle"></i> 
+                                Activities before this date are marked as past events in the calendar.
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Assign Coordinators Card -->
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#coordinatorsCard" aria-expanded="false">
+                    <h5 class="mb-0">
+                        <i class="bi bi-person-plus"></i> Assign Coordinators
+                    </h5>
+                    <button class="btn btn-sm btn-outline-secondary toggle-card">
+                        <i class="bi bi-chevron-down"></i>
+                    </button>
+                </div>
+                <div id="coordinatorsCard" class="collapse">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h6>Coordinator Assignments</h6>
+                            <div class="text-muted small">
+                                <i class="bi bi-info-circle"></i> Click edit to assign coordinators
+                            </div>
+                        </div>
+                        
+                        <!-- Alert for coordinator messages -->
+                        <div id="coordinatorAlert" class="alert alert-dismissible fade" role="alert" style="display: none;">
+                            <span id="coordinatorAlertMessage"></span>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 60%;">Titulación</th>
+                                        <th style="width: 30%;">Coordinator</th>
+                                        <th style="width: 10%;">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="coordinatorsTableBody">
+                                    {% for titulacion in titulaciones %}
+                                    <tr data-titulacion-id="{{ titulacion.id }}">
+                                        <td class="titulacion-name" title="{{ titulacion.nombre }}">
+                                            {{ titulacion.nombre|truncatechars:40 }}
+                                        </td>
+                                        <td class="coordinator-info">
+                                            {% if titulacion.coordinador %}
+                                                <span class="badge bg-success">{{ titulacion.coordinador.username }}</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">Not assigned</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-primary edit-coordinator-btn" 
+                                                    data-titulacion-id="{{ titulacion.id }}" 
+                                                    data-titulacion-name="{{ titulacion.nombre }}"
+                                                    data-current-coordinator="{{ titulacion.coordinador.id|default:'' }}"
+                                                    data-current-coordinator-name="{{ titulacion.coordinador.username|default:'' }}">
+                                                <i class="bi bi-pencil"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr id="noCoordinatorsRow">
+                                        <td colspan="3" class="text-center text-muted">No titulaciones found</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Activity Logs Card -->
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#logsCard" aria-expanded="false">
+                    <h5 class="mb-0">
+                        <i class="bi bi-journal-text"></i> Activity Logs
+                    </h5>
+                    <button class="btn btn-sm btn-outline-secondary toggle-card">
+                        <i class="bi bi-chevron-down"></i>
+                    </button>
+                </div>
+                <div id="logsCard" class="collapse">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h6>Recent Activity (Last 50 entries)</h6>
+                            <a href="{% url 'activity_logs' %}" class="btn btn-primary">
+                                <i class="bi bi-journal-text"></i> View All Logs
+                            </a>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Object Type</th>
+                                        <th>Object</th>
+                                        <th>User</th>
+                                        <th>Action</th>
+                                        <th>Timestamp</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for log in logs %}
+                                    <tr>
+                                        <td>
+                                            {% if log.object_type == 'actividad' %}
+                                                <span class="badge bg-primary">Activity</span>
+                                            {% elif log.object_type == 'tipo_actividad' %}
+                                                <span class="badge bg-secondary">Activity Type</span>
+                                            {% elif log.object_type == 'coordinador' %}
+                                                <span class="badge bg-warning text-dark">Coordinator</span>
+                                            {% else %}
+                                                <span class="badge bg-light text-dark">{{ log.object_type|title }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td title="{% if log.details %}{{ log.details }}{% endif %}">
+                                            {{ log.object_name|truncatechars:25 }}
+                                        </td>
+                                        <td>{{ log.usuario.username }}</td>
+                                        <td>
+                                            {% if log.tipo_log == 'Creación' or log.tipo_log == 'Asignación' %}
+                                                <span class="badge bg-success">{{ log.tipo_log }}</span>
+                                            {% elif log.tipo_log == 'Modificación' %}
+                                                <span class="badge bg-info text-dark">{{ log.tipo_log }}</span>
+                                            {% elif log.tipo_log == 'Eliminación' %}
+                                                <span class="badge bg-danger">{{ log.tipo_log }}</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">{{ log.tipo_log }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ log.timestamp|date:"M d, H:i" }}</td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted">No activity logs found</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create Activity Type Modal -->
+<div class="modal fade" id="createActivityTypeModal" tabindex="-1" aria-labelledby="createActivityTypeModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createActivityTypeModalLabel">
+                    <i class="bi bi-plus-circle"></i> Create New Activity Type
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="createActivityTypeForm">
+                    <div class="mb-3">
+                        <label for="createActivityTypeName" class="form-label">Activity Type Name</label>
+                        <input type="text" class="form-control" id="createActivityTypeName" required>
+                        <div class="form-text">Enter a unique name for the activity type.</div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-success" id="saveActivityTypeBtn">
+                    <i class="bi bi-check-circle"></i> Create
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Activity Type Modal -->
+<div class="modal fade" id="editActivityTypeModal" tabindex="-1" aria-labelledby="editActivityTypeModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editActivityTypeModalLabel">
+                    <i class="bi bi-pencil"></i> Edit Activity Type
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editActivityTypeForm">
+                    <div class="mb-3">
+                        <label for="editActivityTypeName" class="form-label">Activity Type Name</label>
+                        <input type="text" class="form-control" id="editActivityTypeName" required>
+                        <div class="form-text">Enter a unique name for the activity type.</div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="updateActivityTypeBtn">
+                    <i class="bi bi-check-circle"></i> Update
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Agenda Settings Modal -->
+<div class="modal fade" id="agendaSettingsModal" tabindex="-1" aria-labelledby="agendaSettingsModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="agendaSettingsModalLabel">
+                    <i class="bi bi-calendar-edit"></i> Update Agenda Settings
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="agendaSettingsForm">
+                    <div class="mb-3">
+                        <label for="closingDateInput" class="form-label">Closing Date</label>
+                        <input type="date" class="form-control" id="closingDateInput" required>
+                        <div class="form-text">
+                            Activities before this date will be marked as past events in calendars.
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-success" id="saveAgendaSettingsBtn">
+                    <i class="bi bi-check-circle"></i> Update Date
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Assign Coordinator Modal -->
+<div class="modal fade" id="assignCoordinatorModal" tabindex="-1" aria-labelledby="assignCoordinatorModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="assignCoordinatorModalLabel">
+                    <i class="bi bi-person-gear"></i> Assign Coordinator
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="assignCoordinatorForm">
+                    <div class="mb-3">
+                        <label for="titulacionName" class="form-label">Titulación</label>
+                        <input type="text" class="form-control" id="titulacionName" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="coordinatorSelect" class="form-label">Select Coordinator</label>
+                        <select class="form-select" id="coordinatorSelect" required>
+                            <option value="">-- Remove coordinator --</option>
+                            {% for user in all_users %}
+                                <option value="{{ user.id }}">
+                                    {{ user.username }} - {{ user.first_name }} {{ user.last_name }} ({{ user.get_role_display }})
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <div class="form-text">
+                            Users assigned as coordinators will automatically get COORDINATOR role (unless they are ADMIN).
+                        </div>
+                    </div>
+                    <div class="mb-2" id="currentCoordinatorInfo" style="display: none;">
+                        <small class="text-muted">
+                            <strong>Current coordinator:</strong> <span id="currentCoordinatorName"></span>
+                        </small>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-success" id="saveCoordinatorBtn">
+                    <i class="bi bi-check-circle"></i> Assign
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle collapse events for Bootstrap 5
+    const collapseElements = document.querySelectorAll('.collapse');
+    
+    collapseElements.forEach(function(element) {
+        element.addEventListener('show.bs.collapse', function() {
+            const header = document.querySelector(`[data-bs-target="#${element.id}"]`);
+            if (header) {
+                const icon = header.querySelector('.toggle-card i');
+                if (icon) {
+                    icon.className = 'bi bi-chevron-up';
+                }
+                header.setAttribute('aria-expanded', 'true');
+            }
+        });
+        
+        element.addEventListener('hide.bs.collapse', function() {
+            const header = document.querySelector(`[data-bs-target="#${element.id}"]`);
+            if (header) {
+                const icon = header.querySelector('.toggle-card i');
+                if (icon) {
+                    icon.className = 'bi bi-chevron-down';
+                }
+                header.setAttribute('aria-expanded', 'false');
+            }
+        });
+    });
+
+    // Activity Types CRUD functionality
+    let currentEditingTipoId = null;
+    let currentDeletingTipoId = null;
+
+    // Show alert message
+    function showAlert(message, type = 'success') {
+        const alert = document.getElementById('activityTypeAlert');
+        const alertMessage = document.getElementById('activityTypeAlertMessage');
+        
+        alert.className = `alert alert-${type} alert-dismissible fade show`;
+        alertMessage.textContent = message;
+        alert.style.display = 'block';
+        
+        // Auto-hide after 5 seconds
+        setTimeout(() => {
+            alert.style.display = 'none';
+        }, 5000);
+    }
+
+    // Get CSRF token
+    function getCSRFToken() {
+        return document.querySelector('[name=csrfmiddlewaretoken]')?.value || 
+               document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+    }
+
+    // Create activity type
+    document.getElementById('saveActivityTypeBtn').addEventListener('click', function() {
+        const name = document.getElementById('createActivityTypeName').value.trim();
+        
+        if (!name) {
+            showAlert('Please enter a name for the activity type', 'danger');
+            return;
+        }
+
+        fetch('{% url "ajax_create_tipo_actividad" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCSRFToken()
+            },
+            body: JSON.stringify({ nombre: name })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Add new row to table
+                const tableBody = document.getElementById('activityTypesTableBody');
+                const noDataRow = document.getElementById('noActivityTypesRow');
+                
+                if (noDataRow) {
+                    noDataRow.remove();
+                }
+                
+                const newRow = document.createElement('tr');
+                newRow.setAttribute('data-tipo-id', data.id);
+                newRow.innerHTML = `
+                    <td class="tipo-name">${data.nombre}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary edit-tipo-btn" data-tipo-id="${data.id}" data-tipo-name="${data.nombre}">
+                            <i class="bi bi-pencil"></i> Edit
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger delete-tipo-btn" data-tipo-id="${data.id}" data-tipo-name="${data.nombre}">
+                            <i class="bi bi-trash"></i> Delete
+                        </button>
+                    </td>
+                `;
+                tableBody.appendChild(newRow);
+                
+                // Reset form and close modal
+                document.getElementById('createActivityTypeName').value = '';
+                const modal = bootstrap.Modal.getInstance(document.getElementById('createActivityTypeModal'));
+                modal.hide();
+                
+                showAlert(`Activity type "${data.nombre}" created successfully!`, 'success');
+            } else {
+                showAlert(data.error, 'danger');
+            }
+        })
+        .catch(error => {
+            showAlert('Error creating activity type', 'danger');
+            console.error('Error:', error);
+        });
+    });
+
+    // Edit activity type
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.edit-tipo-btn')) {
+            const btn = e.target.closest('.edit-tipo-btn');
+            const tipoId = btn.getAttribute('data-tipo-id');
+            const tipoName = btn.getAttribute('data-tipo-name');
+            
+            currentEditingTipoId = tipoId;
+            document.getElementById('editActivityTypeName').value = tipoName;
+            
+            const modal = new bootstrap.Modal(document.getElementById('editActivityTypeModal'));
+            modal.show();
+        }
+    });
+
+    // Update activity type
+    document.getElementById('updateActivityTypeBtn').addEventListener('click', function() {
+        const name = document.getElementById('editActivityTypeName').value.trim();
+        
+        if (!name) {
+            showAlert('Please enter a name for the activity type', 'danger');
+            return;
+        }
+
+        if (!currentEditingTipoId) {
+            showAlert('No activity type selected for editing', 'danger');
+            return;
+        }
+
+        fetch(`/ajax/tipoactividad/${currentEditingTipoId}/update/`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCSRFToken()
+            },
+            body: JSON.stringify({ nombre: name })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Update the table row
+                const row = document.querySelector(`tr[data-tipo-id="${currentEditingTipoId}"]`);
+                if (row) {
+                    const nameCell = row.querySelector('.tipo-name');
+                    nameCell.textContent = data.nombre;
+                    
+                    // Update button attributes
+                    const editBtn = row.querySelector('.edit-tipo-btn');
+                    const deleteBtn = row.querySelector('.delete-tipo-btn');
+                    editBtn.setAttribute('data-tipo-name', data.nombre);
+                    deleteBtn.setAttribute('data-tipo-name', data.nombre);
+                }
+                
+                // Close modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('editActivityTypeModal'));
+                modal.hide();
+                
+                showAlert(`Activity type updated to "${data.nombre}" successfully!`, 'success');
+                currentEditingTipoId = null;
+            } else {
+                showAlert(data.error, 'danger');
+            }
+        })
+        .catch(error => {
+            showAlert('Error updating activity type', 'danger');
+            console.error('Error:', error);
+        });
+    });
+
+    // Delete activity type
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.delete-tipo-btn')) {
+            const btn = e.target.closest('.delete-tipo-btn');
+            const tipoId = btn.getAttribute('data-tipo-id');
+            const tipoName = btn.getAttribute('data-tipo-name');
+            
+            currentDeletingTipoId = tipoId;
+            document.getElementById('deleteTypeName').textContent = tipoName;
+            
+            // Get activity count and other types
+            fetch(`/ajax/tipoactividad/${tipoId}/activity_count/`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const container = document.getElementById('deleteOptionsContainer');
+                    
+                    if (data.activities_count > 0) {
+                        container.innerHTML = `
+                            <p class="text-warning">
+                                <i class="bi bi-exclamation-triangle"></i>
+                                This activity type has <strong>${data.activities_count} associated activities</strong>.
+                            </p>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="radio" name="deleteAction" id="reassignAction" value="reassign" checked>
+                                <label class="form-check-label" for="reassignAction">
+                                    Reassign activities to another type:
+                                </label>
+                            </div>
+                            <select class="form-select mb-3" id="reassignToSelect">
+                                ${data.other_types.map(type => `<option value="${type.id}">${type.nombre}</option>`).join('')}
+                            </select>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="deleteAction" id="cascadeAction" value="cascade">
+                                <label class="form-check-label text-danger" for="cascadeAction">
+                                    <i class="bi bi-exclamation-triangle"></i>
+                                    Delete all associated activities (CASCADE DELETE - IRREVERSIBLE)
+                                </label>
+                            </div>
+                        `;
+                    } else {
+                        container.innerHTML = `
+                            <p class="text-success">
+                                <i class="bi bi-check-circle"></i>
+                                This activity type has no associated activities and can be safely deleted.
+                            </p>
+                        `;
+                    }
+                    
+                    // Show the delete confirmation form
+                    document.getElementById('deleteConfirmationForm').style.display = 'block';
+                    
+                    // Scroll to the form
+                    document.getElementById('deleteConfirmationForm').scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'nearest' 
+                    });
+                } else {
+                    showAlert(data.error, 'danger');
+                }
+            })
+            .catch(error => {
+                showAlert('Error loading deletion options', 'danger');
+                console.error('Error:', error);
+            });
+        }
+    });
+
+    // Cancel delete
+    document.getElementById('cancelDeleteBtn').addEventListener('click', function() {
+        document.getElementById('deleteConfirmationForm').style.display = 'none';
+        currentDeletingTipoId = null;
+    });
+
+    // Confirm delete
+    document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+        if (!currentDeletingTipoId) {
+            showAlert('No activity type selected for deletion', 'danger');
+            return;
+        }
+
+        let deleteData = {};
+        
+        const reassignAction = document.getElementById('reassignAction');
+        const cascadeAction = document.getElementById('cascadeAction');
+        
+        if (reassignAction && reassignAction.checked) {
+            const reassignSelect = document.getElementById('reassignToSelect');
+            if (!reassignSelect.value) {
+                showAlert('Please select a type to reassign activities to', 'danger');
+                return;
+            }
+            deleteData = {
+                action: 'reassign',
+                reassign_to: reassignSelect.value
+            };
+        } else if (cascadeAction && cascadeAction.checked) {
+            deleteData = {
+                action: 'cascade'
+            };
+        }
+
+        fetch(`/ajax/tipoactividad/${currentDeletingTipoId}/delete/`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCSRFToken()
+            },
+            body: JSON.stringify(deleteData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Remove the row from table
+                const row = document.querySelector(`tr[data-tipo-id="${currentDeletingTipoId}"]`);
+                if (row) {
+                    const typeName = row.querySelector('.tipo-name').textContent;
+                    row.remove();
+                    
+                    // Check if table is now empty
+                    const tableBody = document.getElementById('activityTypesTableBody');
+                    if (tableBody.children.length === 0) {
+                        const noDataRow = document.createElement('tr');
+                        noDataRow.id = 'noActivityTypesRow';
+                        noDataRow.innerHTML = '<td colspan="2" class="text-center text-muted">No activity types found</td>';
+                        tableBody.appendChild(noDataRow);
+                    }
+                    
+                    showAlert(`Activity type "${typeName}" deleted successfully!`, 'success');
+                }
+                
+                // Hide the delete form
+                document.getElementById('deleteConfirmationForm').style.display = 'none';
+                currentDeletingTipoId = null;
+            } else {
+                showAlert(data.error, 'danger');
+            }
+        })
+        .catch(error => {
+            showAlert('Error deleting activity type', 'danger');
+            console.error('Error:', error);
+        });
+    });
+
+    // Agenda Settings functionality
+    
+    // Show agenda settings alert message
+    function showAgendaAlert(message, type = 'success') {
+        const alert = document.getElementById('agendaSettingsAlert');
+        const alertMessage = document.getElementById('agendaSettingsAlertMessage');
+        
+        alert.className = `alert alert-${type} alert-dismissible fade show`;
+        alertMessage.textContent = message;
+        alert.style.display = 'block';
+        
+        // Auto-hide after 5 seconds
+        setTimeout(() => {
+            alert.style.display = 'none';
+        }, 5000);
+    }
+
+    // Open agenda settings modal
+    document.querySelector('[data-bs-target="#agendaSettingsModal"]').addEventListener('click', function() {
+        const currentDate = this.getAttribute('data-current-date');
+        if (currentDate) {
+            document.getElementById('closingDateInput').value = currentDate;
+        }
+    });
+
+    // Update agenda settings
+    document.getElementById('saveAgendaSettingsBtn').addEventListener('click', function() {
+        const closingDate = document.getElementById('closingDateInput').value.trim();
+        
+        if (!closingDate) {
+            showAgendaAlert('Please select a closing date', 'danger');
+            return;
+        }
+
+        fetch('{% url "ajax_update_agenda_settings" %}', {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCSRFToken()
+            },
+            body: JSON.stringify({ closing_date: closingDate })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Update the display
+                const currentClosingDateElement = document.getElementById('currentClosingDate');
+                if (currentClosingDateElement) {
+                    currentClosingDateElement.textContent = data.closing_date_display;
+                }
+                
+                // Update the button's data attribute for future edits
+                const button = document.querySelector('[data-bs-target="#agendaSettingsModal"]');
+                button.setAttribute('data-current-date', data.closing_date);
+                
+                // Update button text and icon if it was a first-time setup
+                const buttonIcon = button.querySelector('i');
+                const buttonText = button.innerHTML;
+                if (buttonText.includes('Set Date')) {
+                    button.innerHTML = '<i class="bi bi-calendar-edit"></i> Change Date';
+                }
+                
+                // Close modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('agendaSettingsModal'));
+                modal.hide();
+                
+                showAgendaAlert(`Closing date updated to ${data.closing_date_display} successfully!`, 'success');
+            } else {
+                showAgendaAlert(data.error, 'danger');
+            }
+        })
+        .catch(error => {
+            showAgendaAlert('Error updating agenda settings', 'danger');
+            console.error('Error:', error);
+        });
+    });
+
+    // Coordinator Assignment functionality
+    let currentTitulacionId = null;
+
+    // Show coordinator alert message
+    function showCoordinatorAlert(message, type = 'success') {
+        const alert = document.getElementById('coordinatorAlert');
+        const alertMessage = document.getElementById('coordinatorAlertMessage');
+        
+        alert.className = `alert alert-${type} alert-dismissible fade show`;
+        alertMessage.textContent = message;
+        alert.style.display = 'block';
+        
+        // Auto-hide after 5 seconds
+        setTimeout(() => {
+            alert.style.display = 'none';
+        }, 5000);
+    }
+
+    // Open coordinator assignment modal
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.edit-coordinator-btn')) {
+            const btn = e.target.closest('.edit-coordinator-btn');
+            const titulacionId = btn.getAttribute('data-titulacion-id');
+            const titulacionName = btn.getAttribute('data-titulacion-name');
+            const currentCoordinatorId = btn.getAttribute('data-current-coordinator');
+            const currentCoordinatorName = btn.getAttribute('data-current-coordinator-name');
+            
+            currentTitulacionId = titulacionId;
+            
+            // Set titulacion name
+            document.getElementById('titulacionName').value = titulacionName;
+            
+            // Set current coordinator in dropdown
+            const coordinatorSelect = document.getElementById('coordinatorSelect');
+            coordinatorSelect.value = currentCoordinatorId || '';
+            
+            // Show/hide current coordinator info
+            const currentCoordinatorInfo = document.getElementById('currentCoordinatorInfo');
+            const currentCoordinatorNameSpan = document.getElementById('currentCoordinatorName');
+            
+            if (currentCoordinatorName) {
+                currentCoordinatorNameSpan.textContent = currentCoordinatorName;
+                currentCoordinatorInfo.style.display = 'block';
+            } else {
+                currentCoordinatorInfo.style.display = 'none';
+            }
+            
+            // Open modal
+            const modal = new bootstrap.Modal(document.getElementById('assignCoordinatorModal'));
+            modal.show();
+        }
+    });
+
+    // Save coordinator assignment
+    document.getElementById('saveCoordinatorBtn').addEventListener('click', function() {
+        const coordinatorId = document.getElementById('coordinatorSelect').value || null;
+        
+        if (!currentTitulacionId) {
+            showCoordinatorAlert('No titulación selected', 'danger');
+            return;
+        }
+
+        fetch('{% url "ajax_update_coordinator" %}', {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCSRFToken()
+            },
+            body: JSON.stringify({
+                titulacion_id: currentTitulacionId,
+                coordinator_id: coordinatorId
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Update the table row
+                const row = document.querySelector(`tr[data-titulacion-id="${currentTitulacionId}"]`);
+                if (row) {
+                    const coordinatorCell = row.querySelector('.coordinator-info');
+                    const editBtn = row.querySelector('.edit-coordinator-btn');
+                    
+                    if (data.coordinator) {
+                        // Coordinator assigned
+                        coordinatorCell.innerHTML = `<span class="badge bg-success">${data.coordinator.username}</span>`;
+                        editBtn.setAttribute('data-current-coordinator', data.coordinator.id);
+                        editBtn.setAttribute('data-current-coordinator-name', data.coordinator.username);
+                    } else {
+                        // Coordinator removed
+                        coordinatorCell.innerHTML = `<span class="badge bg-secondary">Not assigned</span>`;
+                        editBtn.setAttribute('data-current-coordinator', '');
+                        editBtn.setAttribute('data-current-coordinator-name', '');
+                    }
+                }
+                
+                // Close modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('assignCoordinatorModal'));
+                modal.hide();
+                
+                const action = data.coordinator ? 'assigned' : 'removed';
+                const coordinatorName = data.coordinator ? data.coordinator.username : '';
+                showCoordinatorAlert(`Coordinator ${action} successfully${coordinatorName ? ' (' + coordinatorName + ')' : ''}!`, 'success');
+                
+                currentTitulacionId = null;
+            } else {
+                showCoordinatorAlert(data.error, 'danger');
+            }
+        })
+        .catch(error => {
+            showCoordinatorAlert('Error updating coordinator assignment', 'danger');
+            console.error('Error:', error);
+        });
+    });
+});
+</script>
+{% endblock %}

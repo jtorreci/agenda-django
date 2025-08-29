@@ -165,6 +165,33 @@
     </p>
 {% endblock %}
 
+<!-- Activity Details Modal -->
+<div class="modal fade" id="activityDetailModal" tabindex="-1" aria-labelledby="activityDetailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="activityDetailModalLabel">Activity Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Title:</strong> <span id="modalActivityTitle"></span></p>
+                <p><strong>Description:</strong> <span id="modalActivityDescription"></span></p>
+                <p><strong>Type:</strong> <span id="modalActivityType"></span></p>
+                <p><strong>Subjects:</strong> <span id="modalActivitySubjects"></span></p>
+                <p><strong>Start:</strong> <span id="modalActivityStart"></span></p>
+                <p><strong>End:</strong> <span id="modalActivityEnd"></span></p>
+                <p><strong>Approved:</strong> <span id="modalActivityApproved"></span></p>
+                <p><strong>Active:</strong> <span id="modalActivityActive"></span></p>
+                <p><strong>Evaluable:</strong> <span id="modalActivityEvaluable"></span></p>
+                <p><strong>Percentage:</strong> <span id="modalActivityPercentage"></span></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% block extra_js %}
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'></script>
     <script>
@@ -195,6 +222,23 @@
                     .then(response => response.json())
                     .then(data => successCallback(data))
                     .catch(error => failureCallback(error));
+            },
+            eventClick: function(info) {
+                // Populate modal with event details
+                document.getElementById('modalActivityTitle').innerText = info.event.title;
+                document.getElementById('modalActivityDescription').innerText = info.event.extendedProps.description || 'N/A';
+                document.getElementById('modalActivityType').innerText = info.event.extendedProps.activity_type || 'N/A';
+                document.getElementById('modalActivitySubjects').innerText = info.event.extendedProps.subjects || 'N/A';
+                document.getElementById('modalActivityStart').innerText = info.event.start ? info.event.start.toLocaleString() : 'N/A';
+                document.getElementById('modalActivityEnd').innerText = info.event.end ? info.event.end.toLocaleString() : 'N/A';
+                document.getElementById('modalActivityApproved').innerText = info.event.extendedProps.is_approved ? 'Yes' : 'No';
+                document.getElementById('modalActivityActive').innerText = info.event.extendedProps.is_active ? 'Yes' : 'No';
+                document.getElementById('modalActivityEvaluable').innerText = info.event.extendedProps.evaluable ? 'Yes' : 'No';
+                document.getElementById('modalActivityPercentage').innerText = info.event.extendedProps.percentage !== null ? info.event.extendedProps.percentage + '%' : 'N/A';
+
+                // Show the modal
+                var activityDetailModal = new bootstrap.Modal(document.getElementById('activityDetailModal'));
+                activityDetailModal.show();
             }
         });
 

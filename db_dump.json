@@ -1,0 +1,4613 @@
+[
+{
+  "model": "sessions.session",
+  "pk": "00n8mahszuhpswhwrj52gzr2f0sid3ve",
+  "fields": {
+    "session_data": ".eJxVjDsOwyAQBe9CHSHzXUiZ3mdACwvBSYQlY1dR7h5bcpG0b2bemwXc1hq2npcwEbsywS6_W8T0zO0A9MB2n3ma27pMkR8KP2nn40z5dTvdv4OKve61gyghG6-cMKC1SmDIWLDCW5VJeUsAgwCNkmwUu-wKYBmKkiUmKQv7fAGp5zb7:1urwIL:7aKWnWK8IIKX-XNcKoxtBR1-uircrAod-6qm7R-3B7I",
+    "expire_date": "2025-09-12T10:25:21.334Z"
+  }
+},
+{
+  "model": "agenda_academica.agendasettings",
+  "pk": 1,
+  "fields": {
+    "closing_date": "2025-08-29"
+  }
+},
+{
+  "model": "users.customuser",
+  "pk": 1,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$N0UyET0ighK20aQvpOrGxw$QDXDYIQmUl/B9/jmTWr6DcBHBsO5wsvf4NcSCegIVMw=",
+    "last_login": "2025-08-29T10:25:21.306Z",
+    "is_superuser": true,
+    "username": "jtorreci",
+    "first_name": "",
+    "last_name": "",
+    "email": "jtorreci@unex.es",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2025-08-26T21:56:42.641Z",
+    "role": "ADMIN",
+    "groups": [],
+    "user_permissions": [],
+    "subjects": [
+      1,
+      2,
+      44,
+      50
+    ],
+    "coordinated_titulaciones": []
+  }
+},
+{
+  "model": "users.customuser",
+  "pk": 2,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$adZDa82bScYYOqRfAe982E$RRXjih1FfVEFnaXdRrCBkEI844WH0HAqH7QhU+R6nuc=",
+    "last_login": "2025-08-28T19:21:32.869Z",
+    "is_superuser": false,
+    "username": "teacher",
+    "first_name": "",
+    "last_name": "",
+    "email": "teacher@unex.es",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-08-27T07:00:50.279Z",
+    "role": "TEACHER",
+    "groups": [],
+    "user_permissions": [],
+    "subjects": [],
+    "coordinated_titulaciones": []
+  }
+},
+{
+  "model": "users.customuser",
+  "pk": 3,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$FcE5lLFEKtmnqbvF4xflOe$9lIWL1fzouArNjrbX0GZijy/i2YlpXn6AYMrMcsjZAY=",
+    "last_login": "2025-08-28T19:23:04.909Z",
+    "is_superuser": false,
+    "username": "coordinator",
+    "first_name": "",
+    "last_name": "",
+    "email": "coordinator@example.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-08-27T07:00:50.584Z",
+    "role": "COORDINATOR",
+    "groups": [],
+    "user_permissions": [],
+    "subjects": [],
+    "coordinated_titulaciones": []
+  }
+},
+{
+  "model": "users.customuser",
+  "pk": 4,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$WhgHGNNBVO4kU1J5bVr9nX$entSmEZ9AnIYcQF2euNo2Oog6/ldLOu4bUsR8Lsy+qY=",
+    "last_login": "2025-08-28T17:11:13.003Z",
+    "is_superuser": false,
+    "username": "student",
+    "first_name": "",
+    "last_name": "",
+    "email": "student@alumnos.unex.es",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-08-27T07:00:50.883Z",
+    "role": "STUDENT",
+    "groups": [],
+    "user_permissions": [],
+    "subjects": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "coordinated_titulaciones": []
+  }
+},
+{
+  "model": "users.customuser",
+  "pk": 5,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$Reqz8ZS64gkVpWyMky5RvG$BAINsBKwew1cSxHOJ3jvaTvwzxVZ+NVe94zpWy6Bsqg=",
+    "last_login": null,
+    "is_superuser": true,
+    "username": "admin_test",
+    "first_name": "Admin",
+    "last_name": "Test",
+    "email": "admin@unex.es",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2025-08-28T17:24:46.678Z",
+    "role": "ADMIN",
+    "groups": [],
+    "user_permissions": [],
+    "subjects": [],
+    "coordinated_titulaciones": []
+  }
+},
+{
+  "model": "users.customuser",
+  "pk": 6,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$CeLke6uwN7AczH24LfAX1s$wOO1ZnfA790SeeSNHmy9Oqvhqa5liveZl758UARAm80=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "coord_test",
+    "first_name": "Carlos",
+    "last_name": "Coordinador",
+    "email": "coordinador@unex.es",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-08-28T17:24:47.142Z",
+    "role": "COORDINATOR",
+    "groups": [],
+    "user_permissions": [],
+    "subjects": [],
+    "coordinated_titulaciones": []
+  }
+},
+{
+  "model": "users.customuser",
+  "pk": 7,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$hgYQjEUr94POkmrfClsFfJ$FFilgMVXPTfgh27qmvCYMCt5Q5p6CAENyGC8hC++vFQ=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "prof_mate",
+    "first_name": "María",
+    "last_name": "Matemática",
+    "email": "matematicas@unex.es",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-08-28T17:24:47.533Z",
+    "role": "TEACHER",
+    "groups": [],
+    "user_permissions": [],
+    "subjects": [],
+    "coordinated_titulaciones": []
+  }
+},
+{
+  "model": "users.customuser",
+  "pk": 8,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$DpFGGfMl2TiX6sj2dsSKys$E5c4MMPXhcslDhCAIfpwed+ThhoCriq3RB0mStwMHkM=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "prof_fisica",
+    "first_name": "Pedro",
+    "last_name": "Físico",
+    "email": "fisica@unex.es",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-08-28T17:24:47.942Z",
+    "role": "TEACHER",
+    "groups": [],
+    "user_permissions": [],
+    "subjects": [],
+    "coordinated_titulaciones": []
+  }
+},
+{
+  "model": "users.customuser",
+  "pk": 9,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$owvbNAPsDAU2eHJGtDqxCb$qbpGRT63FlbV7wKzVvzQotSBwxtkFoMh9lsuG+7oYbE=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "prof_quimica",
+    "first_name": "Ana",
+    "last_name": "Química",
+    "email": "quimica@unex.es",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-08-28T17:24:48.404Z",
+    "role": "TEACHER",
+    "groups": [],
+    "user_permissions": [],
+    "subjects": [],
+    "coordinated_titulaciones": []
+  }
+},
+{
+  "model": "users.customuser",
+  "pk": 10,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$juzxeYKdQqWP91JEqsyO89$HMMWErsw6Mgz1Utc3Kt6apdjZKG87j77kupPDkN91KA=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "alumno1",
+    "first_name": "Juan",
+    "last_name": "Estudiante",
+    "email": "estudiante1@alumnos.unex.es",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-08-28T17:24:48.833Z",
+    "role": "STUDENT",
+    "groups": [],
+    "user_permissions": [],
+    "subjects": [],
+    "coordinated_titulaciones": []
+  }
+},
+{
+  "model": "users.customuser",
+  "pk": 11,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$49WtDvEuzYSrhxNhzRKsE7$v5cpEp8KkyGpJtyW3CoLV+JnNIeiiSu6/8CLrmBsHr0=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "alumno2",
+    "first_name": "Laura",
+    "last_name": "Alumna",
+    "email": "estudiante2@alumnos.unex.es",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-08-28T17:24:49.239Z",
+    "role": "STUDENT",
+    "groups": [],
+    "user_permissions": [],
+    "subjects": [],
+    "coordinated_titulaciones": []
+  }
+},
+{
+  "model": "users.customuser",
+  "pk": 12,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$NuN0Mv8laTdioFOmAYKc2S$5Vz4SYorAyTEB9Yp2e6Qc7svqCwafqocFVnZUVgpzTY=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "alumno3",
+    "first_name": "Diego",
+    "last_name": "Escolar",
+    "email": "estudiante3@alumnos.unex.es",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-08-28T17:24:49.654Z",
+    "role": "STUDENT",
+    "groups": [],
+    "user_permissions": [],
+    "subjects": [],
+    "coordinated_titulaciones": []
+  }
+},
+{
+  "model": "users.customuser",
+  "pk": 13,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$zctaKmq8eEJu1NovquBuN8$Dw41Ifrv4dnThlrdgtjr0pD3aUBCYLJBtwi3lbxiJ3s=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "pablo",
+    "first_name": "Pablo",
+    "last_name": "",
+    "email": "jtorrecilla.unex@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-08-29T10:07:32.297Z",
+    "role": "ADMIN",
+    "groups": [],
+    "user_permissions": [],
+    "subjects": [],
+    "coordinated_titulaciones": []
+  }
+},
+{
+  "model": "users.customuser",
+  "pk": 14,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$aMnBmV23oROV2YqyiuYWfY$m/awQcQ5qIE4SKlo8TVgrGwG9TLnTcJhptcr5WBipEk=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "pablo_1",
+    "first_name": "Pablo",
+    "last_name": "",
+    "email": "jtorrecilla.unex@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-08-29T10:07:32.736Z",
+    "role": "COORDINATOR",
+    "groups": [],
+    "user_permissions": [],
+    "subjects": [],
+    "coordinated_titulaciones": []
+  }
+},
+{
+  "model": "users.customuser",
+  "pk": 15,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$dUY2r1ZB3LKvO4WJbTLMUr$vRz6l5CL599xUbg19MLCfBn29G33+a5ADGWw9Wuvp6M=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "pablo_2",
+    "first_name": "Pablo",
+    "last_name": "",
+    "email": "jtorrecilla.unex@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-08-29T10:07:33.128Z",
+    "role": "TEACHER",
+    "groups": [],
+    "user_permissions": [],
+    "subjects": [],
+    "coordinated_titulaciones": []
+  }
+},
+{
+  "model": "users.customuser",
+  "pk": 16,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$QSEQYz0ljgTGg8Ttd6LmhP$mIU03lY2iWayT1wny3JalgIrNTyXYTubEvZHNioac68=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "pablo_3",
+    "first_name": "Pablo",
+    "last_name": "",
+    "email": "jtorrecilla.unex@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-08-29T10:07:33.557Z",
+    "role": "STUDENT",
+    "groups": [],
+    "user_permissions": [],
+    "subjects": [],
+    "coordinated_titulaciones": []
+  }
+},
+{
+  "model": "users.customuser",
+  "pk": 17,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$LxGVS3eUQZk6xRLeZYH8HO$FNfqzmOLslUg/7zRF6dSZve7GOfV5sas1EGVT96t0XM=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "marta",
+    "first_name": "Marta",
+    "last_name": "",
+    "email": "jtorrecilla.unex@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-08-29T10:07:33.971Z",
+    "role": "ADMIN",
+    "groups": [],
+    "user_permissions": [],
+    "subjects": [],
+    "coordinated_titulaciones": []
+  }
+},
+{
+  "model": "users.customuser",
+  "pk": 18,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$0fCBrgYkD7KxEViOuYwQqq$csXf9/afbQ6PYGU1dIAiynxXeUKnownjBy8QRb/WFVw=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "marta_1",
+    "first_name": "Marta",
+    "last_name": "",
+    "email": "jtorrecilla.unex@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-08-29T10:07:34.358Z",
+    "role": "COORDINATOR",
+    "groups": [],
+    "user_permissions": [],
+    "subjects": [],
+    "coordinated_titulaciones": []
+  }
+},
+{
+  "model": "users.customuser",
+  "pk": 19,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$CW1EUGfa2qpvstntVwyv5a$rx17uwrdp0CslyqBe/7194urROpRB2UQQeNcb8ZI0HI=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "marta_2",
+    "first_name": "Marta",
+    "last_name": "",
+    "email": "jtorrecilla.unex@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-08-29T10:07:34.765Z",
+    "role": "TEACHER",
+    "groups": [],
+    "user_permissions": [],
+    "subjects": [],
+    "coordinated_titulaciones": []
+  }
+},
+{
+  "model": "users.customuser",
+  "pk": 20,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$dOObuGxAWKfZnt5vxvDDfo$7iiJgGIbQxlqZMQQuA4eF1Kqr3uvEoz6u1U+3ePObZ8=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "marta_3",
+    "first_name": "Marta",
+    "last_name": "",
+    "email": "jtorrecilla.unex@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-08-29T10:07:35.190Z",
+    "role": "STUDENT",
+    "groups": [],
+    "user_permissions": [],
+    "subjects": [],
+    "coordinated_titulaciones": []
+  }
+},
+{
+  "model": "users.customuser",
+  "pk": 21,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$8LwG3FjL88xMGzBPDOBMEX$HuW0CAdwhGQg3Kxv3cdOzIDZdOk7z5C7Kh3XeCsndas=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "pedro",
+    "first_name": "Pedro",
+    "last_name": "",
+    "email": "jtorrecilla.unex@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-08-29T10:07:35.602Z",
+    "role": "ADMIN",
+    "groups": [],
+    "user_permissions": [],
+    "subjects": [],
+    "coordinated_titulaciones": []
+  }
+},
+{
+  "model": "users.customuser",
+  "pk": 22,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$uPyut1bEBhMTHFXMnLjXVY$1RkWAU2OeXk5+7RCaYqbJFFGT+yrUtaqXLhr7MwIPVM=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "pedro_1",
+    "first_name": "Pedro",
+    "last_name": "",
+    "email": "jtorrecilla.unex@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-08-29T10:07:36.004Z",
+    "role": "COORDINATOR",
+    "groups": [],
+    "user_permissions": [],
+    "subjects": [],
+    "coordinated_titulaciones": []
+  }
+},
+{
+  "model": "users.customuser",
+  "pk": 23,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$HL3EnYPK4VywC335qnpWFn$nnWqU1AK/4Yu0d3uRsYWeGERInndeA4H+bBo5wHYZSk=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "pedro_2",
+    "first_name": "Pedro",
+    "last_name": "",
+    "email": "jtorrecilla.unex@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-08-29T10:07:36.392Z",
+    "role": "TEACHER",
+    "groups": [],
+    "user_permissions": [],
+    "subjects": [],
+    "coordinated_titulaciones": []
+  }
+},
+{
+  "model": "users.customuser",
+  "pk": 24,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$ECHRAiNBzpXou73PmcNHFr$J+Ml/yWf+mJwR1LWN3b/Xu/XE+QzuhqrWU6aWjXFDRA=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "pedro_3",
+    "first_name": "Pedro",
+    "last_name": "",
+    "email": "jtorrecilla.unex@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-08-29T10:07:36.807Z",
+    "role": "STUDENT",
+    "groups": [],
+    "user_permissions": [],
+    "subjects": [],
+    "coordinated_titulaciones": []
+  }
+},
+{
+  "model": "users.customuser",
+  "pk": 25,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$DEz3hPEX5q3uPmd4YO6oC9$WJLkWEaXMzqPULS7Y0dlrmi8N4vSLvwXyKheAi56+xc=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "antonio",
+    "first_name": "Antonio",
+    "last_name": "",
+    "email": "jtorrecilla.unex@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-08-29T10:07:37.199Z",
+    "role": "ADMIN",
+    "groups": [],
+    "user_permissions": [],
+    "subjects": [],
+    "coordinated_titulaciones": []
+  }
+},
+{
+  "model": "users.customuser",
+  "pk": 26,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$tWtAMTuuhGDmg6sBdbyiaI$NZiNruDhKdGhTCdZIq4zlD++W0Vx5+OCLcBoeh3t8r8=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "antonio_1",
+    "first_name": "Antonio",
+    "last_name": "",
+    "email": "jtorrecilla.unex@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-08-29T10:07:37.596Z",
+    "role": "COORDINATOR",
+    "groups": [],
+    "user_permissions": [],
+    "subjects": [],
+    "coordinated_titulaciones": []
+  }
+},
+{
+  "model": "users.customuser",
+  "pk": 27,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$SWQkQtivI8GImaD5LRmXic$84lZ6HONz/H4rJILvcWyXd02wwGKxOuJ4o4giGjqaoE=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "antonio_2",
+    "first_name": "Antonio",
+    "last_name": "",
+    "email": "jtorrecilla.unex@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-08-29T10:07:37.999Z",
+    "role": "TEACHER",
+    "groups": [],
+    "user_permissions": [],
+    "subjects": [],
+    "coordinated_titulaciones": []
+  }
+},
+{
+  "model": "users.customuser",
+  "pk": 28,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$SVWGywEtADUGCFE2OxCg29$Rxz+cCps9qCOomYiVtn/r8Ex2+QUsDPEB2y2E2BEsqs=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "antonio_3",
+    "first_name": "Antonio",
+    "last_name": "",
+    "email": "jtorrecilla.unex@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-08-29T10:07:38.452Z",
+    "role": "STUDENT",
+    "groups": [],
+    "user_permissions": [],
+    "subjects": [],
+    "coordinated_titulaciones": []
+  }
+},
+{
+  "model": "users.customuser",
+  "pk": 29,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$7F3z7yPY6PDtpBWv3nZ0ov$X6gCP+A3XSvc94eVE6eLat+Hm3QX38BKYvVW3o59yR0=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "rufina",
+    "first_name": "Rufina",
+    "last_name": "",
+    "email": "jtorrecilla.unex@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-08-29T10:07:38.873Z",
+    "role": "ADMIN",
+    "groups": [],
+    "user_permissions": [],
+    "subjects": [],
+    "coordinated_titulaciones": []
+  }
+},
+{
+  "model": "users.customuser",
+  "pk": 30,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$Zt982ol4Lb0LX3RHdkiLNS$kGCNUVQHGXfGfjgL+TUk8DHO/VfDfv6MFEgxNP0RRmg=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "rufina_1",
+    "first_name": "Rufina",
+    "last_name": "",
+    "email": "jtorrecilla.unex@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-08-29T10:07:39.284Z",
+    "role": "COORDINATOR",
+    "groups": [],
+    "user_permissions": [],
+    "subjects": [],
+    "coordinated_titulaciones": []
+  }
+},
+{
+  "model": "users.customuser",
+  "pk": 31,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$6LkwEbxW4dv5s2eaYRdMdK$4w+wgllaTJkmk8M1/3yqVN+x6BkYSY6rqPKMx8eSfuo=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "rufina_2",
+    "first_name": "Rufina",
+    "last_name": "",
+    "email": "jtorrecilla.unex@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-08-29T10:07:39.679Z",
+    "role": "TEACHER",
+    "groups": [],
+    "user_permissions": [],
+    "subjects": [],
+    "coordinated_titulaciones": []
+  }
+},
+{
+  "model": "users.customuser",
+  "pk": 32,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$quyI7Cx7SFZlJhbXScapTY$0qrJ9rmsTkMsXaig7BK7ENAbRDwAkYeefX689ywYUcY=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "rufina_3",
+    "first_name": "Rufina",
+    "last_name": "",
+    "email": "jtorrecilla.unex@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-08-29T10:07:40.071Z",
+    "role": "STUDENT",
+    "groups": [],
+    "user_permissions": [],
+    "subjects": [],
+    "coordinated_titulaciones": []
+  }
+},
+{
+  "model": "users.customuser",
+  "pk": 33,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$bckmf1eisC9ZnbqLS5HHro$Wgf7vJ9yt8GA3L57zICZaA7JY1qvH4dYRiZfVJz+9kQ=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "blanca",
+    "first_name": "Blanca",
+    "last_name": "",
+    "email": "jtorrecilla.unex@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-08-29T10:07:40.471Z",
+    "role": "ADMIN",
+    "groups": [],
+    "user_permissions": [],
+    "subjects": [],
+    "coordinated_titulaciones": []
+  }
+},
+{
+  "model": "users.customuser",
+  "pk": 34,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$fg2w6jKj0hRhZ8o31LLIcK$kyTzaGBTIpY4aFWMBtFOo0kcL1oYvkXeQGlvMMLHi8c=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "blanca_1",
+    "first_name": "Blanca",
+    "last_name": "",
+    "email": "jtorrecilla.unex@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-08-29T10:07:40.871Z",
+    "role": "COORDINATOR",
+    "groups": [],
+    "user_permissions": [],
+    "subjects": [],
+    "coordinated_titulaciones": []
+  }
+},
+{
+  "model": "users.customuser",
+  "pk": 35,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$8FeQcVAm7JviWZlfcyB4XH$1pdO8ceiC+QnFUqYr/tSnwbDz5dWGFveAbl9gxK9lQs=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "blanca_2",
+    "first_name": "Blanca",
+    "last_name": "",
+    "email": "jtorrecilla.unex@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-08-29T10:07:41.277Z",
+    "role": "TEACHER",
+    "groups": [],
+    "user_permissions": [],
+    "subjects": [],
+    "coordinated_titulaciones": []
+  }
+},
+{
+  "model": "users.customuser",
+  "pk": 36,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$LfWJPlg0tb7gL9sG5fn1fM$2iWwJqAirh7NiqzhsQ4DGQz2V3SwEPCYh11vDvSqQ+I=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "blanca_3",
+    "first_name": "Blanca",
+    "last_name": "",
+    "email": "jtorrecilla.unex@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-08-29T10:07:41.672Z",
+    "role": "STUDENT",
+    "groups": [],
+    "user_permissions": [],
+    "subjects": [],
+    "coordinated_titulaciones": []
+  }
+},
+{
+  "model": "users.customuser",
+  "pk": 37,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$Qxbr8TGLfJzn7XUJSokYJh$AXhAWFYYbNLiY80GSwIIbY1BhlPVuw+mtopjjrI5+mw=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "jose",
+    "first_name": "Jose",
+    "last_name": "",
+    "email": "jtorrecilla.unex@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-08-29T10:07:42.065Z",
+    "role": "ADMIN",
+    "groups": [],
+    "user_permissions": [],
+    "subjects": [],
+    "coordinated_titulaciones": []
+  }
+},
+{
+  "model": "users.customuser",
+  "pk": 38,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$G1eQFpamm93OKeqgXzt6Nq$M58fZ2+3TwwiEvFPT9HATqL0vPGIClo+jgN95gyXaWk=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "jose_1",
+    "first_name": "Jose",
+    "last_name": "",
+    "email": "jtorrecilla.unex@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-08-29T10:07:42.493Z",
+    "role": "COORDINATOR",
+    "groups": [],
+    "user_permissions": [],
+    "subjects": [],
+    "coordinated_titulaciones": []
+  }
+},
+{
+  "model": "users.customuser",
+  "pk": 39,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$bJSYOPxeZSs8fx5mSjmSOe$Pmk20WsBaDskyZFqRgBCxoW65A9/TRZZ0R+5bOsIGiI=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "jose_2",
+    "first_name": "Jose",
+    "last_name": "",
+    "email": "jtorrecilla.unex@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-08-29T10:07:42.899Z",
+    "role": "TEACHER",
+    "groups": [],
+    "user_permissions": [],
+    "subjects": [],
+    "coordinated_titulaciones": []
+  }
+},
+{
+  "model": "users.customuser",
+  "pk": 40,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$RmSPir5hcglavlsJhAFvZR$0jhT+Y7C3pnI+sPhMbG5Hi3K4waQ8bHu/kt6DRYn2s8=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "jose_3",
+    "first_name": "Jose",
+    "last_name": "",
+    "email": "jtorrecilla.unex@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-08-29T10:07:43.299Z",
+    "role": "STUDENT",
+    "groups": [],
+    "user_permissions": [],
+    "subjects": [],
+    "coordinated_titulaciones": []
+  }
+},
+{
+  "model": "academics.titulacion",
+  "pk": 1,
+  "fields": {
+    "nombre": "doble grado en ade / ingeniería informática en ingeniería del software",
+    "coordinador": null
+  }
+},
+{
+  "model": "academics.titulacion",
+  "pk": 2,
+  "fields": {
+    "nombre": "doble grado en ade / ingeniería informática en ingeniería de computadores",
+    "coordinador": null
+  }
+},
+{
+  "model": "academics.titulacion",
+  "pk": 3,
+  "fields": {
+    "nombre": "Grado En Edificación",
+    "coordinador": 30
+  }
+},
+{
+  "model": "academics.titulacion",
+  "pk": 4,
+  "fields": {
+    "nombre": "Grado En Ingeniería Civil",
+    "coordinador": 38
+  }
+},
+{
+  "model": "academics.titulacion",
+  "pk": 5,
+  "fields": {
+    "nombre": "Grado En Ingeniería De Sonido E Imagen En Telecomunicación",
+    "coordinador": 22
+  }
+},
+{
+  "model": "academics.titulacion",
+  "pk": 6,
+  "fields": {
+    "nombre": "Grado En Ingeniería Informática En Ingeniería De Computadores",
+    "coordinador": 26
+  }
+},
+{
+  "model": "academics.titulacion",
+  "pk": 7,
+  "fields": {
+    "nombre": "Grado En Ingeniería Informática En Ingeniería Del Software",
+    "coordinador": 14
+  }
+},
+{
+  "model": "academics.titulacion",
+  "pk": 8,
+  "fields": {
+    "nombre": "Máster Universitario En Ingeniería De Caminos",
+    "coordinador": 18
+  }
+},
+{
+  "model": "academics.titulacion",
+  "pk": 9,
+  "fields": {
+    "nombre": "Máster Universitario En Investigación En Ingeniería Y Arquitectura",
+    "coordinador": null
+  }
+},
+{
+  "model": "academics.titulacion",
+  "pk": 10,
+  "fields": {
+    "nombre": "Máster Universitario En Metodología Para La Modelización De La Información De La Construcción (building Information Modeling Bim) En El Desarrollo Colaborativo De Proyectos",
+    "coordinador": null
+  }
+},
+{
+  "model": "academics.titulacion",
+  "pk": 11,
+  "fields": {
+    "nombre": "Máster Universitario En Ingeniería De Caminos, Canales Y Puertos",
+    "coordinador": null
+  }
+},
+{
+  "model": "academics.titulacion",
+  "pk": 12,
+  "fields": {
+    "nombre": "Máster Universitario En Metodología Para La Modelización De La Información De La Construcción (building Information Modeling BIM) En El Desarrollo Colaborativo De Proyectos",
+    "coordinador": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 1,
+  "fields": {
+    "nombre": "CÁLCULO PARA LA EDIFICACIÓN",
+    "titulacion": 3,
+    "curso": 1,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 2,
+  "fields": {
+    "nombre": "ECONOMÍA Y EMPRESA",
+    "titulacion": 3,
+    "curso": 1,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 3,
+  "fields": {
+    "nombre": "FUNDAMENTOS DE ESTRUCTURAS",
+    "titulacion": 3,
+    "curso": 1,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 4,
+  "fields": {
+    "nombre": "FUNDAMENTOS DE LA EXPRESIÓN GRÁFICA",
+    "titulacion": 3,
+    "curso": 1,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 5,
+  "fields": {
+    "nombre": "FUNDAMENTOS DE MATERIALES",
+    "titulacion": 3,
+    "curso": 1,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 6,
+  "fields": {
+    "nombre": "ÁLGEBRA LINEAL PARA LA EDIFICACIÓN",
+    "titulacion": 3,
+    "curso": 1,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 7,
+  "fields": {
+    "nombre": "CONSTRUCCIÓN I",
+    "titulacion": 3,
+    "curso": 1,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 8,
+  "fields": {
+    "nombre": "DIBUJO I",
+    "titulacion": 3,
+    "curso": 1,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 9,
+  "fields": {
+    "nombre": "FUNDAMENTOS FÍSICOS DE LAS INSTALACIONES",
+    "titulacion": 3,
+    "curso": 1,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 10,
+  "fields": {
+    "nombre": "GEOMETRÍA DESCRIPTIVA",
+    "titulacion": 3,
+    "curso": 1,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 11,
+  "fields": {
+    "nombre": "CONSTRUCCIÓN II",
+    "titulacion": 3,
+    "curso": 2,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 12,
+  "fields": {
+    "nombre": "DIBUJO II",
+    "titulacion": 3,
+    "curso": 2,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 13,
+  "fields": {
+    "nombre": "ESTRUCTURAS I",
+    "titulacion": 3,
+    "curso": 2,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 14,
+  "fields": {
+    "nombre": "INTRODUCCIÓN AL DERECHO PÚBLICO",
+    "titulacion": 3,
+    "curso": 2,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 15,
+  "fields": {
+    "nombre": "MATERIALES I",
+    "titulacion": 3,
+    "curso": 2,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 16,
+  "fields": {
+    "nombre": "CONSTRUCCIÓN III Y CONTROL DE CALIDAD I",
+    "titulacion": 3,
+    "curso": 2,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 17,
+  "fields": {
+    "nombre": "DIBUJO III",
+    "titulacion": 3,
+    "curso": 2,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 18,
+  "fields": {
+    "nombre": "INSTALACIONES I",
+    "titulacion": 3,
+    "curso": 2,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 19,
+  "fields": {
+    "nombre": "MATERIALES II",
+    "titulacion": 3,
+    "curso": 2,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 20,
+  "fields": {
+    "nombre": "TOPOGRAFÍA",
+    "titulacion": 3,
+    "curso": 2,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 21,
+  "fields": {
+    "nombre": "CONSTRUCCIÓN IV Y MANTENIMIENTO I",
+    "titulacion": 3,
+    "curso": 3,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 22,
+  "fields": {
+    "nombre": "ESTRUCTURAS II",
+    "titulacion": 3,
+    "curso": 3,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 23,
+  "fields": {
+    "nombre": "INSTALACIONES II",
+    "titulacion": 3,
+    "curso": 3,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 24,
+  "fields": {
+    "nombre": "ORGANIZACIÓN Y EQUIPOS DE OBRA",
+    "titulacion": 3,
+    "curso": 3,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 25,
+  "fields": {
+    "nombre": "CONSTRUCCIÓN V Y PREFABRICACIÓN",
+    "titulacion": 3,
+    "curso": 3,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 26,
+  "fields": {
+    "nombre": "ESTRUCTURAS III",
+    "titulacion": 3,
+    "curso": 3,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 27,
+  "fields": {
+    "nombre": "LEGISLACIÓN Y PREVENCIÓN I",
+    "titulacion": 3,
+    "curso": 3,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 28,
+  "fields": {
+    "nombre": "OFICINA TÉCNICA",
+    "titulacion": 3,
+    "curso": 3,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 29,
+  "fields": {
+    "nombre": "PRESUPUESTOS I",
+    "titulacion": 3,
+    "curso": 3,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 30,
+  "fields": {
+    "nombre": "MANTENIMIENTO II Y CONTROL DE CALIDAD II",
+    "titulacion": 3,
+    "curso": 4,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 31,
+  "fields": {
+    "nombre": "PATOLOGÍA Y REHABILITACIÓN",
+    "titulacion": 3,
+    "curso": 4,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 32,
+  "fields": {
+    "nombre": "PRESUPUESTOS II",
+    "titulacion": 3,
+    "curso": 4,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 33,
+  "fields": {
+    "nombre": "PROYECTOS",
+    "titulacion": 3,
+    "curso": 4,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 34,
+  "fields": {
+    "nombre": "PERITACIONES Y GESTIÓN URBANÍSTICA",
+    "titulacion": 3,
+    "curso": 4,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 35,
+  "fields": {
+    "nombre": "PREVENCIÓN II",
+    "titulacion": 3,
+    "curso": 4,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 36,
+  "fields": {
+    "nombre": "PROYECTO FIN DE GRADO",
+    "titulacion": 3,
+    "curso": 1000,
+    "semestre": 3,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 37,
+  "fields": {
+    "nombre": "ACÚSTICA EN LA EDIFICACIÓN",
+    "titulacion": 3,
+    "curso": 10,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 38,
+  "fields": {
+    "nombre": "DOMÓTICA",
+    "titulacion": 3,
+    "curso": 10,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 39,
+  "fields": {
+    "nombre": "GESTIÓN FINANCIERA DE EMPRESAS DE EDIFICACIÓN",
+    "titulacion": 3,
+    "curso": 10,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 40,
+  "fields": {
+    "nombre": "LEVANTAMIENTO ARQUITECTÓNICO Y DE ESTRUCTURAS",
+    "titulacion": 3,
+    "curso": 10,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 41,
+  "fields": {
+    "nombre": "INTERIORISMO",
+    "titulacion": 3,
+    "curso": 10,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 42,
+  "fields": {
+    "nombre": "PRÁCTICAS EN EMPRESA",
+    "titulacion": 3,
+    "curso": 10,
+    "semestre": 3,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 43,
+  "fields": {
+    "nombre": "ÁLGEBRA LINEAL",
+    "titulacion": 4,
+    "curso": 1,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 44,
+  "fields": {
+    "nombre": "CÁLCULO INFINITESIMAL",
+    "titulacion": 4,
+    "curso": 1,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 45,
+  "fields": {
+    "nombre": "DIBUJO",
+    "titulacion": 4,
+    "curso": 1,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 46,
+  "fields": {
+    "nombre": "GEOLOGÍA",
+    "titulacion": 4,
+    "curso": 1,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 47,
+  "fields": {
+    "nombre": "INFORMÁTICA",
+    "titulacion": 4,
+    "curso": 1,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 48,
+  "fields": {
+    "nombre": "ECONOMÍA Y EMPRESA",
+    "titulacion": 4,
+    "curso": 1,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 49,
+  "fields": {
+    "nombre": "ESTADÍSTICA",
+    "titulacion": 4,
+    "curso": 1,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 50,
+  "fields": {
+    "nombre": "FÍSICA",
+    "titulacion": 4,
+    "curso": 1,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 51,
+  "fields": {
+    "nombre": "MECÁNICA",
+    "titulacion": 4,
+    "curso": 1,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 52,
+  "fields": {
+    "nombre": "MÉTODOS NUMÉRICOS Y ECUACIONES DIFERENCIALES",
+    "titulacion": 4,
+    "curso": 1,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 53,
+  "fields": {
+    "nombre": "ESTRUCTURAS I",
+    "titulacion": 4,
+    "curso": 2,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 54,
+  "fields": {
+    "nombre": "HIDRÁULICA E HIDROLOGÍA",
+    "titulacion": 4,
+    "curso": 2,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 55,
+  "fields": {
+    "nombre": "QUÍMICA",
+    "titulacion": 4,
+    "curso": 2,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 56,
+  "fields": {
+    "nombre": "SISTEMAS ELÉCTRICOS DE POTENCIA",
+    "titulacion": 4,
+    "curso": 2,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 57,
+  "fields": {
+    "nombre": "TOPOGRAFÍA",
+    "titulacion": 4,
+    "curso": 2,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 58,
+  "fields": {
+    "nombre": "ESTRUCTURAS II",
+    "titulacion": 4,
+    "curso": 2,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 59,
+  "fields": {
+    "nombre": "HIDRÁULICA II",
+    "titulacion": 4,
+    "curso": 2,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 60,
+  "fields": {
+    "nombre": "MAQUINARIA",
+    "titulacion": 4,
+    "curso": 2,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 61,
+  "fields": {
+    "nombre": "MATERIALES",
+    "titulacion": 4,
+    "curso": 2,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 62,
+  "fields": {
+    "nombre": "TOPOGRAFÍA EN OBRA CIVIL",
+    "titulacion": 4,
+    "curso": 2,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 63,
+  "fields": {
+    "nombre": "ABASTECIMIENTO Y SANEAMIENTO",
+    "titulacion": 4,
+    "curso": 3,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 64,
+  "fields": {
+    "nombre": "ESTRUCTURAS III",
+    "titulacion": 4,
+    "curso": 3,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 65,
+  "fields": {
+    "nombre": "INFRAESTRUCTURAS DEL TRANSPORTE TERRESTRE",
+    "titulacion": 4,
+    "curso": 3,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 66,
+  "fields": {
+    "nombre": "MECÁNICA DE SUELOS",
+    "titulacion": 4,
+    "curso": 3,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 67,
+  "fields": {
+    "nombre": "PROCEDIMIENTOS DE CONSTRUCCIÓN",
+    "titulacion": 4,
+    "curso": 3,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 68,
+  "fields": {
+    "nombre": "CAMINOS",
+    "titulacion": 4,
+    "curso": 3,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 69,
+  "fields": {
+    "nombre": "GEOTECNIA Y CIMIENTOS",
+    "titulacion": 4,
+    "curso": 3,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 70,
+  "fields": {
+    "nombre": "SIG",
+    "titulacion": 4,
+    "curso": 3,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 71,
+  "fields": {
+    "nombre": "IMPACTO AMBIENTAL",
+    "titulacion": 4,
+    "curso": 4,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 72,
+  "fields": {
+    "nombre": "SEGURIDAD Y SALUD",
+    "titulacion": 4,
+    "curso": 4,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 73,
+  "fields": {
+    "nombre": "TRABAJO FIN DE GRADO - MENCIÓN CONSTRUCCIONES CIVILES",
+    "titulacion": 4,
+    "curso": 1000,
+    "semestre": 3,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 74,
+  "fields": {
+    "nombre": "TRABAJO FIN DE GRADO - MENCIÓN EN HIDROLOGÍA",
+    "titulacion": 4,
+    "curso": 1000,
+    "semestre": 3,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 75,
+  "fields": {
+    "nombre": "TRABAJO FIN DE GRADO - MENCIÓN TRANSPORTES Y SERVICIOS URBANOS",
+    "titulacion": 4,
+    "curso": 1000,
+    "semestre": 3,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 76,
+  "fields": {
+    "nombre": "ECOLOGÍA",
+    "titulacion": 4,
+    "curso": 10,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 77,
+  "fields": {
+    "nombre": "INFRAESTRUCTURA HIDRÁULICA",
+    "titulacion": 4,
+    "curso": 10,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 78,
+  "fields": {
+    "nombre": "OBRAS MARÍTIMAS",
+    "titulacion": 4,
+    "curso": 10,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 79,
+  "fields": {
+    "nombre": "TIPOLOGÍA ESTRUCTURAL",
+    "titulacion": 4,
+    "curso": 10,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 80,
+  "fields": {
+    "nombre": "TRÁFICO",
+    "titulacion": 4,
+    "curso": 10,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 81,
+  "fields": {
+    "nombre": "URBANISMO",
+    "titulacion": 4,
+    "curso": 10,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 82,
+  "fields": {
+    "nombre": "EDIFICACIÓN Y PREFABRICACIÓN",
+    "titulacion": 4,
+    "curso": 10,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 83,
+  "fields": {
+    "nombre": "FERROCARRILES",
+    "titulacion": 4,
+    "curso": 10,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 84,
+  "fields": {
+    "nombre": "GEOTECNIA ESTRUCTURAL",
+    "titulacion": 4,
+    "curso": 10,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 85,
+  "fields": {
+    "nombre": "INGENIERÍA FLUVIAL",
+    "titulacion": 4,
+    "curso": 10,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 86,
+  "fields": {
+    "nombre": "INGENIERÍA SANITARIA",
+    "titulacion": 4,
+    "curso": 10,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 87,
+  "fields": {
+    "nombre": "OBRAS Y APROVECHAMIENTOS HIDRÁULICOS",
+    "titulacion": 4,
+    "curso": 10,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 88,
+  "fields": {
+    "nombre": "SERVICIOS URBANOS",
+    "titulacion": 4,
+    "curso": 10,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 89,
+  "fields": {
+    "nombre": "TRANSPORTE Y TERRITORIO",
+    "titulacion": 4,
+    "curso": 10,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 90,
+  "fields": {
+    "nombre": "AMPLIACIÓN DE CAMINOS",
+    "titulacion": 4,
+    "curso": 10,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 91,
+  "fields": {
+    "nombre": "CAPTURA DE DATOS 3D",
+    "titulacion": 4,
+    "curso": 10,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 92,
+  "fields": {
+    "nombre": "ENERGÉTICA, CENTRALES Y REDES",
+    "titulacion": 4,
+    "curso": 10,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 93,
+  "fields": {
+    "nombre": "HIDROLOGÍA APLICADA",
+    "titulacion": 4,
+    "curso": 10,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 94,
+  "fields": {
+    "nombre": "MODELIZACIÓN HIDRÁULICA",
+    "titulacion": 4,
+    "curso": 10,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 95,
+  "fields": {
+    "nombre": "PATOLOGÍA",
+    "titulacion": 4,
+    "curso": 10,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 96,
+  "fields": {
+    "nombre": "PROYECTOS Y OBRAS",
+    "titulacion": 4,
+    "curso": 10,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 97,
+  "fields": {
+    "nombre": "SEGURIDAD VIAL",
+    "titulacion": 4,
+    "curso": 10,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 98,
+  "fields": {
+    "nombre": "TRANSPORTES URBANOS",
+    "titulacion": 4,
+    "curso": 10,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 99,
+  "fields": {
+    "nombre": "PRÁCTICAS EXTERNAS",
+    "titulacion": 4,
+    "curso": 10,
+    "semestre": 3,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 100,
+  "fields": {
+    "nombre": "ÁLGEBRA LINEAL",
+    "titulacion": 5,
+    "curso": 1,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 101,
+  "fields": {
+    "nombre": "CÁLCULO",
+    "titulacion": 5,
+    "curso": 1,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 102,
+  "fields": {
+    "nombre": "ECONOMÍA Y EMPRESA",
+    "titulacion": 5,
+    "curso": 1,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 103,
+  "fields": {
+    "nombre": "FÍSICA",
+    "titulacion": 5,
+    "curso": 1,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 104,
+  "fields": {
+    "nombre": "FUNDAMENTOS DE PROGRAMACIÓN",
+    "titulacion": 5,
+    "curso": 1,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 105,
+  "fields": {
+    "nombre": "AMPLIACIÓN DEL CÁLCULO",
+    "titulacion": 5,
+    "curso": 1,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 106,
+  "fields": {
+    "nombre": "ANÁLISIS DE REDES",
+    "titulacion": 5,
+    "curso": 1,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 107,
+  "fields": {
+    "nombre": "DISPOSITIVOS ELECTRÓNICOS",
+    "titulacion": 5,
+    "curso": 1,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 108,
+  "fields": {
+    "nombre": "FUNDAMENTOS DE COMPUTADORES",
+    "titulacion": 5,
+    "curso": 1,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 109,
+  "fields": {
+    "nombre": "SEÑALES ALEATORIAS",
+    "titulacion": 5,
+    "curso": 1,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 110,
+  "fields": {
+    "nombre": "ANÁLISIS EN VARIABLE COMPLEJA",
+    "titulacion": 5,
+    "curso": 2,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 111,
+  "fields": {
+    "nombre": "CAMPOS ELECTROMAGNÉTICOS",
+    "titulacion": 5,
+    "curso": 2,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 112,
+  "fields": {
+    "nombre": "ECUACIONES DIFERENCIALES",
+    "titulacion": 5,
+    "curso": 2,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 113,
+  "fields": {
+    "nombre": "FUNDAMENTOS DE ELECTRÓNICA",
+    "titulacion": 5,
+    "curso": 2,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 114,
+  "fields": {
+    "nombre": "SEÑALES Y SISTEMAS",
+    "titulacion": 5,
+    "curso": 2,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 115,
+  "fields": {
+    "nombre": "COMPUTACIÓN AVANZADA",
+    "titulacion": 5,
+    "curso": 2,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 116,
+  "fields": {
+    "nombre": "ELECTRÓNICA DIGITAL",
+    "titulacion": 5,
+    "curso": 2,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 117,
+  "fields": {
+    "nombre": "FÍSICA DE LA ACÚSTICA",
+    "titulacion": 5,
+    "curso": 2,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 118,
+  "fields": {
+    "nombre": "RADIACIÓN Y ONDAS GUIADAS",
+    "titulacion": 5,
+    "curso": 2,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 119,
+  "fields": {
+    "nombre": "TEORÍA DE LA COMUNICACIÓN",
+    "titulacion": 5,
+    "curso": 2,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 120,
+  "fields": {
+    "nombre": "FUNDAMENTOS DE INGENIERÍA ACÚSTICA",
+    "titulacion": 5,
+    "curso": 3,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 121,
+  "fields": {
+    "nombre": "PROCESADO DISCRETO DE SEÑALES DE AUDIO Y VÍDEO",
+    "titulacion": 5,
+    "curso": 3,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 122,
+  "fields": {
+    "nombre": "SISTEMAS DE COMUNICACIÓN POR LÍNEA",
+    "titulacion": 5,
+    "curso": 3,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 123,
+  "fields": {
+    "nombre": "SISTEMAS DIGITALES",
+    "titulacion": 5,
+    "curso": 3,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 124,
+  "fields": {
+    "nombre": "SÍNTESIS DE REDES",
+    "titulacion": 5,
+    "curso": 3,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 125,
+  "fields": {
+    "nombre": "SISTEMAS DE COMUNICACIÓN INALÁMBRICOS",
+    "titulacion": 5,
+    "curso": 3,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 126,
+  "fields": {
+    "nombre": "TRATAMIENTO DIGITAL DE IMÁGENES",
+    "titulacion": 5,
+    "curso": 3,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 127,
+  "fields": {
+    "nombre": "AUDIO DIGITAL",
+    "titulacion": 5,
+    "curso": 4,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 128,
+  "fields": {
+    "nombre": "EQUIPOS DE AUDIO Y VÍDEO",
+    "titulacion": 5,
+    "curso": 4,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 129,
+  "fields": {
+    "nombre": "REDES Y SERVICIOS DE TELECOMUNICACIÓN",
+    "titulacion": 5,
+    "curso": 4,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 130,
+  "fields": {
+    "nombre": "RUIDO Y VIBRACIONES",
+    "titulacion": 5,
+    "curso": 4,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 131,
+  "fields": {
+    "nombre": "AISLAMIENTO Y ACONDICIONAMIENTO ACÚSTICO",
+    "titulacion": 5,
+    "curso": 4,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 132,
+  "fields": {
+    "nombre": "TELEVISIÓN DIGITAL",
+    "titulacion": 5,
+    "curso": 4,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 133,
+  "fields": {
+    "nombre": "TRABAJO FIN DE GRADO",
+    "titulacion": 5,
+    "curso": 1000,
+    "semestre": 3,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 134,
+  "fields": {
+    "nombre": "PROYECTOS DE INFRAESTRUCTURAS COMUNES DE TELECOMUNICACIÓN",
+    "titulacion": 5,
+    "curso": 10,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 135,
+  "fields": {
+    "nombre": "DISEÑO MEDIANTE CIRCUITOS ANÁLOGICOS INTEGRADOS",
+    "titulacion": 5,
+    "curso": 10,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 136,
+  "fields": {
+    "nombre": "FOTÓNICA",
+    "titulacion": 5,
+    "curso": 10,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 137,
+  "fields": {
+    "nombre": "MÉTODOS NUMÉRICOS DE LA INGENIERÍA",
+    "titulacion": 5,
+    "curso": 10,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 138,
+  "fields": {
+    "nombre": "DOMÓTICA",
+    "titulacion": 5,
+    "curso": 10,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 139,
+  "fields": {
+    "nombre": "ESTUDIOS Y CERTIFICACIONES DE EMISIONES RADIOELÉCTRICAS",
+    "titulacion": 5,
+    "curso": 10,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 140,
+  "fields": {
+    "nombre": "INGENIERÍA DEL SOFTWARE",
+    "titulacion": 5,
+    "curso": 10,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 141,
+  "fields": {
+    "nombre": "PROCESADORES DIGITALES DE SEÑAL",
+    "titulacion": 5,
+    "curso": 10,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 142,
+  "fields": {
+    "nombre": "REDES MULTIMEDIA",
+    "titulacion": 5,
+    "curso": 10,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 143,
+  "fields": {
+    "nombre": "PRÁCTICAS EXTERNAS",
+    "titulacion": 5,
+    "curso": 10,
+    "semestre": 3,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 144,
+  "fields": {
+    "nombre": "ÁLGEBRA LINEAL",
+    "titulacion": 6,
+    "curso": 1,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 145,
+  "fields": {
+    "nombre": "CÁLCULO",
+    "titulacion": 6,
+    "curso": 1,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 146,
+  "fields": {
+    "nombre": "FÍSICA",
+    "titulacion": 6,
+    "curso": 1,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 147,
+  "fields": {
+    "nombre": "INTRODUCCIÓN A LA PROGRAMACIÓN",
+    "titulacion": 6,
+    "curso": 1,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 148,
+  "fields": {
+    "nombre": "TECNOLOGÍA DE COMPUTADORES",
+    "titulacion": 6,
+    "curso": 1,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 149,
+  "fields": {
+    "nombre": "AMPLIACIÓN DE MATEMÁTICAS",
+    "titulacion": 6,
+    "curso": 1,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 150,
+  "fields": {
+    "nombre": "ELECTRÓNICA",
+    "titulacion": 6,
+    "curso": 1,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 151,
+  "fields": {
+    "nombre": "ESTADÍSTICA",
+    "titulacion": 6,
+    "curso": 1,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 152,
+  "fields": {
+    "nombre": "ESTRUCTURA DE DATOS Y DE LA INFORMACIÓN",
+    "titulacion": 6,
+    "curso": 1,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 153,
+  "fields": {
+    "nombre": "INTRODUCCIÓN A LOS COMPUTADORES",
+    "titulacion": 6,
+    "curso": 1,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 154,
+  "fields": {
+    "nombre": "ADMINISTRACIÓN Y ORGANIZACIÓN DE COMPUTADORES",
+    "titulacion": 6,
+    "curso": 2,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 155,
+  "fields": {
+    "nombre": "ANÁLISIS Y DISEÑO DE ALGORITMOS",
+    "titulacion": 6,
+    "curso": 2,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 156,
+  "fields": {
+    "nombre": "BASES DE DATOS",
+    "titulacion": 6,
+    "curso": 2,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 157,
+  "fields": {
+    "nombre": "DESARROLLO DE PROGRAMAS",
+    "titulacion": 6,
+    "curso": 2,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 158,
+  "fields": {
+    "nombre": "ECONOMÍA Y EMPRESA",
+    "titulacion": 6,
+    "curso": 2,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 159,
+  "fields": {
+    "nombre": "ESTRUCTURA DE COMPUTADORES",
+    "titulacion": 6,
+    "curso": 2,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 160,
+  "fields": {
+    "nombre": "FUNDAMENTOS DE REDES Y COMUNICACIONES",
+    "titulacion": 6,
+    "curso": 2,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 161,
+  "fields": {
+    "nombre": "GESTIÓN DE LAS ORGANIZACIONES",
+    "titulacion": 6,
+    "curso": 2,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 162,
+  "fields": {
+    "nombre": "INTELIGENCIA ARTIFICIAL Y SISTEMAS INTELIGENTES",
+    "titulacion": 6,
+    "curso": 2,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 163,
+  "fields": {
+    "nombre": "PROGRAMACIÓN CONCURRENTE Y DISTRIBUIDA",
+    "titulacion": 6,
+    "curso": 2,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 164,
+  "fields": {
+    "nombre": "AUDITORÍA Y LEGISLACIÓN INFORMÁTICA",
+    "titulacion": 6,
+    "curso": 3,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 165,
+  "fields": {
+    "nombre": "DISEÑO E INTERACCIÓN DE SISTEMAS DE INFORMACIÓN",
+    "titulacion": 6,
+    "curso": 3,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 166,
+  "fields": {
+    "nombre": "INGENIERÍA DE SOFTWARE",
+    "titulacion": 6,
+    "curso": 3,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 167,
+  "fields": {
+    "nombre": "REDES DE ORDENADORES",
+    "titulacion": 6,
+    "curso": 3,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 168,
+  "fields": {
+    "nombre": "SISTEMAS OPERATIVOS",
+    "titulacion": 6,
+    "curso": 3,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 169,
+  "fields": {
+    "nombre": "ARQUITECTURA DE COMPUTADORES",
+    "titulacion": 6,
+    "curso": 3,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 170,
+  "fields": {
+    "nombre": "BIOMETRÍA Y SEGURIDAD DE SISTEMAS",
+    "titulacion": 6,
+    "curso": 3,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 171,
+  "fields": {
+    "nombre": "COMPUTACIÓN DISTRIBUIDA",
+    "titulacion": 6,
+    "curso": 3,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 172,
+  "fields": {
+    "nombre": "DISEÑO DE PROCESADORES",
+    "titulacion": 6,
+    "curso": 3,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 173,
+  "fields": {
+    "nombre": "DISEÑO DE SISTEMAS OPERATIVOS",
+    "titulacion": 6,
+    "curso": 3,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 174,
+  "fields": {
+    "nombre": "ARQUITECTURAS ESPECIALIZADAS",
+    "titulacion": 6,
+    "curso": 4,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 175,
+  "fields": {
+    "nombre": "ROBÓTICA",
+    "titulacion": 6,
+    "curso": 4,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 176,
+  "fields": {
+    "nombre": "SISTEMAS EN TIEMPO REAL",
+    "titulacion": 6,
+    "curso": 4,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 177,
+  "fields": {
+    "nombre": "PROYECTO FIN DE GRADO",
+    "titulacion": 6,
+    "curso": 4,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 178,
+  "fields": {
+    "nombre": "ARQUITECTURAS WEB",
+    "titulacion": 6,
+    "curso": 4,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 179,
+  "fields": {
+    "nombre": "COMPUTACIÓN BIO-INSPIRADA",
+    "titulacion": 6,
+    "curso": 4,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 180,
+  "fields": {
+    "nombre": "DISPOSITIVOS UBICUOS",
+    "titulacion": 6,
+    "curso": 4,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 181,
+  "fields": {
+    "nombre": "PROCESAMIENTO GRÁFICO",
+    "titulacion": 6,
+    "curso": 4,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 182,
+  "fields": {
+    "nombre": "COMPUTACIÓN PARALELA",
+    "titulacion": 6,
+    "curso": 4,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 183,
+  "fields": {
+    "nombre": "PROGRAMACIÓN EN INTERNET",
+    "titulacion": 6,
+    "curso": 4,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 184,
+  "fields": {
+    "nombre": "ROBÓTICA AVANZADA",
+    "titulacion": 6,
+    "curso": 4,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 185,
+  "fields": {
+    "nombre": "SISTEMAS MULTIMEDIA",
+    "titulacion": 6,
+    "curso": 4,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 186,
+  "fields": {
+    "nombre": "VIRTUALIZACIÓN Y ESCALABILIDAD",
+    "titulacion": 6,
+    "curso": 4,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 187,
+  "fields": {
+    "nombre": "VISIÓN ARTIFICIAL",
+    "titulacion": 6,
+    "curso": 4,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 188,
+  "fields": {
+    "nombre": "PRÁCTICAS EXTERNAS",
+    "titulacion": 6,
+    "curso": 4,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 189,
+  "fields": {
+    "nombre": "ÁLGEBRA LINEAL",
+    "titulacion": 7,
+    "curso": 1,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 190,
+  "fields": {
+    "nombre": "CÁLCULO",
+    "titulacion": 7,
+    "curso": 1,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 191,
+  "fields": {
+    "nombre": "FÍSICA",
+    "titulacion": 7,
+    "curso": 1,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 192,
+  "fields": {
+    "nombre": "INTRODUCCIÓN A LA PROGRAMACIÓN",
+    "titulacion": 7,
+    "curso": 1,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 193,
+  "fields": {
+    "nombre": "TECNOLOGÍA DE COMPUTADORES",
+    "titulacion": 7,
+    "curso": 1,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 194,
+  "fields": {
+    "nombre": "AMPLIACIÓN DE MATEMÁTICAS",
+    "titulacion": 7,
+    "curso": 1,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 195,
+  "fields": {
+    "nombre": "ELECTRÓNICA",
+    "titulacion": 7,
+    "curso": 1,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 196,
+  "fields": {
+    "nombre": "ESTADÍSTICA",
+    "titulacion": 7,
+    "curso": 1,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 197,
+  "fields": {
+    "nombre": "ESTRUCTURA DE DATOS Y DE LA INFORMACIÓN",
+    "titulacion": 7,
+    "curso": 1,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 198,
+  "fields": {
+    "nombre": "INTRODUCCIÓN A LOS COMPUTADORES",
+    "titulacion": 7,
+    "curso": 1,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 199,
+  "fields": {
+    "nombre": "ADMINISTRACIÓN Y ORGANIZACIÓN DE COMPUTADORES",
+    "titulacion": 7,
+    "curso": 2,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 200,
+  "fields": {
+    "nombre": "ANÁLISIS Y DISEÑO DE ALGORITMOS",
+    "titulacion": 7,
+    "curso": 2,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 201,
+  "fields": {
+    "nombre": "BASES DE DATOS",
+    "titulacion": 7,
+    "curso": 2,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 202,
+  "fields": {
+    "nombre": "DESARROLLO DE PROGRAMAS",
+    "titulacion": 7,
+    "curso": 2,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 203,
+  "fields": {
+    "nombre": "ECONOMÍA Y EMPRESA",
+    "titulacion": 7,
+    "curso": 2,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 204,
+  "fields": {
+    "nombre": "ESTRUCTURA DE COMPUTADORES",
+    "titulacion": 7,
+    "curso": 2,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 205,
+  "fields": {
+    "nombre": "FUNDAMENTOS DE REDES Y COMUNICACIONES",
+    "titulacion": 7,
+    "curso": 2,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 206,
+  "fields": {
+    "nombre": "GESTIÓN DE LAS ORGANIZACIONES",
+    "titulacion": 7,
+    "curso": 2,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 207,
+  "fields": {
+    "nombre": "INTELIGENCIA ARTIFICIAL Y SISTEMAS INTELIGENTES",
+    "titulacion": 7,
+    "curso": 2,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 208,
+  "fields": {
+    "nombre": "PROGRAMACIÓN CONCURRENTE Y DISTRIBUIDA",
+    "titulacion": 7,
+    "curso": 2,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 209,
+  "fields": {
+    "nombre": "AUDITORÍA Y LEGISLACIÓN INFORMÁTICA",
+    "titulacion": 7,
+    "curso": 3,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 210,
+  "fields": {
+    "nombre": "DISEÑO E INTERACCIÓN DE SISTEMAS DE INFORMACIÓN",
+    "titulacion": 7,
+    "curso": 3,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 211,
+  "fields": {
+    "nombre": "DISEÑO Y ADMINISTRACIÓN DE BASES DE DATOS",
+    "titulacion": 7,
+    "curso": 3,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 212,
+  "fields": {
+    "nombre": "INGENIERÍA DE SOFTWARE",
+    "titulacion": 7,
+    "curso": 3,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 213,
+  "fields": {
+    "nombre": "SISTEMAS OPERATIVOS",
+    "titulacion": 7,
+    "curso": 3,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 214,
+  "fields": {
+    "nombre": "ARQUITECTURA DE REDES Y PROTOCOLOS",
+    "titulacion": 7,
+    "curso": 3,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 215,
+  "fields": {
+    "nombre": "DISEÑO Y MODELADO DE SISTEMAS SOFTWARE",
+    "titulacion": 7,
+    "curso": 3,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 216,
+  "fields": {
+    "nombre": "INGENIERÍA DE REQUISITOS",
+    "titulacion": 7,
+    "curso": 3,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 217,
+  "fields": {
+    "nombre": "PROGRAMACIÓN EN INTERNET",
+    "titulacion": 7,
+    "curso": 3,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 218,
+  "fields": {
+    "nombre": "TEORÍA DE LENGUAJES",
+    "titulacion": 7,
+    "curso": 3,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 219,
+  "fields": {
+    "nombre": "ARQUITECTURAS SOFTWARE PARA ENTORNOS EMPRESARIALES",
+    "titulacion": 7,
+    "curso": 4,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 220,
+  "fields": {
+    "nombre": "GESTIÓN DE PROYECTOS SOFTWARE",
+    "titulacion": 7,
+    "curso": 4,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 221,
+  "fields": {
+    "nombre": "PROGRAMACIÓN DE BASES DE DATOS",
+    "titulacion": 7,
+    "curso": 4,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 222,
+  "fields": {
+    "nombre": "PROYECTO FIN DE GRADO",
+    "titulacion": 7,
+    "curso": 4,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 223,
+  "fields": {
+    "nombre": "ADMINISTRACIÓN DE REDES Y SERVICIOS",
+    "titulacion": 7,
+    "curso": 4,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 224,
+  "fields": {
+    "nombre": "ARQUITECTURAS ORIENTADAS A SERVICIOS",
+    "titulacion": 7,
+    "curso": 4,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 225,
+  "fields": {
+    "nombre": "IMAGEN DIGITAL",
+    "titulacion": 7,
+    "curso": 4,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 226,
+  "fields": {
+    "nombre": "SEGURIDAD EN REDES TELEMÁTICAS",
+    "titulacion": 7,
+    "curso": 4,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 227,
+  "fields": {
+    "nombre": "BIOMETRÍA Y SEGURIDAD DE SISTEMAS",
+    "titulacion": 7,
+    "curso": 4,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 228,
+  "fields": {
+    "nombre": "INGENIERÍA WEB",
+    "titulacion": 7,
+    "curso": 4,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 229,
+  "fields": {
+    "nombre": "MINERÍA DE DATOS Y ALMACENES DE DATOS",
+    "titulacion": 7,
+    "curso": 4,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 230,
+  "fields": {
+    "nombre": "PROCESAMIENTO DE LA INFORMACIÓN MULTIMEDIA",
+    "titulacion": 7,
+    "curso": 4,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 231,
+  "fields": {
+    "nombre": "RECUPERACIÓN DE LA INFORMACIÓN Y BÚSQUEDA EN LA WEB",
+    "titulacion": 7,
+    "curso": 4,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 232,
+  "fields": {
+    "nombre": "REDES DE COMUNICACIONES MÓVILES Y MULTIMEDIA",
+    "titulacion": 7,
+    "curso": 4,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 233,
+  "fields": {
+    "nombre": "PRÁCTICAS EXTERNAS",
+    "titulacion": 7,
+    "curso": 4,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 234,
+  "fields": {
+    "nombre": "CONSERVACIÓN Y EXPLOTACIÓN DE INFRAESTRUCTURAS DEL TRANSPORTE",
+    "titulacion": 11,
+    "curso": 1,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 235,
+  "fields": {
+    "nombre": "MECÁNICA AVANZADA DE SUELOS Y ROCAS",
+    "titulacion": 11,
+    "curso": 1,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 236,
+  "fields": {
+    "nombre": "MECÁNICA DE MEDIOS CONTINUOS",
+    "titulacion": 11,
+    "curso": 1,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 237,
+  "fields": {
+    "nombre": "MÉTODOS NUMÉRICOS DE LA INGENIERÍA CIVIL",
+    "titulacion": 11,
+    "curso": 1,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 238,
+  "fields": {
+    "nombre": "ORDENACIÓN TERRITORIAL Y PLANEAMIENTO URBANO",
+    "titulacion": 11,
+    "curso": 1,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 239,
+  "fields": {
+    "nombre": "CONSERVACIÓN Y EXPLOTACIÓN DE OBRAS HIDRÁULICAS",
+    "titulacion": 11,
+    "curso": 1,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 240,
+  "fields": {
+    "nombre": "INGENIERÍA SANITARIA Y GESTIÓN DE RESIDUOS",
+    "titulacion": 11,
+    "curso": 1,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 241,
+  "fields": {
+    "nombre": "MODELIZACIÓN EN INGENIERÍA",
+    "titulacion": 11,
+    "curso": 1,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 242,
+  "fields": {
+    "nombre": "TECNOLOGÍA DE ESTRUCTURAS",
+    "titulacion": 11,
+    "curso": 1,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 243,
+  "fields": {
+    "nombre": "CÁLCULO AVANZADO DE ESTRUCTURAS",
+    "titulacion": 11,
+    "curso": 2,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 244,
+  "fields": {
+    "nombre": "INGENIERÍA GEOTÉCNICA",
+    "titulacion": 11,
+    "curso": 2,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 245,
+  "fields": {
+    "nombre": "LOGÍSTICA, INTERMODALIDAD Y MODELOS CONCESIONALES",
+    "titulacion": 11,
+    "curso": 2,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 246,
+  "fields": {
+    "nombre": "PLANEAMIENTO Y GESTIÓN DE RECURSOS HÍDRICOS",
+    "titulacion": 11,
+    "curso": 2,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 247,
+  "fields": {
+    "nombre": "PUERTOS Y COSTAS",
+    "titulacion": 11,
+    "curso": 2,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 248,
+  "fields": {
+    "nombre": "TRABAJO FIN DE MÁSTER",
+    "titulacion": 11,
+    "curso": 2,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 249,
+  "fields": {
+    "nombre": "ACTUACIONES DE LA INGENIERÍA CIVIL FRENTE A LOS RIESGOS NATURALES",
+    "titulacion": 11,
+    "curso": 2,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 250,
+  "fields": {
+    "nombre": "AMPLIACIÓN DE MATERIALES",
+    "titulacion": 11,
+    "curso": 2,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 251,
+  "fields": {
+    "nombre": "AUSCULTACIÓN MONITORIZACIÓN Y PERITACIÓN",
+    "titulacion": 11,
+    "curso": 2,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 252,
+  "fields": {
+    "nombre": "CONTAMINACIÓN",
+    "titulacion": 11,
+    "curso": 2,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 253,
+  "fields": {
+    "nombre": "EMPRENDIMIENTO I+D+I EN INGENIERÍA",
+    "titulacion": 11,
+    "curso": 2,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 254,
+  "fields": {
+    "nombre": "GESTIÓN DE EMPRESAS",
+    "titulacion": 11,
+    "curso": 2,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 255,
+  "fields": {
+    "nombre": "GESTIÓN DE PATRIMONIO",
+    "titulacion": 11,
+    "curso": 2,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 256,
+  "fields": {
+    "nombre": "GESTIÓN DE PROYECTOS",
+    "titulacion": 11,
+    "curso": 2,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 257,
+  "fields": {
+    "nombre": "LA PROFESIÓN DEL ICCP",
+    "titulacion": 11,
+    "curso": 2,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 258,
+  "fields": {
+    "nombre": "MAPAS DE RUIDO",
+    "titulacion": 11,
+    "curso": 2,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 259,
+  "fields": {
+    "nombre": "PATOLOGÍA Y REHABILITACIÓN",
+    "titulacion": 11,
+    "curso": 2,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 260,
+  "fields": {
+    "nombre": "PUENTES",
+    "titulacion": 11,
+    "curso": 2,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 261,
+  "fields": {
+    "nombre": "SEGURIDAD VIARIA",
+    "titulacion": 11,
+    "curso": 2,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 262,
+  "fields": {
+    "nombre": "SIG AVANZADO",
+    "titulacion": 11,
+    "curso": 2,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 263,
+  "fields": {
+    "nombre": "SISTEMAS DE TRANSPORTE Y CIUDADES INTELIGENTES",
+    "titulacion": 11,
+    "curso": 2,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 264,
+  "fields": {
+    "nombre": "TELEDETECCIÓN EN OBRAS DE INGENIERÍA CIVIL",
+    "titulacion": 11,
+    "curso": 2,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 265,
+  "fields": {
+    "nombre": "INICIACIÓN A LA INVESTIGACIÓN",
+    "titulacion": 9,
+    "curso": 1,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 266,
+  "fields": {
+    "nombre": "PROYECTOS DE INVESTIGACIÓN",
+    "titulacion": 9,
+    "curso": 1,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 267,
+  "fields": {
+    "nombre": "TÉCNICAS, PROCEDIMIENTOS E INSTRUMENTOS DE RECOGIDA Y ANÁLISIS DE DATOS",
+    "titulacion": 9,
+    "curso": 1,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 268,
+  "fields": {
+    "nombre": "TECNOLOGÍAS DE LA COMUNICACION Y LA DOCUMENTACIÓN CIENTÍFICA",
+    "titulacion": 9,
+    "curso": 1,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 269,
+  "fields": {
+    "nombre": "LABORATORIO DE INVESTIGACIÓN",
+    "titulacion": 9,
+    "curso": 1,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 270,
+  "fields": {
+    "nombre": "TRABAJO FIN DE MÁSTER",
+    "titulacion": 9,
+    "curso": 1,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 271,
+  "fields": {
+    "nombre": "DESARROLLO COLABORATIVO DE PROYECTOS",
+    "titulacion": 12,
+    "curso": 1,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 272,
+  "fields": {
+    "nombre": "INTRODUCCIÓN AL BIM. INTRODUCCIÓN A LAS PLATAFORMAS DE TRABAJO (BIM I)",
+    "titulacion": 12,
+    "curso": 1,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 273,
+  "fields": {
+    "nombre": "METODOLOGÍA Y MODELADO AVANZADO DE PROYECTOS DE CONSTRUCCIÓN BIM (BIM II)",
+    "titulacion": 12,
+    "curso": 1,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 274,
+  "fields": {
+    "nombre": "MEDICIONES Y PRESUPUESTOS. PLANIFICACIÓN DE LA CONSTRUCCIÓN Y CONTROL DE LA EJECUCIÓN (4D Y 5D)",
+    "titulacion": 12,
+    "curso": 1,
+    "semestre": 2,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 275,
+  "fields": {
+    "nombre": "TRABAJO FIN DE MÁSTER (ESP. EDIFICACIÓN)",
+    "titulacion": 12,
+    "curso": 1,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 276,
+  "fields": {
+    "nombre": "TRABAJO FIN DE MÁSTER (ESP. INGENIERÍA CIVIL)",
+    "titulacion": 12,
+    "curso": 1,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 277,
+  "fields": {
+    "nombre": "DISEÑO, MODELADO Y CÁLCULO DE ESTRUCTURAS DE EDIFICACIÓN MEDIANTE BIM",
+    "titulacion": 12,
+    "curso": 1,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 278,
+  "fields": {
+    "nombre": "DISEÑO, MODELADO Y CÁLCULO DE ESTRUCTURAS DE INGENIERÍA CIVIL MEDIANTE BIM",
+    "titulacion": 12,
+    "curso": 1,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 279,
+  "fields": {
+    "nombre": "DISEÑO, MODELADO Y CÁLCULO OBRAS DE LINEALES MEDIANTE BIM",
+    "titulacion": 12,
+    "curso": 1,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 280,
+  "fields": {
+    "nombre": "MODELADO, DISEÑO Y TRABAJO COLABORATIVO EN LAS INSTALACIONES DE EDIFICACIÓN Y EFICIENCIA ENERGÉTICA",
+    "titulacion": 12,
+    "curso": 1,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 281,
+  "fields": {
+    "nombre": "ANÁLISIS DEL PROYECTO Y SUS INTERFERENCIAS.GESTIÓN:DOCUMENTAL Y GRÁFICA.INICIACIÓN A LA VISUALIZACIÓ",
+    "titulacion": 12,
+    "curso": 1,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 282,
+  "fields": {
+    "nombre": "GESTIÓN INTEGRAL, COORDINACIÓN Y SOSTENIBILIDAD DEL PROYECTO Y SU IMPLANTACIÓN EN BIM",
+    "titulacion": 12,
+    "curso": 1,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 283,
+  "fields": {
+    "nombre": "PRÁCTICAS EXTERNAS",
+    "titulacion": 12,
+    "curso": 1,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "academics.asignatura",
+  "pk": 284,
+  "fields": {
+    "nombre": "SUPERFICIES COMPLEJAS, RENDERIZADO Y VISUALIZACIÓN DE MODELOS BIM",
+    "titulacion": 12,
+    "curso": 1,
+    "semestre": 1,
+    "coordinator": null
+  }
+},
+{
+  "model": "schedule.tipoactividad",
+  "pk": 1,
+  "fields": {
+    "nombre": "Práctica de Laboratorio"
+  }
+},
+{
+  "model": "schedule.tipoactividad",
+  "pk": 2,
+  "fields": {
+    "nombre": "Examen Parcial"
+  }
+},
+{
+  "model": "schedule.tipoactividad",
+  "pk": 3,
+  "fields": {
+    "nombre": "Entrega Trabajo"
+  }
+},
+{
+  "model": "schedule.tipoactividad",
+  "pk": 4,
+  "fields": {
+    "nombre": "Exposición Oral en Clase"
+  }
+},
+{
+  "model": "schedule.tipoactividad",
+  "pk": 5,
+  "fields": {
+    "nombre": "Seminario"
+  }
+},
+{
+  "model": "schedule.actividad",
+  "pk": 2,
+  "fields": {
+    "nombre": "Prueba 02",
+    "tipo_actividad": 2,
+    "fecha_inicio": "2025-08-27T18:00:00Z",
+    "fecha_fin": "2025-08-27T20:30:00Z",
+    "descripcion": "Prueba de creación de actividad",
+    "evaluable": false,
+    "porcentaje_evaluacion": "0.00",
+    "no_recuperable": false,
+    "aprobada": true,
+    "activa": false,
+    "asignaturas": [
+      1
+    ]
+  }
+},
+{
+  "model": "schedule.actividad",
+  "pk": 3,
+  "fields": {
+    "nombre": "Otra prueba",
+    "tipo_actividad": 3,
+    "fecha_inicio": "2025-08-29T13:42:00Z",
+    "fecha_fin": "2025-08-27T13:42:00Z",
+    "descripcion": "otra pruebita",
+    "evaluable": true,
+    "porcentaje_evaluacion": "10.00",
+    "no_recuperable": false,
+    "aprobada": false,
+    "activa": true,
+    "asignaturas": [
+      1,
+      2
+    ]
+  }
+},
+{
+  "model": "schedule.actividad",
+  "pk": 4,
+  "fields": {
+    "nombre": "Clase de repaso antes de parcial",
+    "tipo_actividad": 5,
+    "fecha_inicio": "2025-11-30T11:30:00Z",
+    "fecha_fin": "2025-11-30T17:30:00Z",
+    "descripcion": "Clase antes del primer parcial",
+    "evaluable": false,
+    "porcentaje_evaluacion": "0.00",
+    "no_recuperable": false,
+    "aprobada": true,
+    "activa": true,
+    "asignaturas": [
+      1
+    ]
+  }
+},
+{
+  "model": "schedule.logactividad",
+  "pk": 1,
+  "fields": {
+    "actividad": 2,
+    "object_type": "actividad",
+    "object_name": "",
+    "object_id": null,
+    "timestamp": "2025-08-28T19:24:34.128Z",
+    "usuario": 3,
+    "tipo_log": "Borrado",
+    "details": null
+  }
+},
+{
+  "model": "schedule.logactividad",
+  "pk": 2,
+  "fields": {
+    "actividad": null,
+    "object_type": "tipo_actividad",
+    "object_name": "Seminario",
+    "object_id": 5,
+    "timestamp": "2025-08-28T21:35:31.246Z",
+    "usuario": 1,
+    "tipo_log": "Creación",
+    "details": "Activity type \"Seminario\" created"
+  }
+},
+{
+  "model": "schedule.logactividad",
+  "pk": 3,
+  "fields": {
+    "actividad": 4,
+    "object_type": "actividad",
+    "object_name": "Clase de repaso",
+    "object_id": 4,
+    "timestamp": "2025-08-29T09:29:47.181Z",
+    "usuario": 1,
+    "tipo_log": "Creación",
+    "details": "Activity \"Clase de repaso\" created for 1 subject(s)"
+  }
+},
+{
+  "model": "schedule.logactividad",
+  "pk": 4,
+  "fields": {
+    "actividad": 4,
+    "object_type": "actividad",
+    "object_name": "Clase de repaso antes de parcial",
+    "object_id": 4,
+    "timestamp": "2025-08-29T09:30:54.772Z",
+    "usuario": 1,
+    "tipo_log": "Modificación",
+    "details": "Activity \"Clase de repaso antes de parcial\" modified"
+  }
+},
+{
+  "model": "schedule.logactividad",
+  "pk": 5,
+  "fields": {
+    "actividad": null,
+    "object_type": "coordinador",
+    "object_name": "Grado En Ingeniería Civil",
+    "object_id": 4,
+    "timestamp": "2025-08-29T10:31:02.032Z",
+    "usuario": 1,
+    "tipo_log": "Modificación",
+    "details": "Coordinator for \"Grado En Ingeniería Civil\" changed from teacher to jose_1"
+  }
+},
+{
+  "model": "schedule.logactividad",
+  "pk": 6,
+  "fields": {
+    "actividad": null,
+    "object_type": "coordinador",
+    "object_name": "Grado En Ingeniería De Sonido E Imagen En Telecomunicación",
+    "object_id": 5,
+    "timestamp": "2025-08-29T10:31:15.393Z",
+    "usuario": 1,
+    "tipo_log": "Asignación",
+    "details": "Coordinator pedro_1 assigned to \"Grado En Ingeniería De Sonido E Imagen En Telecomunicación\""
+  }
+},
+{
+  "model": "schedule.logactividad",
+  "pk": 7,
+  "fields": {
+    "actividad": null,
+    "object_type": "coordinador",
+    "object_name": "Grado En Ingeniería Informática En Ingeniería De Computadores",
+    "object_id": 6,
+    "timestamp": "2025-08-29T10:31:28.965Z",
+    "usuario": 1,
+    "tipo_log": "Asignación",
+    "details": "Coordinator antonio_1 assigned to \"Grado En Ingeniería Informática En Ingeniería De Computadores\""
+  }
+},
+{
+  "model": "schedule.logactividad",
+  "pk": 8,
+  "fields": {
+    "actividad": null,
+    "object_type": "coordinador",
+    "object_name": "Grado En Ingeniería Informática En Ingeniería Del Software",
+    "object_id": 7,
+    "timestamp": "2025-08-29T10:31:41.796Z",
+    "usuario": 1,
+    "tipo_log": "Asignación",
+    "details": "Coordinator pablo_1 assigned to \"Grado En Ingeniería Informática En Ingeniería Del Software\""
+  }
+},
+{
+  "model": "schedule.logactividad",
+  "pk": 9,
+  "fields": {
+    "actividad": null,
+    "object_type": "coordinador",
+    "object_name": "Máster Universitario En Ingeniería De Caminos",
+    "object_id": 8,
+    "timestamp": "2025-08-29T10:32:08.661Z",
+    "usuario": 1,
+    "tipo_log": "Asignación",
+    "details": "Coordinator marta_1 assigned to \"Máster Universitario En Ingeniería De Caminos\""
+  }
+},
+{
+  "model": "schedule.logactividad",
+  "pk": 10,
+  "fields": {
+    "actividad": null,
+    "object_type": "actividad",
+    "object_name": "PDF Report: Agenda_General_Centro.pdf",
+    "object_id": null,
+    "timestamp": "2025-08-29T10:32:27.115Z",
+    "usuario": 1,
+    "tipo_log": "Report Generation",
+    "details": "PDF agenda report generated for 10 titulacion(s)"
+  }
+},
+{
+  "model": "schedule.logactividad",
+  "pk": 11,
+  "fields": {
+    "actividad": null,
+    "object_type": "actividad",
+    "object_name": "PDF Report: Agenda_General_Centro.pdf",
+    "object_id": null,
+    "timestamp": "2025-08-29T10:34:34.773Z",
+    "usuario": 1,
+    "tipo_log": "Report Generation",
+    "details": "PDF agenda report generated for 10 titulacion(s)"
+  }
+},
+{
+  "model": "schedule.logactividad",
+  "pk": 12,
+  "fields": {
+    "actividad": null,
+    "object_type": "actividad",
+    "object_name": "PDF Report: Agenda_General_Centro.pdf",
+    "object_id": null,
+    "timestamp": "2025-08-29T10:35:00.371Z",
+    "usuario": 1,
+    "tipo_log": "Report Generation",
+    "details": "PDF agenda report generated for 10 titulacion(s)"
+  }
+},
+{
+  "model": "schedule.logactividad",
+  "pk": 13,
+  "fields": {
+    "actividad": 4,
+    "object_type": "actividad",
+    "object_name": "",
+    "object_id": null,
+    "timestamp": "2025-08-29T10:41:59.157Z",
+    "usuario": 1,
+    "tipo_log": "Desaprobación desde Dashboard",
+    "details": null
+  }
+},
+{
+  "model": "schedule.logactividad",
+  "pk": 14,
+  "fields": {
+    "actividad": 4,
+    "object_type": "actividad",
+    "object_name": "",
+    "object_id": null,
+    "timestamp": "2025-08-29T10:42:01.526Z",
+    "usuario": 1,
+    "tipo_log": "Aprobación desde Dashboard",
+    "details": null
+  }
+},
+{
+  "model": "schedule.logactividad",
+  "pk": 15,
+  "fields": {
+    "actividad": 2,
+    "object_type": "actividad",
+    "object_name": "",
+    "object_id": null,
+    "timestamp": "2025-08-29T10:42:03.503Z",
+    "usuario": 1,
+    "tipo_log": "Desaprobación desde Dashboard",
+    "details": null
+  }
+},
+{
+  "model": "schedule.logactividad",
+  "pk": 16,
+  "fields": {
+    "actividad": 2,
+    "object_type": "actividad",
+    "object_name": "",
+    "object_id": null,
+    "timestamp": "2025-08-29T10:42:04.665Z",
+    "usuario": 1,
+    "tipo_log": "Aprobación desde Dashboard",
+    "details": null
+  }
+},
+{
+  "model": "schedule.vistacalendario",
+  "pk": 1,
+  "fields": {
+    "nombre": "Asignaturas primer cuatri",
+    "usuario": 1,
+    "token": "5a131604-8c08-4881-bed9-2691aae2f448",
+    "asignaturas": [
+      1,
+      2
+    ],
+    "tipos_actividad": [
+      1,
+      2,
+      3,
+      4
+    ]
+  }
+},
+{
+  "model": "schedule.vistacalendario",
+  "pk": 2,
+  "fields": {
+    "nombre": "Parciales",
+    "usuario": 1,
+    "token": "9c6bdcce-3c1c-4209-8431-85c4816f99ee",
+    "asignaturas": [
+      1,
+      2,
+      44,
+      50
+    ],
+    "tipos_actividad": [
+      2
+    ]
+  }
+},
+{
+  "model": "schedule.vistacalendario",
+  "pk": 3,
+  "fields": {
+    "nombre": "ical01",
+    "usuario": 4,
+    "token": "f2649124-8226-45ea-8e3c-072c501f0984",
+    "asignaturas": [
+      1,
+      2
+    ],
+    "tipos_actividad": [
+      2
+    ]
+  }
+},
+{
+  "model": "schedule.actividadversion",
+  "pk": 1,
+  "fields": {
+    "actividad_original": 4,
+    "version_numero": 1,
+    "modificada_por": 1,
+    "fecha_modificacion": "2025-08-29T09:30:54.750Z",
+    "comentario_version": "he cambiado el título",
+    "nombre": "Clase de repaso",
+    "descripcion": "Clase antes del primer parcial",
+    "fecha_inicio": "2025-11-12T11:29:00Z",
+    "fecha_fin": "2025-11-12T17:30:00Z",
+    "evaluable": false,
+    "porcentaje_evaluacion": "0.00",
+    "no_recuperable": false,
+    "aprobada": true,
+    "activa": true,
+    "asignaturas_snapshot": [
+      {
+        "id": 1,
+        "nombre": "CÁLCULO PARA LA EDIFICACIÓN"
+      }
+    ],
+    "tipo_actividad_snapshot": {
+      "id": 5,
+      "nombre": "Seminario"
+    }
+  }
+},
+{
+  "model": "schedule.actividadversion",
+  "pk": 2,
+  "fields": {
+    "actividad_original": 4,
+    "version_numero": 2,
+    "modificada_por": 1,
+    "fecha_modificacion": "2025-08-29T10:41:59.137Z",
+    "comentario_version": "Approval status changed to False",
+    "nombre": "Clase de repaso antes de parcial",
+    "descripcion": "Clase antes del primer parcial",
+    "fecha_inicio": "2025-11-30T11:30:00Z",
+    "fecha_fin": "2025-11-30T17:30:00Z",
+    "evaluable": false,
+    "porcentaje_evaluacion": "0.00",
+    "no_recuperable": false,
+    "aprobada": true,
+    "activa": true,
+    "asignaturas_snapshot": [
+      {
+        "id": 1,
+        "nombre": "CÁLCULO PARA LA EDIFICACIÓN"
+      }
+    ],
+    "tipo_actividad_snapshot": {
+      "id": 5,
+      "nombre": "Seminario"
+    }
+  }
+},
+{
+  "model": "schedule.actividadversion",
+  "pk": 3,
+  "fields": {
+    "actividad_original": 4,
+    "version_numero": 3,
+    "modificada_por": 1,
+    "fecha_modificacion": "2025-08-29T10:42:01.511Z",
+    "comentario_version": "Approval status changed to True",
+    "nombre": "Clase de repaso antes de parcial",
+    "descripcion": "Clase antes del primer parcial",
+    "fecha_inicio": "2025-11-30T11:30:00Z",
+    "fecha_fin": "2025-11-30T17:30:00Z",
+    "evaluable": false,
+    "porcentaje_evaluacion": "0.00",
+    "no_recuperable": false,
+    "aprobada": false,
+    "activa": true,
+    "asignaturas_snapshot": [
+      {
+        "id": 1,
+        "nombre": "CÁLCULO PARA LA EDIFICACIÓN"
+      }
+    ],
+    "tipo_actividad_snapshot": {
+      "id": 5,
+      "nombre": "Seminario"
+    }
+  }
+},
+{
+  "model": "schedule.actividadversion",
+  "pk": 4,
+  "fields": {
+    "actividad_original": 2,
+    "version_numero": 1,
+    "modificada_por": 1,
+    "fecha_modificacion": "2025-08-29T10:42:03.487Z",
+    "comentario_version": "Approval status changed to False",
+    "nombre": "Prueba 02",
+    "descripcion": "Prueba de creación de actividad",
+    "fecha_inicio": "2025-08-27T18:00:00Z",
+    "fecha_fin": "2025-08-27T20:30:00Z",
+    "evaluable": false,
+    "porcentaje_evaluacion": "0.00",
+    "no_recuperable": false,
+    "aprobada": true,
+    "activa": false,
+    "asignaturas_snapshot": [
+      {
+        "id": 1,
+        "nombre": "CÁLCULO PARA LA EDIFICACIÓN"
+      }
+    ],
+    "tipo_actividad_snapshot": {
+      "id": 2,
+      "nombre": "Examen Parcial"
+    }
+  }
+},
+{
+  "model": "schedule.actividadversion",
+  "pk": 5,
+  "fields": {
+    "actividad_original": 2,
+    "version_numero": 2,
+    "modificada_por": 1,
+    "fecha_modificacion": "2025-08-29T10:42:04.646Z",
+    "comentario_version": "Approval status changed to True",
+    "nombre": "Prueba 02",
+    "descripcion": "Prueba de creación de actividad",
+    "fecha_inicio": "2025-08-27T18:00:00Z",
+    "fecha_fin": "2025-08-27T20:30:00Z",
+    "evaluable": false,
+    "porcentaje_evaluacion": "0.00",
+    "no_recuperable": false,
+    "aprobada": false,
+    "activa": false,
+    "asignaturas_snapshot": [
+      {
+        "id": 1,
+        "nombre": "CÁLCULO PARA LA EDIFICACIÓN"
+      }
+    ],
+    "tipo_actividad_snapshot": {
+      "id": 2,
+      "nombre": "Examen Parcial"
+    }
+  }
+}
+]

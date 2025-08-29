@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Version History" %} - {{ activity.nombre }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="bi bi-clock-history"></i> {% trans "Version History" %}</h2>
+                <div>
+                    <a href="{% url 'activity_edit' activity.pk %}" class="btn btn-primary">
+                        <i class="bi bi-pencil"></i> {% trans "Edit Current Version" %}
+                    </a>
+                    {% if user.role == 'TEACHER' %}
+                        <a href="{% url 'teacher_dashboard' %}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> {% trans "Back to Dashboard" %}
+                        </a>
+                    {% elif user.role == 'COORDINATOR' %}
+                        <a href="{% url 'coordinator_dashboard' %}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> {% trans "Back to Dashboard" %}
+                        </a>
+                    {% elif user.role == 'ADMIN' %}
+                        <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> {% trans "Back to Dashboard" %}
+                        </a>
+                    {% else %}
+                        <a href="{% url 'home' %}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> {% trans "Back to Home" %}
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Current Version Card -->
+            <div class="card mb-4 border-success">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-star-fill"></i> {% trans "Current Version" %} - {{ activity.nombre }}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>{% trans "Description" %}:</strong> {{ activity.descripcion|default:"No description" }}</p>
+                            <p><strong>{% trans "Start Date" %}:</strong> {{ activity.fecha_inicio|date:"M d, Y H:i" }}</p>
+                            <p><strong>{% trans "End Date" %}:</strong> {{ activity.fecha_fin|date:"M d, Y H:i" }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>{% trans "Type" %}:</strong> {{ activity.tipo_actividad.nombre }}</p>
+                            <p><strong>Subjects:</strong> 
+                                {% for asignatura in activity.asignaturas.all %}
+                                    <span class="badge bg-primary">{{ asignatura.nombre }}</span>{% if not forloop.last %} {% endif %}
+                                {% endfor %}
+                            </p>
+                            <p>
+                                <strong>Evaluable:</strong> 
+                                {% if activity.evaluable %}
+                                    <span class="badge bg-warning">Yes ({{ activity.porcentaje_evaluacion }}%)</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">No</span>
+                                {% endif %}
+                            </p>
+                            <p>
+                                <strong>Status:</strong>
+                                {% if activity.aprobada %}
+                                    <span class="badge bg-success">Approved</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Pending Approval</span>
+                                {% endif %}
+                                {% if activity.activa %}
+                                    <span class="badge bg-info">Active</span>
+                                {% else %}
+                                    <span class="badge bg-dark">Inactive</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Version History -->
+            {% if versions %}
+                <h4>Previous Versions ({{ versions.count }})</h4>
+                <div class="row">
+                    {% for version in versions %}
+                    <div class="col-md-6 mb-3">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0">
+                                    <i class="bi bi-archive"></i> Version {{ version.version_numero }}
+                                </h6>
+                                <small class="text-muted">{{ version.fecha_modificacion|date:"M d, Y H:i" }}</small>
+                            </div>
+                            <div class="card-body">
+                                <p><strong>Name:</strong> {{ version.nombre }}</p>
+                                <p><strong>Modified by:</strong> {{ version.modificada_por.username }}</p>
+                                {% if version.comentario_version %}
+                                    <p><strong>Comment:</strong> <em>{{ version.comentario_version }}</em></p>
+                                {% endif %}
+                                <p><strong>Subjects:</strong> {{ version.get_asignaturas_names }}</p>
+                                <p><strong>Type:</strong> {{ version.tipo_actividad_snapshot.nombre|default:"N/A" }}</p>
+                                
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <a href="{% url 'activity_version_detail' activity.pk version.pk %}" class="btn btn-outline-info">
+                                        <i class="bi bi-eye"></i> View Details
+                                    </a>
+                                    <a href="{% url 'activity_restore_version' activity.pk version.pk %}" class="btn btn-outline-warning">
+                                        <i class="bi bi-arrow-clockwise"></i> Restore
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i> No previous versions found. This activity has not been modified since creation.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

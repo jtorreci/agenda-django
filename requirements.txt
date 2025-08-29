@@ -1,0 +1,11 @@
+asgiref==3.9.1
+charset-normalizer==3.4.3
+Django==5.2.5
+django-widget-tweaks==1.5.0
+icalendar==6.3.1
+pillow==11.3.0
+python-dateutil==2.9.0.post0
+reportlab==4.4.3
+six==1.17.0
+sqlparse==0.5.3
+tzdata==2025.2

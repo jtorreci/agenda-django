@@ -163,6 +163,33 @@
     </p>
 {% endblock %}
 
+<!-- Activity Details Modal -->
+<div class="modal fade" id="activityDetailModal" tabindex="-1" aria-labelledby="activityDetailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="activityDetailModalLabel">Activity Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Title:</strong> <span id="modalActivityTitle"></span></p>
+                <p><strong>Description:</strong> <span id="modalActivityDescription"></span></p>
+                <p><strong>Type:</strong> <span id="modalActivityType"></span></p>
+                <p><strong>Subjects:</strong> <span id="modalActivitySubjects"></span></p>
+                <p><strong>Start:</strong> <span id="modalActivityStart"></span></p>
+                <p><strong>End:</strong> <span id="modalActivityEnd"></span></p>
+                <p><strong>Approved:</strong> <span id="modalActivityApproved"></span></p>
+                <p><strong>Active:</strong> <span id="modalActivityActive"></span></p>
+                <p><strong>Evaluable:</strong> <span id="modalActivityEvaluable"></span></p>
+                <p><strong>Percentage:</strong> <span id="modalActivityPercentage"></span></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% block extra_js %}
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'></script>
     <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
@@ -179,7 +206,24 @@
         var calendar = new FullCalendar.Calendar(calendarEl, {
             initialView: 'dayGridMonth',
             headerToolbar: { left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek' },
-            events: [] // Se cargará dinámicamente
+            events: [], // Se cargará dinámicamente
+            eventClick: function(info) {
+                // Populate modal with event details
+                document.getElementById('modalActivityTitle').innerText = info.event.title;
+                document.getElementById('modalActivityDescription').innerText = info.event.extendedProps.description || 'N/A';
+                document.getElementById('modalActivityType').innerText = info.event.extendedProps.activity_type || 'N/A';
+                document.getElementById('modalActivitySubjects').innerText = info.event.extendedProps.subjects || 'N/A';
+                document.getElementById('modalActivityStart').innerText = info.event.start ? info.event.start.toLocaleString() : 'N/A';
+                document.getElementById('modalActivityEnd').innerText = info.event.end ? info.event.end.toLocaleString() : 'N/A';
+                document.getElementById('modalActivityApproved').innerText = info.event.extendedProps.is_approved ? 'Yes' : 'No';
+                document.getElementById('modalActivityActive').innerText = info.event.extendedProps.is_active ? 'Yes' : 'No';
+                document.getElementById('modalActivityEvaluable').innerText = info.event.extendedProps.evaluable ? 'Yes' : 'No';
+                document.getElementById('modalActivityPercentage').innerText = info.event.extendedProps.percentage !== null ? info.event.extendedProps.percentage + '%' : 'N/A';
+
+                // Show the modal
+                var activityDetailModal = new bootstrap.Modal(document.getElementById('activityDetailModal'));
+                activityDetailModal.show();
+            }
         });
 
         var calendarTab = document.getElementById('calendar-tab');
@@ -209,9 +253,9 @@
 
             fetch(`{% url 'get_filtered_activities' %}?subject_ids=${selectedSubjectIds.join(',')}`)
                 .then(response => response.json())
-                .then(data => {
+                .then(data => { // data is now directly the array of activities
                     let tableHtml = '<p>No activities found for the selected subjects.</p>';
-                    if (data.activities.length > 0) {
+                    if (data.length > 0) { // Check data.length directly
                         tableHtml = `
                             <div class="table-responsive">
                                 <table class="table table-striped table-hover">
@@ -220,13 +264,13 @@
                                             <th>Name</th><th>Subjects</th><th>Type</th><th>Start Date</th><th>Actions</th>
                                         </tr>
                                     </thead><tbody>`;
-                        data.activities.forEach(activity => {
+                        data.forEach(activity => { // Iterate directly over data
                             tableHtml += `
                                 <tr>
-                                    <td>${activity.nombre}</td>
-                                    <td>${activity.asignaturas.join(', ')}</td>
-                                    <td>${activity.tipo_actividad}</td>
-                                    <td>${new Date(activity.fecha_inicio).toLocaleString()}</td>
+                                    <td>${activity.title}</td> <!-- Use activity.title -->
+                                    <td>${activity.extendedProps.subjects}</td> <!-- Use extendedProps.subjects -->
+                                    <td>${activity.extendedProps.activity_type}</td> <!-- Use extendedProps.activity_type -->
+                                    <td>${new Date(activity.start).toLocaleString()}</td> <!-- Use activity.start -->
                                     <td>
                                         <a href="/activity/edit/${activity.id}/" class="btn btn-sm btn-info">Edit</a>
                                         <a href="/activity/delete/${activity.id}/" class="btn btn-sm btn-danger ms-1">Delete</a>
@@ -250,7 +294,7 @@
                 return;
             }
             // Suponiendo una URL que devuelve eventos de calendario en formato JSON
-            fetch(`/api/calendar_events/?subject_ids=${selectedSubjectIds.join(',')}`)
+            fetch(`{% url 'get_filtered_activities' %}?subject_ids=${selectedSubjectIds.join(',')}`)
                 .then(response => response.json())
                 .then(events => {
                     calendar.removeAllEvents();

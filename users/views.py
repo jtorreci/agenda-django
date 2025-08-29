@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required, user_passes_test
 from .forms import StudentSubjectForm, NotificationForm
-from schedule.models import Actividad, VistaCalendario, TipoActividad
+from schedule.models import Actividad, VistaCalendario, TipoActividad, LogActividad
 from schedule.forms import VistaCalendarioForm # New import
 from academics.models import Titulacion, Asignatura
 from django.core.mail import send_mail
@@ -10,6 +10,9 @@ from django.utils.translation import gettext as _
 from .models import CustomUser
 from django.contrib import messages
 from django.http import JsonResponse
+from agenda_academica.models import AgendaSettings
+from django.views.decorators.http import require_http_methods
+import json
 
 def is_teacher(user):
     return user.is_authenticated and user.role in [CustomUser.ROLE_TEACHER, CustomUser.ROLE_COORDINATOR, CustomUser.ROLE_ADMIN]
@@ -254,13 +257,41 @@ def student_calendar_events(request):
 
     # 4. Formatear los datos para FullCalendar
     events = []
+    from agenda_academica.models import AgendaSettings
+    from django.utils import timezone
+
+    # Load the closing date
+    try:
+        closing_date = AgendaSettings.load().closing_date
+    except Exception:
+        # Fallback if AgendaSettings is not configured or an error occurs
+        closing_date = timezone.now().date()
+
     for activity in activities:
+        event_class_names = []
+        if activity.fecha_inicio.date() < closing_date:
+            event_class_names.append('past-event')
+        else:
+            event_class_names.append('future-event')
+
+        # Get assigned subject names
+        subject_names = ", ".join([s.nombre for s in activity.asignaturas.all()])
+
         events.append({
+            'id': activity.id, # Add activity ID for eventClick
             'title': activity.nombre,
             'start': activity.fecha_inicio.isoformat(), # Formato estándar ISO 8601
             'end': activity.fecha_fin.isoformat(),
-            # Opcional: puedes añadir un enlace para que se pueda hacer clic en el evento
-            # 'url': f'/ruta/a/la/actividad/{activity.id}/' 
+            'classNames': event_class_names, # Add class for styling
+            'extendedProps': { # Add more details for eventClick
+                'description': activity.descripcion,
+                'activity_type': activity.tipo_actividad.nombre,
+                'subjects': subject_names,
+                'is_approved': activity.aprobada,
+                'is_active': activity.activa,
+                'evaluable': activity.evaluable,
+                'percentage': activity.porcentaje_evaluacion,
+            }
         })
 
     # 4. Devolver los datos como una respuesta JSON
@@ -275,7 +306,19 @@ def coordinator_dashboard(request):
     # Always show all titulaciones in the filter dropdown
     titulaciones = Titulacion.objects.all()
     asignaturas = Asignatura.objects.all() # All asignaturas for filter
-    cursos = Asignatura.objects.order_by('curso').values_list('curso', flat=True).distinct()
+    
+    # Get unique courses and semesters with human-readable labels
+    curso_values = Asignatura.objects.order_by('curso').values_list('curso', flat=True).distinct()
+    cursos_with_labels = []
+    for curso in curso_values:
+        if curso == 10:
+            label = "Optativa"
+        elif curso == 1000:
+            label = "TFE"
+        else:
+            label = str(curso)
+        cursos_with_labels.append({'value': curso, 'label': label})
+    
     semestres = Asignatura.objects.order_by('semestre').values_list('semestre', flat=True).distinct()
     tipos_actividad = TipoActividad.objects.all()
 
@@ -334,7 +377,7 @@ def coordinator_dashboard(request):
     return render(request, 'users/coordinator_dashboard.html', {
         'titulaciones': titulaciones, # All titulaciones for filter dropdown
         'asignaturas': asignaturas, # All asignaturas for filter dropdown
-        'cursos': cursos,
+        'cursos': cursos_with_labels,
         'semestres': semestres,
         'tipos_actividad': tipos_actividad,
         'activities': activities.distinct(),
@@ -450,9 +493,50 @@ def assign_coordinators(request):
     })
 
 @login_required
+@user_passes_test(is_admin)
+def admin_dashboard(request):
+    from agenda_academica.models import AgendaSettings
+    
+    total_users = CustomUser.objects.count()
+    total_teachers = CustomUser.objects.filter(role='TEACHER').count()
+    total_students = CustomUser.objects.filter(role='STUDENT').count()
+    total_activities = Actividad.objects.count()
+    total_titulaciones = Titulacion.objects.count()
+    total_asignaturas = Asignatura.objects.count()
+    active_activities = Actividad.objects.filter(activa=True).count()
+    
+    titulaciones = Titulacion.objects.all().order_by('nombre')
+    all_users = CustomUser.objects.all().order_by('username')
+    tipos_actividad = TipoActividad.objects.all()
+    logs = LogActividad.objects.all().order_by('-timestamp')[:50]
+    
+    try:
+        settings = AgendaSettings.load()
+    except:
+        settings = None
+    
+    context = {
+        'total_users': total_users,
+        'total_teachers': total_teachers,
+        'total_students': total_students,
+        'total_activities': total_activities,
+        'total_titulaciones': total_titulaciones,
+        'total_asignaturas': total_asignaturas,
+        'active_activities': active_activities,
+        'titulaciones': titulaciones,
+        'all_titulaciones': titulaciones,  # For PDF report dropdown
+        'all_users': all_users,
+        'tipos_actividad': tipos_actividad,
+        'logs': logs,
+        'settings': settings,
+    }
+    
+    return render(request, 'users/admin_dashboard.html', context)
+
+@login_required
 def dashboard_redirect(request):
     if request.user.role == CustomUser.ROLE_ADMIN:
-        return render(request, 'users/dashboard_selection.html', {'dashboards': {'Admin': 'admin:index', 'Coordinator': 'coordinator_dashboard', 'Teacher': 'teacher_dashboard'}})
+        return redirect('admin_dashboard')
     elif request.user.role == CustomUser.ROLE_COORDINATOR:
         return render(request, 'users/dashboard_selection.html', {'dashboards': {'Coordinator': 'coordinator_dashboard', 'Teacher': 'teacher_dashboard'}})
     elif request.user.role == CustomUser.ROLE_TEACHER:
@@ -515,3 +599,96 @@ def teacher_student_view(request):
     user_subjects = request.user.subjects.all()
     activities = Actividad.objects.filter(asignaturas__in=user_subjects).order_by('fecha_inicio')
     return render(request, 'users/teacher_student_view.html', {'activities': activities})
+
+@login_required
+@user_passes_test(lambda u: u.role == 'ADMIN' or u.is_superuser)
+@require_http_methods(["PUT"])
+def ajax_update_coordinator(request):
+    try:
+        data = json.loads(request.body)
+        titulacion_id = data.get('titulacion_id')
+        coordinator_id = data.get('coordinator_id')  # Can be None to remove coordinator
+        
+        if not titulacion_id:
+            return JsonResponse({'success': False, 'error': 'ID de titulación requerido'})
+        
+        try:
+            titulacion = Titulacion.objects.get(id=titulacion_id)
+        except Titulacion.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Titulación no encontrada'})
+        
+        # Get current coordinator before change
+        current_coordinator = titulacion.coordinador
+        
+        # Update coordinator
+        if coordinator_id:
+            try:
+                new_coordinator = CustomUser.objects.get(id=coordinator_id)
+                titulacion.coordinador = new_coordinator
+                titulacion.save()
+                
+                # Ensure the assigned user has COORDINATOR role (unless they're ADMIN)
+                if new_coordinator.role not in [CustomUser.ROLE_COORDINATOR, CustomUser.ROLE_ADMIN]:
+                    new_coordinator.role = CustomUser.ROLE_COORDINATOR
+                    new_coordinator.save()
+                
+                coordinator_info = {
+                    'id': new_coordinator.id,
+                    'username': new_coordinator.username,
+                    'full_name': f"{new_coordinator.first_name} {new_coordinator.last_name}".strip() or new_coordinator.username
+                }
+                
+                # Log the coordinator assignment
+                if current_coordinator:
+                    details = f'Coordinator for "{titulacion.nombre}" changed from {current_coordinator.username} to {new_coordinator.username}'
+                    action = 'Modificación'
+                else:
+                    details = f'Coordinator {new_coordinator.username} assigned to "{titulacion.nombre}"'
+                    action = 'Asignación'
+                    
+                LogActividad.objects.create(
+                    object_type='coordinador',
+                    object_name=titulacion.nombre,
+                    object_id=titulacion.id,
+                    usuario=request.user,
+                    tipo_log=action,
+                    details=details
+                )
+                
+            except CustomUser.DoesNotExist:
+                return JsonResponse({'success': False, 'error': 'Usuario no encontrado'})
+        else:
+            # Remove coordinator
+            if current_coordinator:
+                # Log the coordinator removal
+                LogActividad.objects.create(
+                    object_type='coordinador',
+                    object_name=titulacion.nombre,
+                    object_id=titulacion.id,
+                    usuario=request.user,
+                    tipo_log='Eliminación',
+                    details=f'Coordinator {current_coordinator.username} removed from "{titulacion.nombre}"'
+                )
+                
+            titulacion.coordinador = None
+            titulacion.save()
+            coordinator_info = None
+        
+        # Check if we need to remove COORDINATOR role from previous coordinator
+        if current_coordinator and current_coordinator.id != coordinator_id:
+            if (current_coordinator.role == CustomUser.ROLE_COORDINATOR and 
+                not Titulacion.objects.filter(coordinador=current_coordinator).exists()):
+                # Demote to TEACHER role since coordinators are usually teachers
+                current_coordinator.role = CustomUser.ROLE_TEACHER
+                current_coordinator.save()
+        
+        return JsonResponse({
+            'success': True,
+            'titulacion_id': titulacion_id,
+            'coordinator': coordinator_info
+        })
+        
+    except json.JSONDecodeError:
+        return JsonResponse({'success': False, 'error': 'Datos JSON inválidos'})
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})

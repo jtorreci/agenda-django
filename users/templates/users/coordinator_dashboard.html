@@ -25,6 +25,39 @@
         .ts-wrapper.multi .ts-control > div {
             flex-shrink: 0;
         }
+        
+        /* Estilos para checkboxes de aprobación */
+        .approval-checkbox:disabled {
+            opacity: 0.6;
+            cursor: not-allowed !important;
+        }
+        
+        .approval-checkbox:not(:disabled):hover {
+            transform: scale(1.1);
+            transition: transform 0.1s ease;
+        }
+        
+        .approval-cell {
+            text-align: center;
+            position: relative;
+        }
+        
+        /* Tooltip mejorado */
+        .approval-checkbox[title]:hover::after {
+            content: attr(title);
+            position: absolute;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: nowrap;
+            z-index: 1000;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            margin-bottom: 5px;
+        }
     </style>
 {% endblock %}
 
@@ -55,9 +88,9 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label for="curso" class="form-label">Curso:</label>
-                                <select name="curso" id="curso" multiple class="form-select">
+                                <select name="curso" id="curso" multiple>
                                     {% for curso in cursos %}
-                                        <option value="{{ curso }}" {% if curso|stringformat:"s" in selected_cursos %}selected{% endif %}>{{ curso }}</option>
+                                        <option value="{{ curso.value }}" {% if curso.value|stringformat:"s" in selected_cursos %}selected{% endif %}>{{ curso.label }}</option>
                                     {% endfor %}
                                 </select>
                             </div>
@@ -65,7 +98,7 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label for="semestre" class="form-label">Semestre:</label>
-                                <select name="semestre" id="semestre" multiple class="form-select">
+                                <select name="semestre" id="semestre" multiple>
                                     {% for semestre in semestres %}
                                         <option value="{{ semestre }}" {% if semestre|stringformat:"s" in selected_semestres %}selected{% endif %}>{{ semestre }}</option>
                                     {% endfor %}
@@ -136,6 +169,27 @@
                         <a href="{% url 'coordinator_dashboard' %}" class="btn btn-outline-secondary ms-2" title="Clear Filters">✖</a>
                     </div>
                 </form>
+                <hr class="my-4">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'activity_logs' %}" class="btn btn-outline-info">View Activity Logs</a>
+                    <div class="dropdown">
+                        <button class="btn btn-outline-success dropdown-toggle w-100" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-file-pdf"></i> Generate PDF Report
+                        </button>
+                        <ul class="dropdown-menu w-100">
+                            {% for titulacion in titulaciones %}
+                                <li><a class="dropdown-item" href="{% url 'generate_agenda_report_titulacion' titulacion.id %}">{{ titulacion.nombre }}</a></li>
+                            {% endfor %}
+                            {% if titulaciones|length > 1 %}
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{% url 'generate_agenda_report_all' %}"><strong>All Titulaciones</strong></a></li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                    <a href="{% url 'ical_management' %}" class="btn btn-outline-warning">
+                        <i class="bi bi-calendar-event"></i> Manage iCal Feeds
+                    </a>
+                </div>
             </div>
         </div>
         <div class="col-md-9">
@@ -172,12 +226,14 @@
                                         <td>{{ activity.fecha_fin }}</td>
                                         <td><input type="checkbox" {% if activity.evaluable %}checked{% endif %} disabled></td>
                                         <td>{{ activity.porcentaje_evaluacion }}%</td>
-                                        <td>
-                                            {% with can_edit=False %}{% for asignatura in activity.asignaturas.all %}{% if asignatura.titulacion.id|stringformat:"s" in user_coordinated_titulaciones_ids %}{% with can_edit=True %}{% endwith %}{% endif %}{% endfor %}{% endwith %}
-                                            <input type="checkbox" class="form-check-input approval-checkbox" data-activity-id="{{ activity.id }}" {% if activity.aprobada %}checked{% endif %} {% if not can_edit %}disabled{% endif %}>
+                                        <td class="approval-cell" data-activity-id="{{ activity.id }}">
+                                            <input type="checkbox" 
+                                                   class="form-check-input approval-checkbox" 
+                                                   data-activity-id="{{ activity.id }}" 
+                                                   {% if activity.aprobada %}checked{% endif %}>
                                         </td>
                                         <td>
-                                            <a href="{% url 'activity_edit' activity.id %}" class="btn btn-sm btn-info">Edit</a>
+                                            <a href="{% url 'activity_details_readonly' activity.id %}" class="btn btn-sm btn-info">View Details</a>
                                             <a href="{% url 'activity_delete' activity.id %}" class="btn btn-sm btn-danger ms-1">Delete</a>
                                         </td>
                                     </tr>
@@ -208,6 +264,33 @@
     </p>
 {% endblock %}
 
+<!-- Activity Details Modal -->
+<div class="modal fade" id="activityDetailModal" tabindex="-1" aria-labelledby="activityDetailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="activityDetailModalLabel">Activity Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Title:</strong> <span id="modalActivityTitle"></span></p>
+                <p><strong>Description:</strong> <span id="modalActivityDescription"></span></p>
+                <p><strong>Type:</strong> <span id="modalActivityType"></span></p>
+                <p><strong>Subjects:</strong> <span id="modalActivitySubjects"></span></p>
+                <p><strong>Start:</strong> <span id="modalActivityStart"></span></p>
+                <p><strong>End:</strong> <span id="modalActivityEnd"></span></p>
+                <p><strong>Approved:</strong> <span id="modalActivityApproved"></span></p>
+                <p><strong>Active:</strong> <span id="modalActivityActive"></span></p>
+                <p><strong>Evaluable:</strong> <span id="modalActivityEvaluable"></span></p>
+                <p><strong>Percentage:</strong> <span id="modalActivityPercentage"></span></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% block extra_js %}
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'></script>
     <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
@@ -217,7 +300,8 @@
         // --- 3. Inicialización de Tom Select ---
         new TomSelect('#titulacion',{ plugins: ['remove_button'], create: false });
         new TomSelect('#asignatura',{ plugins: ['remove_button'], create: false });
-        // Los otros selectores no se transforman para mantener su UI simple
+        new TomSelect('#curso',{ plugins: ['remove_button'], create: false });
+        new TomSelect('#semestre',{ plugins: ['remove_button'], create: false });
         
         // --- LÓGICA DEL CALENDARIO (CORREGIDA) ---
         var calendarEl = document.getElementById('calendar');
@@ -229,6 +313,23 @@
                 const params = new URLSearchParams(new FormData(document.getElementById('filter-form')));
                 fetch(`/all_activities/?${params.toString()}`)
                     .then(response => response.json()).then(data => successCallback(data)).catch(error => failureCallback(error));
+            },
+            eventClick: function(info) {
+                // Populate modal with event details
+                document.getElementById('modalActivityTitle').innerText = info.event.title;
+                document.getElementById('modalActivityDescription').innerText = info.event.extendedProps.description || 'N/A';
+                document.getElementById('modalActivityType').innerText = info.event.extendedProps.activity_type || 'N/A';
+                document.getElementById('modalActivitySubjects').innerText = info.event.extendedProps.subjects || 'N/A';
+                document.getElementById('modalActivityStart').innerText = info.event.start ? info.event.start.toLocaleString() : 'N/A';
+                document.getElementById('modalActivityEnd').innerText = info.event.end ? info.event.end.toLocaleString() : 'N/A';
+                document.getElementById('modalActivityApproved').innerText = info.event.extendedProps.is_approved ? 'Yes' : 'No';
+                document.getElementById('modalActivityActive').innerText = info.event.extendedProps.is_active ? 'Yes' : 'No';
+                document.getElementById('modalActivityEvaluable').innerText = info.event.extendedProps.evaluable ? 'Yes' : 'No';
+                document.getElementById('modalActivityPercentage').innerText = info.event.extendedProps.percentage !== null ? info.event.extendedProps.percentage + '%' : 'N/A';
+
+                // Show the modal
+                var activityDetailModal = new bootstrap.Modal(document.getElementById('activityDetailModal'));
+                activityDetailModal.show();
             }
         });
 
@@ -242,19 +343,99 @@
             }
         });
 
-        // --- RESTO DEL SCRIPT ---
+        // --- SETUP APPROVAL CHECKBOXES WITH PERMISSIONS ---
+        const userRole = '{{ user.role }}';
+        const coordinatedTitulacionIds = {{ user_coordinated_titulaciones_ids|safe }};
+        
+        // Create activity to titulaciones mapping
+        const activityTitulaciones = {};
+        {% for activity in activities %}
+            activityTitulaciones[{{ activity.id }}] = [
+                {% for asignatura in activity.asignaturas.all %}
+                    {{ asignatura.titulacion.id }}{% if not forloop.last %},{% endif %}
+                {% endfor %}
+            ];
+        {% endfor %}
+        
+        function canEditApproval(activityId) {
+            // Admins can edit everything
+            if (userRole === 'ADMIN') {
+                return {
+                    canEdit: true,
+                    reason: 'Admin: Can approve/unapprove all activities'
+                };
+            }
+            
+            // Check if coordinator coordinates any titulacion involved in this activity
+            const activityTitulacionIds = activityTitulaciones[activityId] || [];
+            const hasPermission = activityTitulacionIds.some(titulacionId => 
+                coordinatedTitulacionIds.includes(titulacionId)
+            );
+            
+            if (hasPermission) {
+                return {
+                    canEdit: true,
+                    reason: 'Coordinator: Can approve/unapprove activities in your coordinated titulaciones'
+                };
+            } else {
+                return {
+                    canEdit: false,
+                    reason: 'Cannot edit: You don\'t coordinate any titulacion involved in this activity'
+                };
+            }
+        }
+        
+        // Setup each approval checkbox
         document.querySelectorAll('.approval-checkbox').forEach(checkbox => {
-            checkbox.addEventListener('change', function() {
-                const activityId = this.dataset.activityId;
-                const isApproved = this.checked;
-                fetch(`/activity/toggle_approval_from_dashboard/${activityId}/`, {
-                    method: 'POST',
-                    headers: { 'X-CSRFToken': '{{ csrf_token }}', 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 'aprobada': isApproved })
-                })
-                .then(response => response.json()).then(data => { if (!data.success) { alert('Failed to update status'); this.checked = !isApproved; } })
-                .catch(error => { alert('Error toggling status.'); this.checked = !isApproved; });
-            });
+            const activityId = parseInt(checkbox.dataset.activityId);
+            const permission = canEditApproval(activityId);
+            
+            // Set tooltip
+            checkbox.title = permission.reason;
+            
+            // Enable/disable based on permissions
+            if (!permission.canEdit) {
+                checkbox.disabled = true;
+                checkbox.style.cursor = 'not-allowed';
+                // Add visual indicator for disabled checkboxes
+                checkbox.parentElement.style.opacity = '0.6';
+            } else {
+                checkbox.disabled = false;
+                checkbox.style.cursor = 'pointer';
+                
+                // Add change event listener only for editable checkboxes
+                checkbox.addEventListener('change', function() {
+                    const isApproved = this.checked;
+                    const originalState = !isApproved; // Store original state for rollback
+                    
+                    // Disable checkbox during request
+                    this.disabled = true;
+                    
+                    fetch(`/activity/toggle_approval_from_dashboard/${activityId}/`, {
+                        method: 'POST',
+                        headers: { 
+                            'X-CSRFToken': '{{ csrf_token }}', 
+                            'Content-Type': 'application/json' 
+                        },
+                        body: JSON.stringify({ 'aprobada': isApproved })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (!data.success) {
+                            alert('Failed to update approval status');
+                            this.checked = originalState; // Rollback
+                        }
+                        // Re-enable checkbox
+                        this.disabled = false;
+                    })
+                    .catch(error => {
+                        console.error('Error toggling approval status:', error);
+                        alert('Error updating approval status.');
+                        this.checked = originalState; // Rollback
+                        this.disabled = false; // Re-enable
+                    });
+                });
+            }
         });
 
         const titulacionSelect = document.getElementById('titulacion');
@@ -264,9 +445,10 @@
         function updateAsignaturas() {
             // Tom Select usa un objeto API, así que obtenemos los valores de su instancia
             const tsTitulacion = titulacionSelect.tomselect;
+            const tsCurso = cursoSelect.tomselect;
             const selectedTitulaciones = tsTitulacion.getValue();
+            const selectedCursos = tsCurso.getValue();
             
-            const selectedCursos = Array.from(cursoSelect.selectedOptions).map(option => option.value);
             const params = new URLSearchParams();
             selectedTitulaciones.forEach(id => params.append('titulacion_ids', id));
             selectedCursos.forEach(id => params.append('curso_ids', id));
@@ -281,9 +463,9 @@
                 });
         }
 
-        if (titulacionSelect.tomselect && cursoSelect) {
+        if (titulacionSelect.tomselect && cursoSelect.tomselect) {
             titulacionSelect.tomselect.on('change', updateAsignaturas);
-            cursoSelect.addEventListener('change', updateAsignaturas);
+            cursoSelect.tomselect.on('change', updateAsignaturas);
             updateAsignaturas();
         }
 

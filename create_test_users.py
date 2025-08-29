@@ -1,13 +1,18 @@
 #!/usr/bin/env python
+"""
+Script to create test users for the Agenda Académica system
+Creates users with different roles: Admin, Coordinator, Teacher, Student
+"""
+
 import os
-import django
 import sys
+import django
 
 # Setup Django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'agenda_academica.settings')
 django.setup()
 
-from django.contrib.auth import get_user_model
+from users.models import CustomUser
 from academics.models import Titulacion, Asignatura
 
 User = get_user_model()

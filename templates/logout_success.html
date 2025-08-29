@@ -1,18 +1,237 @@
 {% extends 'base.html' %}
 {% load i18n %}
 
-{% block title %}{% trans "Logged Out" %}{% endblock %}
+{% block title %}{% trans "Logged Out" %} - Agenda Académica{% endblock %}
+
+{% block extra_head %}
+<style>
+    .logout-container {
+        min-height: 80vh;
+        background-color: var(--bs-body-bg);
+        background-image: 
+            radial-gradient(circle at 20% 50%, rgba(0, 123, 255, 0.05) 0%, transparent 50%),
+            radial-gradient(circle at 80% 20%, rgba(108, 117, 125, 0.05) 0%, transparent 50%),
+            radial-gradient(circle at 40% 80%, rgba(0, 123, 255, 0.03) 0%, transparent 50%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 1rem;
+    }
+    
+    .logout-card {
+        background: var(--bs-body-bg);
+        border: 1px solid var(--bs-border-color);
+        border-radius: 20px;
+        box-shadow: 
+            0 25px 45px rgba(0, 0, 0, 0.08),
+            0 8px 30px rgba(0, 0, 0, 0.04);
+        width: 100%;
+        max-width: 420px;
+        overflow: hidden;
+    }
+    
+    /* Dark theme support */
+    @media (prefers-color-scheme: dark) {
+        .logout-card {
+            box-shadow: 
+                0 25px 45px rgba(0, 0, 0, 0.3),
+                0 8px 30px rgba(0, 0, 0, 0.15);
+        }
+    }
+    
+    .logout-header {
+        background: linear-gradient(45deg, #28a745, #20c997);
+        color: white;
+        padding: 2rem 2rem 1.5rem;
+        text-align: center;
+        margin-bottom: 0;
+    }
+    
+    .logout-header h2 {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        font-size: 1.75rem;
+    }
+    
+    .logout-header p {
+        opacity: 0.9;
+        margin-bottom: 0;
+        font-size: 0.95rem;
+    }
+    
+    .logout-body {
+        padding: 2rem;
+        text-align: center;
+    }
+    
+    .success-icon {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(45deg, #28a745, #20c997);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        animation: successPulse 2s ease-in-out infinite alternate;
+    }
+    
+    @keyframes successPulse {
+        0% { transform: scale(1); box-shadow: 0 0 20px rgba(40, 167, 69, 0.3); }
+        100% { transform: scale(1.05); box-shadow: 0 0 30px rgba(40, 167, 69, 0.5); }
+    }
+    
+    .success-icon i {
+        font-size: 2rem;
+        color: white;
+    }
+    
+    .logout-message {
+        color: var(--bs-body-color);
+        margin-bottom: 1.5rem;
+        font-size: 1.1rem;
+        line-height: 1.6;
+    }
+    
+    .logout-submessage {
+        color: var(--bs-secondary-color);
+        margin-bottom: 2rem;
+        font-size: 0.95rem;
+    }
+    
+    .btn-login-again {
+        background: linear-gradient(45deg, #007bff, #0056b3);
+        border: none;
+        border-radius: 12px;
+        padding: 0.8rem 2.5rem;
+        font-weight: 600;
+        font-size: 1.05rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+        color: white;
+        text-decoration: none;
+        display: inline-block;
+    }
+    
+    .btn-login-again:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 123, 255, 0.4);
+        background: linear-gradient(45deg, #0056b3, #004085);
+        color: white;
+    }
+    
+    .btn-home {
+        border: 2px solid var(--bs-secondary);
+        border-radius: 12px;
+        color: var(--bs-secondary);
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        background: transparent;
+        text-decoration: none;
+        display: inline-block;
+        margin-left: 1rem;
+        font-size: 1rem;
+    }
+    
+    .btn-home:hover {
+        background: var(--bs-secondary);
+        color: white;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 15px rgba(108, 117, 125, 0.2);
+    }
+    
+    @media (max-width: 576px) {
+        .logout-container {
+            padding: 1rem;
+            min-height: 100vh;
+        }
+        
+        .logout-header {
+            padding: 1.5rem 1.5rem 1rem;
+        }
+        
+        .logout-header h2 {
+            font-size: 1.5rem;
+        }
+        
+        .logout-body {
+            padding: 1.5rem;
+        }
+        
+        .success-icon {
+            width: 60px;
+            height: 60px;
+        }
+        
+        .success-icon i {
+            font-size: 1.5rem;
+        }
+        
+        .btn-home {
+            margin-left: 0;
+            margin-top: 1rem;
+            display: block;
+        }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center mt-5">
-    <div class="col-md-6 col-lg-4">
-        <div class="card shadow-lg">
-            <div class="card-body p-4 text-center">
-                <h2 class="card-title mb-4">{% trans "You have been logged out successfully." %}</h2>
-                <p class="mb-4">{% trans "Thank you for using Agenda Academica." %}</p>
-                <a href="{% url 'login' %}" class="btn btn-primary btn-lg">{% trans "Login Again" %}</a>
+<div class="logout-container">
+    <div class="logout-card">
+        <div class="logout-header">
+            <h2>
+                <i class="bi bi-check-circle me-2"></i>
+                {% trans "Session Ended" %}
+            </h2>
+            <p>{% trans "You have been logged out successfully" %}</p>
+        </div>
+        
+        <div class="logout-body">
+            <div class="success-icon">
+                <i class="bi bi-check-lg"></i>
+            </div>
+            
+            <div class="logout-message">
+                {% trans "Thank you for using Agenda Académica" %}
+            </div>
+            
+            <div class="logout-submessage">
+                {% trans "Your session has been securely closed. All your data is safe." %}
+            </div>
+            
+            <div class="d-flex justify-content-center flex-wrap">
+                <a href="{% url 'login' %}" class="btn-login-again">
+                    <i class="bi bi-box-arrow-in-right me-2"></i>
+                    {% trans "Login Again" %}
+                </a>
+                <a href="{% url 'home' %}" class="btn-home">
+                    <i class="bi bi-house me-2"></i>
+                    {% trans "Go to Home" %}
+                </a>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-redirect to login after 30 seconds (optional)
+    // setTimeout(() => {
+    //     window.location.href = "{% url 'login' %}";
+    // }, 30000);
+    
+    // Add a subtle entrance animation
+    const card = document.querySelector('.logout-card');
+    card.style.opacity = '0';
+    card.style.transform = 'translateY(20px)';
+    
+    setTimeout(() => {
+        card.style.transition = 'all 0.5s ease';
+        card.style.opacity = '1';
+        card.style.transform = 'translateY(0)';
+    }, 100);
+});
+</script>
 {% endblock %}

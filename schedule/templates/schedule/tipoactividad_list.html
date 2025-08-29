@@ -2,13 +2,18 @@
 
 {% block content %}
   <h2>Tipos de Actividad</h2>
-  <a href="{% url 'tipoactividad_create' %}">Crear Nuevo Tipo de Actividad</a>
-  <ul>
+  <div class="mb-3">
+    <a href="{% url 'tipoactividad_create' %}" class="btn btn-success">Crear Nuevo Tipo de Actividad</a>
+    <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+  </div>
+  <ul class="list-group">
     {% for tipoactividad in object_list %}
-      <li>
+      <li class="list-group-item d-flex justify-content-between align-items-center">
         {{ tipoactividad.nombre }}
-        <a href="{% url 'tipoactividad_update' tipoactividad.pk %}">Editar</a>
-        <a href="{% url 'tipoactividad_delete' tipoactividad.pk %}">Borrar</a>
+        <div>
+          <a href="{% url 'tipoactividad_update' tipoactividad.pk %}" class="btn btn-sm btn-outline-primary">Editar</a>
+          <a href="{% url 'tipoactividad_delete' tipoactividad.pk %}" class="btn btn-sm btn-outline-danger">Borrar</a>
+        </div>
       </li>
     {% endfor %}
   </ul>

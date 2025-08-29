@@ -49,6 +49,227 @@ msgstr "Acceso"
 msgid "Welcome to Agenda Academica"
 msgstr "Bienvenido a Agenda Académica"
 
+# Activity logging translations
+msgid "Creation"
+msgstr "Creación"
+
+msgid "Modification"  
+msgstr "Modificación"
+
+msgid "Deletion"
+msgstr "Eliminación"
+
+msgid "Reactivation"
+msgstr "Reactivación"
+
+msgid "Version Restore"
+msgstr "Restauración de versión"
+
+# Activity versioning translations
+msgid "Version History"
+msgstr "Historial de versiones"
+
+msgid "Current Version"
+msgstr "Versión actual"
+
+msgid "Previous Versions"
+msgstr "Versiones anteriores"
+
+msgid "Edit Current Version"
+msgstr "Editar versión actual"
+
+msgid "Back to Dashboard"
+msgstr "Volver al panel"
+
+msgid "Back to History"
+msgstr "Volver al historial"
+
+msgid "View Details"
+msgstr "Ver detalles"
+
+msgid "Restore"
+msgstr "Restaurar"
+
+msgid "Restore This Version"
+msgstr "Restaurar esta versión"
+
+msgid "Cancel"
+msgstr "Cancelar"
+
+# Activity details translations
+msgid "Activity Name"
+msgstr "Nombre de la actividad"
+
+msgid "Description"
+msgstr "Descripción"
+
+msgid "Start Date"
+msgstr "Fecha de inicio"
+
+msgid "End Date"
+msgstr "Fecha de fin"
+
+msgid "Type"
+msgstr "Tipo"
+
+msgid "Subjects"
+msgstr "Asignaturas"
+
+msgid "Evaluable"
+msgstr "Evaluable"
+
+msgid "Percentage"
+msgstr "Porcentaje"
+
+msgid "Status"
+msgstr "Estado"
+
+msgid "Approved"
+msgstr "Aprobada"
+
+msgid "Pending Approval"
+msgstr "Pendiente de aprobación"
+
+msgid "Active"
+msgstr "Activa"
+
+msgid "Inactive"
+msgstr "Inactiva"
+
+msgid "Yes"
+msgstr "Sí"
+
+msgid "No"
+msgstr "No"
+
+msgid "Modified by"
+msgstr "Modificado por"
+
+msgid "Comment"
+msgstr "Comentario"
+
+# Activity creation/modification log details
+msgid "Activity \"%(name)s\" created for %(count)d subject(s)"
+msgstr "Actividad \"%(name)s\" creada para %(count)d asignatura(s)"
+
+msgid "Activity \"%(name)s\" modified"
+msgstr "Actividad \"%(name)s\" modificada"
+
+msgid "Activity type \"%(name)s\" created"
+msgstr "Tipo de actividad \"%(name)s\" creado"
+
+# Additional translations for versioning system
+msgid "Back to Home"
+msgstr "Volver al inicio"
+
+msgid "No description"
+msgstr "Sin descripción"
+
+msgid "Version"
+msgstr "Versión"
+
+msgid "Modified on"
+msgstr "Modificado el"
+
+msgid "Created by"
+msgstr "Creado por"
+
+msgid "Date"
+msgstr "Fecha"
+
+msgid "Restoration Details"
+msgstr "Detalles de restauración"
+
+msgid "Version to restore"
+msgstr "Versión a restaurar"
+
+msgid "Important Information"
+msgstr "Información importante"
+
+msgid "This will restore the activity to"
+msgstr "Esto restaurará la actividad a"
+
+msgid "The current version will be saved as a new version before restoration"
+msgstr "La versión actual se guardará como una nueva versión antes de la restauración"
+
+msgid "All changes made after"
+msgstr "Todos los cambios realizados después del"
+
+msgid "will be reverted"
+msgstr "serán revertidos"
+
+msgid "This action can be undone by restoring a more recent version"
+msgstr "Esta acción se puede deshacer restaurando una versión más reciente"
+
+msgid "Confirm Version Restoration"
+msgstr "Confirmar restauración de versión"
+
+# Login page translations
+msgid "Please log in to continue"
+msgstr "Por favor, inicia sesión para continuar"
+
+msgid "Username"
+msgstr "Nombre de usuario"
+
+msgid "Password"
+msgstr "Contraseña"
+
+msgid "Login"
+msgstr "Iniciar sesión"
+
+msgid "Logging in..."
+msgstr "Iniciando sesión..."
+
+msgid "Create New Account"
+msgstr "Crear nueva cuenta"
+
+# Logout page translations
+msgid "Logged Out"
+msgstr "Sesión cerrada"
+
+msgid "Session Ended"
+msgstr "Sesión finalizada"
+
+msgid "You have been logged out successfully"
+msgstr "Has cerrado sesión correctamente"
+
+msgid "Thank you for using Agenda Académica"
+msgstr "Gracias por usar Agenda Académica"
+
+msgid "Your session has been securely closed. All your data is safe."
+msgstr "Tu sesión se ha cerrado de forma segura. Todos tus datos están a salvo."
+
+msgid "Login Again"
+msgstr "Iniciar sesión de nuevo"
+
+msgid "Go to Home"
+msgstr "Ir al inicio"
+
+# Registration page translations
+msgid "Register"
+msgstr "Registrarse"
+
+msgid "Create Account"
+msgstr "Crear cuenta"
+
+msgid "Join Agenda Académica today"
+msgstr "Únete a Agenda Académica hoy"
+
+msgid "Email address"
+msgstr "Correo electrónico"
+
+msgid "Confirm password"
+msgstr "Confirmar contraseña"
+
+msgid "Creating account..."
+msgstr "Creando cuenta..."
+
+msgid "Sign In"
+msgstr "Iniciar sesión"
+
+msgid "Already have an account?"
+msgstr "¿Ya tienes una cuenta?"
+
 #: .\users\views.py:42
 msgid "Thank you for registering. Your account has been created."
 msgstr "Gracias por tu registro. Ya tienes una cuenta disponible"

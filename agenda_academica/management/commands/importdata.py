@@ -22,13 +22,16 @@ class Command(BaseCommand):
             next(reader)  # Skip header
             for row in reader:
                 titulacion_nombre = row[3]
-                titulacion = Titulacion.objects.get(nombre=titulacion_nombre)
-                Asignatura.objects.get_or_create(
-                    nombre=row[0],
-                    curso=row[1],
-                    semestre=row[2],
-                    titulacion=titulacion
-                )
+                try:
+                    titulacion, created = Titulacion.objects.get_or_create(nombre=titulacion_nombre)
+                    Asignatura.objects.get_or_create(
+                        nombre=row[0],
+                        curso=row[1],
+                        semestre=row[2],
+                        titulacion=titulacion
+                    )
+                except Exception as e:
+                    self.stdout.write(self.style.ERROR(f'Error importing asignatura {row[0]} for titulacion {titulacion_nombre}: {e}'))
         self.stdout.write(self.style.SUCCESS('Asignaturas imported successfully.'))
 
         self.stdout.write(self.style.SUCCESS('Data import completed.'))

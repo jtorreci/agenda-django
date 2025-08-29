@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+
+{% block title %}Restore Version - {{ activity.nombre }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-warning">
+                <div class="card-header bg-warning">
+                    <h5 class="mb-0">
+                        <i class="bi bi-exclamation-triangle"></i> Confirm Version Restoration
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <h6><i class="bi bi-info-circle"></i> Important Information</h6>
+                        <ul class="mb-0">
+                            <li>This will restore the activity to <strong>Version {{ version.version_numero }}</strong></li>
+                            <li>The current version will be saved as a new version before restoration</li>
+                            <li>All changes made after {{ version.fecha_modificacion|date:"M d, Y H:i" }} will be reverted</li>
+                            <li>This action can be undone by restoring a more recent version</li>
+                        </ul>
+                    </div>
+
+                    <!-- Current vs Target Version Comparison -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header bg-light">
+                                    <h6 class="mb-0 text-danger">Current Version (will be replaced)</h6>
+                                </div>
+                                <div class="card-body">
+                                    <p><strong>Name:</strong> {{ activity.nombre }}</p>
+                                    <p><strong>Description:</strong> {{ activity.descripcion|default:"No description"|truncatechars:80 }}</p>
+                                    <p><strong>Start:</strong> {{ activity.fecha_inicio|date:"M d, Y H:i" }}</p>
+                                    <p><strong>End:</strong> {{ activity.fecha_fin|date:"M d, Y H:i" }}</p>
+                                    <p><strong>Type:</strong> {{ activity.tipo_actividad.nombre }}</p>
+                                    <p><strong>Subjects:</strong> 
+                                        {% for asignatura in activity.asignaturas.all %}
+                                            <span class="badge bg-primary">{{ asignatura.nombre }}</span>
+                                        {% endfor %}
+                                    </p>
+                                    <p><strong>Evaluable:</strong> 
+                                        {% if activity.evaluable %}
+                                            <span class="badge bg-warning">Yes ({{ activity.porcentaje_evaluacion }}%)</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">No</span>
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header bg-light">
+                                    <h6 class="mb-0 text-success">Version {{ version.version_numero }} (target)</h6>
+                                </div>
+                                <div class="card-body">
+                                    <p><strong>Name:</strong> {{ version.nombre }}</p>
+                                    <p><strong>Description:</strong> {{ version.descripcion|default:"No description"|truncatechars:80 }}</p>
+                                    <p><strong>Start:</strong> {{ version.fecha_inicio|date:"M d, Y H:i" }}</p>
+                                    <p><strong>End:</strong> {{ version.fecha_fin|date:"M d, Y H:i" }}</p>
+                                    <p><strong>Type:</strong> {{ version.tipo_actividad_snapshot.nombre|default:"N/A" }}</p>
+                                    <p><strong>Subjects:</strong> 
+                                        {% if version.asignaturas_snapshot %}
+                                            {% for asignatura in version.asignaturas_snapshot %}
+                                                <span class="badge bg-primary">{{ asignatura.nombre }}</span>
+                                            {% endfor %}
+                                        {% else %}
+                                            No subjects
+                                        {% endif %}
+                                    </p>
+                                    <p><strong>Evaluable:</strong> 
+                                        {% if version.evaluable %}
+                                            <span class="badge bg-warning">Yes ({{ version.porcentaje_evaluacion }}%)</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">No</span>
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <p><strong>Restoration Details:</strong></p>
+                        <ul>
+                            <li><strong>Version to restore:</strong> {{ version.version_numero }}</li>
+                            <li><strong>Created by:</strong> {{ version.modificada_por.username }}</li>
+                            <li><strong>Date:</strong> {{ version.fecha_modificacion|date:"M d, Y H:i" }}</li>
+                            {% if version.comentario_version %}
+                                <li><strong>Comment:</strong> {{ version.comentario_version }}</li>
+                            {% endif %}
+                        </ul>
+                    </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <button type="submit" class="btn btn-warning">
+                                    <i class="bi bi-arrow-clockwise"></i> Restore Version {{ version.version_numero }}
+                                </button>
+                            </div>
+                            <div>
+                                <a href="{% url 'activity_version_detail' activity.pk version.pk %}" class="btn btn-secondary">
+                                    <i class="bi bi-eye"></i> View Details
+                                </a>
+                                <a href="{% url 'activity_version_history' activity.pk %}" class="btn btn-outline-secondary">
+                                    <i class="bi bi-x"></i> Cancel
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

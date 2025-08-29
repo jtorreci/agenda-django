@@ -12,10 +12,21 @@ class ActividadForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user', None)
+        read_only = kwargs.pop('read_only', False) # New parameter
         # Set queryset before calling super().__init__
         if user and user.role in ['TEACHER', 'COORDINATOR', 'ADMIN']:
             self.base_fields['asignaturas'].queryset = user.subjects.all()
         super().__init__(*args, **kwargs)
+
+        if read_only: # Apply read-only attributes
+            for field_name, field in self.fields.items():
+                if field_name in ['fecha_inicio', 'fecha_fin']:
+                    field.widget.attrs['readonly'] = True
+                    # Do NOT set disabled=True for date/time fields if we want their value to show
+                else:
+                    field.widget.attrs['readonly'] = True
+                    field.widget.attrs['disabled'] = True # Disable for checkboxes/selects
+                field.required = False # Make fields not required in read-only mode
 
     class Meta:
         model = Actividad

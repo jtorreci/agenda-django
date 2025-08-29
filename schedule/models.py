@@ -42,27 +42,46 @@ class Actividad(models.Model):
         else:
             return False  # Evaluable with >=10% weight require manual approval
 
-    def set_approval_manually(self, approved_status):
+    def set_approval_manually(self, approved_status, modified_by=None):
         """
         Manually set approval status (used by coordinators)
         This prevents automatic approval logic from overriding manual decisions
         """
         self._approval_manually_set = True
         self.aprobada = approved_status
+        if modified_by:
+            self._modified_by = modified_by
+            self._version_comment = f'Approval status changed to {approved_status}'
         self.save()
 
     def __str__(self):
         return self.nombre
 
 class LogActividad(models.Model):
+    OBJECT_TYPE_CHOICES = [
+        ('actividad', 'Activity'),
+        ('tipo_actividad', 'Activity Type'),
+        ('coordinador', 'Coordinator Assignment'),
+    ]
+    
     id_log = models.AutoField(primary_key=True)
-    actividad = models.ForeignKey(Actividad, on_delete=models.CASCADE)
+    # Keep actividad field for backward compatibility, but make it optional
+    actividad = models.ForeignKey(Actividad, on_delete=models.CASCADE, null=True, blank=True)
+    # New fields for generic logging
+    object_type = models.CharField(max_length=20, choices=OBJECT_TYPE_CHOICES, default='actividad')
+    object_name = models.CharField(max_length=255)  # Name of the object being logged
+    object_id = models.PositiveIntegerField(null=True, blank=True)  # ID of the object being logged
+    
     timestamp = models.DateTimeField(auto_now_add=True)
     usuario = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     tipo_log = models.CharField(max_length=50)
+    details = models.TextField(blank=True, null=True)  # Additional details about the action
+
+    class Meta:
+        ordering = ['-timestamp']
 
     def __str__(self):
-        return f"Log {self.tipo_log} for {self.actividad.nombre} by {self.usuario.username} at {self.timestamp}"
+        return f"Log {self.tipo_log} for {self.object_type}: {self.object_name} by {self.usuario.username} at {self.timestamp}"
 
 class VistaCalendario(models.Model):
     nombre = models.CharField(max_length=255)
@@ -73,3 +92,43 @@ class VistaCalendario(models.Model):
 
     def __str__(self):
         return self.nombre
+
+class ActividadVersion(models.Model):
+    """
+    Stores historical versions of activities for version control and rollback functionality.
+    Each time an activity is modified, the current version is saved here before applying changes.
+    """
+    # Version control metadata
+    actividad_original = models.ForeignKey(Actividad, on_delete=models.CASCADE, related_name='versiones')
+    version_numero = models.PositiveIntegerField()  # Auto-incremented version number
+    modificada_por = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    fecha_modificacion = models.DateTimeField(auto_now_add=True)
+    comentario_version = models.TextField(blank=True, null=True)  # Optional comment about the change
+    
+    # Snapshot of all activity fields at the time of modification
+    nombre = models.CharField(max_length=255)
+    descripcion = models.TextField(blank=True, null=True)
+    fecha_inicio = models.DateTimeField()
+    fecha_fin = models.DateTimeField()
+    evaluable = models.BooleanField(default=False)
+    porcentaje_evaluacion = models.DecimalField(max_digits=5, decimal_places=2, default=0.0)
+    no_recuperable = models.BooleanField(default=False)
+    aprobada = models.BooleanField(default=False)
+    activa = models.BooleanField(default=True)
+    
+    # Store related data as JSON or text fields since we can't use ManyToMany in versions
+    asignaturas_snapshot = models.JSONField(default=list)  # Store list of asignatura IDs and names
+    tipo_actividad_snapshot = models.JSONField(default=dict)  # Store tipo_actividad ID and name
+
+    class Meta:
+        ordering = ['-fecha_modificacion']
+        unique_together = ['actividad_original', 'version_numero']
+
+    def __str__(self):
+        return f"{self.actividad_original.nombre} - v{self.version_numero} ({self.fecha_modificacion.strftime('%Y-%m-%d %H:%M')})"
+
+    def get_asignaturas_names(self):
+        """Return comma-separated list of asignatura names from snapshot"""
+        if self.asignaturas_snapshot:
+            return ', '.join([asig['nombre'] for asig in self.asignaturas_snapshot])
+        return 'N/A'
