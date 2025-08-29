@@ -8,7 +8,7 @@ call "C:\Users\Usuario\Dropbox\Universidad\Desarrollo\your_venv_name\Scripts\act
 :: Navigate to your Django project root if not already there
 :: cd C:\Users\Usuario\Dropbox\Universidad\Desarrollo\agenda-django
 
-python manage.py dumpdata --exclude auth.permission --exclude contenttypes --indent 2 > db_dump.json
+python manage.py dumpdata --exclude auth.permission --exclude contenttypes --indent 2 --encoding=utf-8 > db_dump.json
 
 echo Database dump generated: db_dump.json
 pause
