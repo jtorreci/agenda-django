@@ -27,17 +27,35 @@ load_dotenv(BASE_DIR / '.env')
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'f092e75180c4349c14230668be060441013315edcc07937397f0d57b73240f45cc6ba7ba887b40d4727fb10f2b9d08324464')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DJANGO_DEBUG', '') != 'False'
+DEBUG = os.environ.get('DJANGO_DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = ['jtorreci.pythonanywhere.com', 'www.jtorreci.pythonanywhere.com'] # Replace with your PythonAnywhere domain
+# ALLOWED_HOSTS dinámico según entorno
+ALLOWED_HOSTS = []
+if DEBUG:
+    # Desarrollo: permitir localhost y 127.0.0.1
+    ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+else:
+    # Producción: usar hosts de las variables de entorno
+    production_hosts = os.environ.get('ALLOWED_HOSTS', 'jtorreci.pythonanywhere.com,www.jtorreci.pythonanywhere.com')
+    ALLOWED_HOSTS = [host.strip() for host in production_hosts.split(',')]
 
-# Security settings
-CSRF_COOKIE_SECURE = True
-SESSION_COOKIE_SECURE = True
-SECURE_SSL_REDIRECT = True
-SECURE_HSTS_SECONDS = 31536000 # 1 year
-SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-SECURE_HSTS_PRELOAD = True
+# Security settings - diferentes para desarrollo y producción
+if DEBUG:
+    # Desarrollo: configuraciones relajadas para HTTP
+    CSRF_COOKIE_SECURE = False
+    SESSION_COOKIE_SECURE = False
+    SECURE_SSL_REDIRECT = False
+    SECURE_HSTS_SECONDS = 0
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = False
+    SECURE_HSTS_PRELOAD = False
+else:
+    # Producción: configuraciones estrictas para HTTPS
+    CSRF_COOKIE_SECURE = True
+    SESSION_COOKIE_SECURE = True
+    SECURE_SSL_REDIRECT = True
+    SECURE_HSTS_SECONDS = 31536000 # 1 year
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
 
 # Application definition
 

@@ -24,4 +24,8 @@ urlpatterns = [
     path('api/student_events/', views.student_calendar_events, name='student_calendar_events'),
     path('ajax/coordinator/update/', views.ajax_update_coordinator, name='ajax_update_coordinator'),
     path('login_attempts/', views.login_attempts, name='login_attempts'),
+    # Tipos de Perfil AJAX endpoints
+    path('ajax/tipo-perfil/create/', views.ajax_create_tipo_perfil, name='ajax_create_tipo_perfil'),
+    path('ajax/tipo-perfil/<int:pk>/update/', views.ajax_update_tipo_perfil, name='ajax_update_tipo_perfil'),
+    path('ajax/tipo-perfil/<int:pk>/delete/', views.ajax_delete_tipo_perfil, name='ajax_delete_tipo_perfil'),
 ]

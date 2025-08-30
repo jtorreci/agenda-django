@@ -12,6 +12,7 @@ from django.http import JsonResponse
 from agenda_academica.models import AgendaSettings
 from django.views.decorators.http import require_http_methods
 import json
+from django.db import models
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
@@ -536,6 +537,7 @@ def assign_coordinators(request):
 @user_passes_test(is_admin)
 def admin_dashboard(request):
     from agenda_academica.models import AgendaSettings
+    from .models import TipoPerfil
     
     total_users = CustomUser.objects.count()
     total_teachers = CustomUser.objects.filter(role='TEACHER').count()
@@ -548,6 +550,7 @@ def admin_dashboard(request):
     titulaciones = Titulacion.objects.all().order_by('nombre')
     all_users = CustomUser.objects.all().order_by('username')
     tipos_actividad = TipoActividad.objects.all()
+    tipos_perfil = TipoPerfil.objects.all().order_by('orden', 'nombre')
     logs = LogActividad.objects.all().order_by('-timestamp')[:50]
     
     try:
@@ -567,6 +570,7 @@ def admin_dashboard(request):
         'all_titulaciones': titulaciones,  # For PDF report dropdown
         'all_users': all_users,
         'tipos_actividad': tipos_actividad,
+        'tipos_perfil': tipos_perfil,
         'logs': logs,
         'settings': settings,
     }
@@ -730,5 +734,169 @@ def ajax_update_coordinator(request):
         
     except json.JSONDecodeError:
         return JsonResponse({'success': False, 'error': 'Datos JSON inválidos'})
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
+
+
+# ==================== GESTIÓN DE TIPOS DE PERFIL ====================
+
+@login_required
+@user_passes_test(lambda u: u.role == 'ADMIN' or u.is_superuser)
+@require_http_methods(["POST"])
+def ajax_create_tipo_perfil(request):
+    try:
+        from .models import TipoPerfil
+        data = json.loads(request.body)
+        nombre = data.get('nombre', '').strip()
+        codigo = data.get('codigo', '').strip()
+        descripcion = data.get('descripcion', '').strip()
+        color = data.get('color', '#6c757d')
+        icono = data.get('icono', 'bi-person')
+        
+        if not nombre or not codigo:
+            return JsonResponse({'success': False, 'error': 'El nombre y código son requeridos'})
+        
+        if TipoPerfil.objects.filter(nombre=nombre).exists():
+            return JsonResponse({'success': False, 'error': 'Ya existe un tipo de perfil con ese nombre'})
+            
+        if TipoPerfil.objects.filter(codigo=codigo).exists():
+            return JsonResponse({'success': False, 'error': 'Ya existe un tipo de perfil con ese código'})
+        
+        # Obtener el siguiente orden
+        max_orden = TipoPerfil.objects.aggregate(max_orden=models.Max('orden'))['max_orden'] or 0
+        
+        tipo_perfil = TipoPerfil.objects.create(
+            nombre=nombre,
+            codigo=codigo,
+            descripcion=descripcion,
+            color=color,
+            icono=icono,
+            orden=max_orden + 1,
+            es_sistema=False  # Los creados desde dashboard no son del sistema
+        )
+        
+        # Log the creation
+        LogActividad.objects.create(
+            object_type='tipo_perfil',
+            object_name=tipo_perfil.nombre,
+            object_id=tipo_perfil.id,
+            usuario=request.user,
+            tipo_log=_('Creation'),
+            details=_('Profile type "%(name)s" created') % {'name': tipo_perfil.nombre}
+        )
+        
+        return JsonResponse({
+            'success': True, 
+            'id': tipo_perfil.id, 
+            'nombre': tipo_perfil.nombre,
+            'codigo': tipo_perfil.codigo,
+            'descripcion': tipo_perfil.descripcion,
+            'color': tipo_perfil.color,
+            'icono': tipo_perfil.icono
+        })
+        
+    except json.JSONDecodeError:
+        return JsonResponse({'success': False, 'error': 'Datos JSON inválidos'})
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
+
+
+@login_required
+@user_passes_test(lambda u: u.role == 'ADMIN' or u.is_superuser)
+@require_http_methods(["PUT"])
+def ajax_update_tipo_perfil(request, pk):
+    try:
+        from .models import TipoPerfil
+        tipo_perfil = TipoPerfil.objects.get(pk=pk)
+        data = json.loads(request.body)
+        
+        nombre = data.get('nombre', '').strip()
+        codigo = data.get('codigo', '').strip()
+        descripcion = data.get('descripcion', '').strip()
+        color = data.get('color', tipo_perfil.color)
+        icono = data.get('icono', tipo_perfil.icono)
+        
+        if not nombre or not codigo:
+            return JsonResponse({'success': False, 'error': 'El nombre y código son requeridos'})
+        
+        if TipoPerfil.objects.filter(nombre=nombre).exclude(pk=pk).exists():
+            return JsonResponse({'success': False, 'error': 'Ya existe un tipo de perfil con ese nombre'})
+            
+        if TipoPerfil.objects.filter(codigo=codigo).exclude(pk=pk).exists():
+            return JsonResponse({'success': False, 'error': 'Ya existe un tipo de perfil con ese código'})
+        
+        old_name = tipo_perfil.nombre
+        tipo_perfil.nombre = nombre
+        tipo_perfil.codigo = codigo
+        tipo_perfil.descripcion = descripcion
+        tipo_perfil.color = color
+        tipo_perfil.icono = icono
+        tipo_perfil.save()
+        
+        # Log the update
+        LogActividad.objects.create(
+            object_type='tipo_perfil',
+            object_name=tipo_perfil.nombre,
+            object_id=tipo_perfil.id,
+            usuario=request.user,
+            tipo_log=_('Modification'),
+            details=f'Profile type updated from "{old_name}" to "{tipo_perfil.nombre}"'
+        )
+        
+        return JsonResponse({
+            'success': True,
+            'id': tipo_perfil.id,
+            'nombre': tipo_perfil.nombre,
+            'codigo': tipo_perfil.codigo,
+            'descripcion': tipo_perfil.descripcion,
+            'color': tipo_perfil.color,
+            'icono': tipo_perfil.icono
+        })
+        
+    except TipoPerfil.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'Tipo de perfil no encontrado'})
+    except json.JSONDecodeError:
+        return JsonResponse({'success': False, 'error': 'Datos JSON inválidos'})
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
+
+
+@login_required
+@user_passes_test(lambda u: u.role == 'ADMIN' or u.is_superuser)
+@require_http_methods(["DELETE"])
+def ajax_delete_tipo_perfil(request, pk):
+    try:
+        from .models import TipoPerfil, AsignacionPerfil
+        tipo_perfil = TipoPerfil.objects.get(pk=pk)
+        
+        if tipo_perfil.es_sistema:
+            return JsonResponse({'success': False, 'error': 'No se pueden eliminar los tipos de perfil del sistema'})
+        
+        # Contar asignaciones activas
+        asignaciones_count = AsignacionPerfil.objects.filter(tipo_perfil=tipo_perfil, activa=True).count()
+        
+        if asignaciones_count > 0:
+            return JsonResponse({
+                'success': False, 
+                'error': f'Este tipo de perfil tiene {asignaciones_count} asignación(es) activa(s). Debe reasignar o desactivar estas asignaciones primero.'
+            })
+        
+        tipo_name = tipo_perfil.nombre
+        tipo_perfil.delete()
+        
+        # Log the deletion
+        LogActividad.objects.create(
+            object_type='tipo_perfil',
+            object_name=tipo_name,
+            object_id=pk,
+            usuario=request.user,
+            tipo_log='Eliminación',
+            details=f'Profile type "{tipo_name}" deleted'
+        )
+        
+        return JsonResponse({'success': True})
+        
+    except TipoPerfil.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'Tipo de perfil no encontrado'})
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)})
