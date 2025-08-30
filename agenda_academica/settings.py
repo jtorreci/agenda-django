@@ -11,22 +11,33 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+from dotenv import load_dotenv
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+load_dotenv(BASE_DIR / '.env')
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-=4qk(3frmnwbce5-2v5((hau&buak0@m0y-x)ncpz0!d-(ey$e'
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'f092e75180c4349c14230668be060441013315edcc07937397f0d57b73240f45cc6ba7ba887b40d4727fb10f2b9d08324464')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = os.environ.get('DJANGO_DEBUG', '') != 'False'
 
 ALLOWED_HOSTS = ['jtorreci.pythonanywhere.com', 'www.jtorreci.pythonanywhere.com'] # Replace with your PythonAnywhere domain
 
+# Security settings
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+SECURE_SSL_REDIRECT = True
+SECURE_HSTS_SECONDS = 31536000 # 1 year
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
 
 # Application definition
 
@@ -144,7 +155,17 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Agenda Closing Date is now managed via AgendaSettings model in DB, no longer needed here.
 
 # Email Backend Configuration
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'jtorrecilla.agenda@gmail.com')
+
+# Custom Email Domain Settings
+TEACHER_EMAIL_DOMAINS = os.environ.get('TEACHER_EMAIL_DOMAINS', 'unex.es').split(',')
+STUDENT_EMAIL_DOMAINS = os.environ.get('STUDENT_EMAIL_DOMAINS', 'alumnos.unex.es').split(',')
 
 LOGIN_REDIRECT_URL = '/users/dashboard_redirect/'
 LOGIN_URL = '/login/'

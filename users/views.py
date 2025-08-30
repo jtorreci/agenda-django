@@ -3,7 +3,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required, user_passes_test
 from .forms import StudentSubjectForm, NotificationForm
 from schedule.models import Actividad, VistaCalendario, TipoActividad, LogActividad
-from schedule.forms import VistaCalendarioForm # New import
+from schedule.forms import VistaCalendarioForm
 from academics.models import Titulacion, Asignatura
 from django.core.mail import send_mail
 from django.utils.translation import gettext as _
@@ -13,6 +13,13 @@ from django.http import JsonResponse
 from agenda_academica.models import AgendaSettings
 from django.views.decorators.http import require_http_methods
 import json
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_str
+from django.template.loader import render_to_string
+from django.contrib.sites.shortcuts import get_current_site
+from .models import LoginAttempt
+from django.conf import settings # Import settings
 
 def is_teacher(user):
     return user.is_authenticated and user.role in [CustomUser.ROLE_TEACHER, CustomUser.ROLE_COORDINATOR, CustomUser.ROLE_ADMIN]
@@ -29,30 +36,63 @@ def is_admin(user):
 def is_coordinator_or_admin(user):
     return user.role == CustomUser.ROLE_COORDINATOR or user.role == CustomUser.ROLE_ADMIN or user.is_superuser
 
+@login_required
+@user_passes_test(is_admin)
+def login_attempts(request):
+    attempts = LoginAttempt.objects.all().order_by('-timestamp')
+    return render(request, 'users/login_attempts.html', {'attempts': attempts})
+
 def register(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():
             user = form.save(commit=False)
+            user.is_active = False
             email_domain = user.email.split('@')[-1]
-            if email_domain == 'unex.es':
+
+            # Check email domain for role assignment and validation
+            if email_domain in settings.TEACHER_EMAIL_DOMAINS:
                 user.role = CustomUser.ROLE_TEACHER
-            elif email_domain == 'alumnos.unex.es':
+            elif email_domain in settings.STUDENT_EMAIL_DOMAINS:
                 user.role = CustomUser.ROLE_STUDENT
             else:
-                user.role = CustomUser.ROLE_STUDENT
+                messages.error(request, _('Registration is only allowed for email addresses from UNEX (unex.es or alumnos.unex.es).'))
+                return render(request, 'users/registration.html', {'form': form})
+
             user.save()
-            send_mail(
-                _('Welcome to Agenda Academica'),
-                _('Thank you for registering. Your account has been created.'),
-                'from@example.com',
-                [user.email],
-                fail_silently=False,
-            )
-            return redirect('login')  # Redirect to login page after successful registration
+
+            # Send confirmation email
+            current_site = get_current_site(request)
+            mail_subject = _('Activate your account')
+            message = render_to_string('users/account_activation_email.html', {
+                'user': user,
+                'domain': current_site.domain,
+                'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+                'token': default_token_generator.make_token(user),
+            })
+            send_mail(mail_subject, message, 'from@example.com', [user.email])
+            
+            messages.success(request, _('Please check your email to complete the registration.'))
+            return redirect('login')
     else:
         form = UserCreationForm()
     return render(request, 'users/registration.html', {'form': form})
+
+def activate(request, uidb64, token):
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = CustomUser.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, CustomUser.DoesNotExist):
+        user = None
+
+    if user is not None and default_token_generator.check_token(user, token):
+        user.is_active = True
+        user.save()
+        messages.success(request, _('Your account has been activated successfully. You can now log in.'))
+        return redirect('login')
+    else:
+        messages.error(request, _('The activation link is invalid.'))
+        return redirect('login')
 
 @login_required
 @user_passes_test(is_teacher)
@@ -233,6 +273,7 @@ def student_ical_config(request):
     })
 
 @login_required
+@user_passes_test(is_student)
 def student_calendar_events(request):
     """
     Esta vista devuelve los eventos del estudiante logueado en formato JSON

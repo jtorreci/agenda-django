@@ -17,3 +17,12 @@ class CustomUser(AbstractUser):
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='STUDENT')
     subjects = models.ManyToManyField(Asignatura, blank=True)
     coordinated_titulaciones = models.ManyToManyField(Titulacion, blank=True)
+
+class LoginAttempt(models.Model):
+    username = models.CharField(max_length=150)
+    ip_address = models.GenericIPAddressField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+    success = models.BooleanField()
+
+    def __str__(self):
+        return f'{self.username} - {self.timestamp} - {"Success" if self.success else "Failed"}'

@@ -47,3 +47,5 @@ media/
 
 # My stuff
 *.csv
+security_audit.md
+.env

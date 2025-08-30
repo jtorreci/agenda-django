@@ -60,6 +60,11 @@
                 </div>
             </div>
 
+            <div class="alert alert-warning" role="alert">
+                <h4 class="alert-heading">{% trans "Security Warning" %}</h4>
+                <p>{% trans "The iCal URLs are private but shareable. Anyone with the URL can access the calendar feed. Do not share them publicly unless you want the calendar to be public." %}</p>
+            </div>
+
             <!-- Complete Titulacion Feeds -->
             {% if complete_feeds %}
             <div class="section-header">

@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Login Attempts</h2>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Timestamp</th>
+        <th>Username</th>
+        <th>IP Address</th>
+        <th>Result</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for attempt in attempts %}
+        <tr>
+          <td>{{ attempt.timestamp }}</td>
+          <td>{{ attempt.username }}</td>
+          <td>{{ attempt.ip_address }}</td>
+          <td>{% if attempt.success %}Success{% else %}Failed{% endif %}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

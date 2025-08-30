@@ -48,6 +48,9 @@ def activity_form(request, pk=None, read_only=False): # Added read_only paramete
     activity = None # Initialize activity to None
     if pk:
         activity = get_object_or_404(Actividad, pk=pk)
+        # IDOR check
+        if not request.user.is_staff and not activity.asignaturas.filter(id__in=request.user.subjects.all()).exists():
+            return redirect(get_user_dashboard_url(request.user))
         initial_subjects = activity.asignaturas.all()
     else:
         subject_ids_str = request.GET.get('subjects')
@@ -106,6 +109,9 @@ def activity_form(request, pk=None, read_only=False): # Added read_only paramete
 @user_passes_test(is_teacher)
 def activity_delete(request, pk):
     activity = get_object_or_404(Actividad, pk=pk)
+    # IDOR check
+    if not request.user.is_staff and not activity.asignaturas.filter(id__in=request.user.subjects.all()).exists():
+        return redirect(get_user_dashboard_url(request.user))
     if request.method == 'POST':
         activity.activa = False
         activity.save()
@@ -282,7 +288,6 @@ def delete_misassigned_activity(request, pk):
         return redirect('coordinator_dashboard')
     return render(request, 'schedule/activity_confirm_delete.html', {'activity': activity})
 
-@csrf_exempt # Temporarily for testing, should use proper CSRF handling in production
 @require_POST
 @login_required
 @user_passes_test(is_coordinator) # Only coordinators can approve

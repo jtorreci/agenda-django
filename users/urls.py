@@ -1,8 +1,14 @@
 from django.urls import path
 from . import views
+from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     path('register/', views.register, name='register'),
+    path('activate/<uidb64>/<token>/', views.activate, name='activate'),
+    path('password_reset/', auth_views.PasswordResetView.as_view(), name='password_reset'),
+    path('password_reset/done/', auth_views.PasswordResetDoneView.as_view(), name='password_reset_done'),
+    path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
+    path('reset/done/', auth_views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
     path('teacher_dashboard/', views.teacher_dashboard, name='teacher_dashboard'),
     path('student_dashboard/', views.student_dashboard, name='student_dashboard'),
     path('select_subjects/', views.select_subjects, name='select_subjects'),
@@ -17,4 +23,5 @@ urlpatterns = [
     path('dashboard_redirect/', views.dashboard_redirect, name='dashboard_redirect'),
     path('api/student_events/', views.student_calendar_events, name='student_calendar_events'),
     path('ajax/coordinator/update/', views.ajax_update_coordinator, name='ajax_update_coordinator'),
+    path('login_attempts/', views.login_attempts, name='login_attempts'),
 ]
