@@ -1,7 +1,6 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required, user_passes_test
-from .forms import StudentSubjectForm, NotificationForm
+from .forms import StudentSubjectForm, NotificationForm, CustomUserCreationForm # Import CustomUserCreationForm
 from schedule.models import Actividad, VistaCalendario, TipoActividad, LogActividad
 from schedule.forms import VistaCalendarioForm
 from academics.models import Titulacion, Asignatura
@@ -44,7 +43,7 @@ def login_attempts(request):
 
 def register(request):
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = CustomUserCreationForm(request.POST) # Use CustomUserCreationForm
         if form.is_valid():
             user = form.save(commit=False)
             user.is_active = False
@@ -75,7 +74,7 @@ def register(request):
             messages.success(request, _('Please check your email to complete the registration.'))
             return redirect('login')
     else:
-        form = UserCreationForm()
+        form = CustomUserCreationForm() # Use CustomUserCreationForm
     return render(request, 'users/registration.html', {'form': form})
 
 def activate(request, uidb64, token):
