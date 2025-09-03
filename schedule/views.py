@@ -127,47 +127,60 @@ def activity_delete(request, pk):
 @user_passes_test(is_teacher)
 def get_filtered_activities(request):
     subject_ids_str = request.GET.get('subject_ids')
+    show_context = request.GET.get('show_context') == 'true'
+
     if not subject_ids_str:
-        return JsonResponse({'activities': []})
+        return JsonResponse([], safe=False)
 
     subject_ids = [int(s_id) for s_id in subject_ids_str.split(',') if s_id.isdigit()]
     
-    # Get all activities that are linked to any of the selected subjects
-    # Use a dictionary to maintain order and uniqueness by ID
-    unique_activities = {}
-    for activity in Actividad.objects.filter(asignaturas__id__in=subject_ids).order_by('fecha_inicio'):
-        unique_activities[activity.id] = activity
+    final_subject_ids = set(subject_ids)
 
-    activities_to_serialize = list(unique_activities.values())
+    if show_context and subject_ids:
+        # Find all subjects that share the same course and titulacion
+        selected_subjects = Asignatura.objects.filter(id__in=subject_ids)
+        titulacion_curso_pairs = selected_subjects.values_list('titulacion_id', 'curso').distinct()
+        
+        contextual_subjects = Asignatura.objects.none()
+        for titulacion_id, curso in titulacion_curso_pairs:
+            contextual_subjects |= Asignatura.objects.filter(titulacion_id=titulacion_id, curso=curso)
+        
+        final_subject_ids.update(contextual_subjects.values_list('id', flat=True))
+
+    # Get all activities that are linked to any of the final subjects
+    activities = Actividad.objects.filter(asignaturas__id__in=list(final_subject_ids)).distinct().order_by('fecha_inicio')
 
     # Manually serialize the data to include related fields
     from django.utils import timezone
 
-    # Load the closing date
     try:
         closing_date = AgendaSettings.load().closing_date
     except Exception:
-        # Fallback if AgendaSettings is not configured or an error occurs
         closing_date = timezone.now().date()
 
     activities_data = []
-    for activity in activities_to_serialize:
+    teacher_subject_ids = set(request.user.subjects.all().values_list('id', flat=True))
+
+    for activity in activities:
         event_class_names = []
         if activity.fecha_inicio.date() < closing_date:
             event_class_names.append('past-event')
         else:
             event_class_names.append('future-event')
 
-        # Get assigned subject names
         subject_names = ", ".join([s.nombre for s in activity.asignaturas.all()])
+        
+        # Check if the activity belongs to the current teacher
+        activity_subject_ids = set(activity.asignaturas.all().values_list('id', flat=True))
+        is_own = not teacher_subject_ids.isdisjoint(activity_subject_ids)
 
         activities_data.append({
             'id': activity.id,
-            'title': activity.nombre, # Changed 'nombre' to 'title' for FullCalendar
+            'title': activity.nombre,
             'start': activity.fecha_inicio.isoformat(),
             'end': activity.fecha_fin.isoformat(),
-            'classNames': event_class_names, # Add class for styling
-            'extendedProps': { # Add more details for eventClick
+            'classNames': event_class_names,
+            'extendedProps': {
                 'description': activity.descripcion,
                 'activity_type': activity.tipo_actividad.nombre,
                 'subjects': subject_names,
@@ -175,10 +188,11 @@ def get_filtered_activities(request):
                 'is_active': activity.activa,
                 'evaluable': activity.evaluable,
                 'percentage': activity.porcentaje_evaluacion,
+                'is_own': is_own
             }
         })
     
-    return JsonResponse(activities_data, safe=False) # Return raw list for FullCalendar
+    return JsonResponse(activities_data, safe=False)
 
 @login_required
 @user_passes_test(is_teacher)

@@ -14,6 +14,10 @@
                 overflow-y: auto;
             }
         }
+        .contextual-activity {
+            background-color: #f8f9fa; /* Gris claro para actividades contextuales */
+            opacity: 0.8;
+        }
     </style>
 {% endblock %}
 
@@ -52,6 +56,14 @@
                         </tbody>
                     </table>
                 </div>
+
+                <div class="form-check mt-2 mb-3">
+                    <input class="form-check-input" type="checkbox" id="show_context_activities">
+                    <label class="form-check-label" for="show_context_activities">
+                        Ver actividades de la misma titulación y curso
+                    </label>
+                </div>
+
                 <div class="d-grid">
                     <button id="createActivityBtn" class="btn btn-primary">Create Activity for Selected</button>
                 </div>
@@ -99,9 +111,6 @@
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" id="calendar-tab" data-bs-toggle="tab" data-bs-target="#calendar-view" type="button" role="tab" aria-controls="calendar-view" aria-selected="false">Calendar</button>
                 </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="filters-tab" data-bs-toggle="tab" data-bs-target="#filters-view" type="button" role="tab" aria-controls="filters-view" aria-selected="false">Advanced Filters</button>
-                </li>
             </ul>
 
             <div class="tab-content" id="myTabContent">
@@ -115,40 +124,6 @@
                 <div class="tab-pane fade p-3" id="calendar-view" role="tabpanel" aria-labelledby="calendar-tab">
                     <h4>Calendar for Selected Subjects</h4>
                     <div id='calendar'></div>
-                </div>
-
-                <div class="tab-pane fade p-3" id="filters-view" role="tabpanel" aria-labelledby="filters-tab">
-                    <h4>Filter All Your Activities</h4>
-                     <form method="get" action="." id="filter-form">
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="titulacion" class="form-label">Filter by Titulacion:</label>
-                                <select name="titulacion" id="titulacion" multiple>
-                                    {% for titulacion in titulaciones %}
-                                        <option value="{{ titulacion.id }}">{{ titulacion.nombre }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="asignatura" class="form-label">Filter by Asignatura:</label>
-                                <select name="asignatura" id="asignatura" multiple>
-                                    {% for asignatura in asignaturas %}
-                                        <option value="{{ asignatura.id }}">{{ asignatura.nombre }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="tipo_actividad" class="form-label">Filter by Activity Type:</label>
-                                <select name="tipo_actividad" id="tipo_actividad" multiple class="form-select">
-                                    {% for tipo in tipos_actividad %}
-                                        <option value="{{ tipo.id }}">{{ tipo.nombre }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Apply Filters</button>
-                        <a href="{% url 'teacher_dashboard' %}" class="btn btn-outline-secondary">Clear</a>
-                    </form>
                 </div>
             </div>
         </div>
@@ -196,19 +171,23 @@
 
     <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // --- INICIALIZACIÓN DE COMPONENTES ---
-        new TomSelect('#titulacion', { plugins: ['remove_button'] });
-        new TomSelect('#asignatura', { plugins: ['remove_button'] });
+        const calendarEl = document.getElementById('calendar');
+        const activitiesTableContainer = document.getElementById('activitiesTableContainer');
+        const showContextCheckbox = document.getElementById('show_context_activities');
+        let isCalendarRendered = false;
 
-        // --- LÓGICA DEL CALENDARIO ---
-        var calendarEl = document.getElementById('calendar');
-        var isCalendarRendered = false;
-        var calendar = new FullCalendar.Calendar(calendarEl, {
+        const calendar = new FullCalendar.Calendar(calendarEl, {
             initialView: 'dayGridMonth',
             headerToolbar: { left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek' },
             events: [], // Se cargará dinámicamente
+            eventDataTransform: function(eventInfo) {
+                if (!eventInfo.extendedProps.is_own) {
+                    eventInfo.backgroundColor = '#6c757d';
+                    eventInfo.borderColor = '#6c757d';
+                }
+                return eventInfo;
+            },
             eventClick: function(info) {
-                // Populate modal with event details
                 document.getElementById('modalActivityTitle').innerText = info.event.title;
                 document.getElementById('modalActivityDescription').innerText = info.event.extendedProps.description || 'N/A';
                 document.getElementById('modalActivityType').innerText = info.event.extendedProps.activity_type || 'N/A';
@@ -219,31 +198,16 @@
                 document.getElementById('modalActivityActive').innerText = info.event.extendedProps.is_active ? 'Yes' : 'No';
                 document.getElementById('modalActivityEvaluable').innerText = info.event.extendedProps.evaluable ? 'Yes' : 'No';
                 document.getElementById('modalActivityPercentage').innerText = info.event.extendedProps.percentage !== null ? info.event.extendedProps.percentage + '%' : 'N/A';
-
-                // Show the modal
                 var activityDetailModal = new bootstrap.Modal(document.getElementById('activityDetailModal'));
                 activityDetailModal.show();
             }
         });
 
-        var calendarTab = document.getElementById('calendar-tab');
-        calendarTab.addEventListener('shown.bs.tab', function (event) {
-            if (!isCalendarRendered) {
-                calendar.render();
-                isCalendarRendered = true;
-            }
-            refetchCalendarEvents();
-        });
-
-        // --- LÓGICA DE CARGA DE ACTIVIDADES ---
-        const activitiesTableContainer = document.getElementById('activitiesTableContainer');
-        
         function getSelectedSubjectIds() {
-            const checkboxes = document.querySelectorAll('.subject-checkbox:checked');
-            return Array.from(checkboxes).map(cb => cb.value);
+            return Array.from(document.querySelectorAll('.subject-checkbox:checked')).map(cb => cb.value);
         }
 
-        function loadActivities() {
+        function fetchData() {
             const selectedSubjectIds = getSelectedSubjectIds();
             if (selectedSubjectIds.length === 0) {
                 activitiesTableContainer.innerHTML = '<p class="text-muted">Select subjects on the left to see their activities.</p>';
@@ -251,35 +215,17 @@
                 return;
             }
 
-            fetch(`{% url 'get_filtered_activities' %}?subject_ids=${selectedSubjectIds.join(',')}`)
+            const showContext = showContextCheckbox.checked;
+            const url = `{% url 'get_filtered_activities' %}?subject_ids=${selectedSubjectIds.join(',')}&show_context=${showContext}`;
+
+            fetch(url)
                 .then(response => response.json())
-                .then(data => { // data is now directly the array of activities
-                    let tableHtml = '<p>No activities found for the selected subjects.</p>';
-                    if (data.length > 0) { // Check data.length directly
-                        tableHtml = `
-                            <div class="table-responsive">
-                                <table class="table table-striped table-hover">
-                                    <thead class="table-dark">
-                                        <tr>
-                                            <th>Name</th><th>Subjects</th><th>Type</th><th>Start Date</th><th>Actions</th>
-                                        </tr>
-                                    </thead><tbody>`;
-                        data.forEach(activity => { // Iterate directly over data
-                            tableHtml += `
-                                <tr>
-                                    <td>${activity.title}</td> <!-- Use activity.title -->
-                                    <td>${activity.extendedProps.subjects}</td> <!-- Use extendedProps.subjects -->
-                                    <td>${activity.extendedProps.activity_type}</td> <!-- Use extendedProps.activity_type -->
-                                    <td>${new Date(activity.start).toLocaleString()}</td> <!-- Use activity.start -->
-                                    <td>
-                                        <a href="/activity/edit/${activity.id}/" class="btn btn-sm btn-info">Edit</a>
-                                        <a href="/activity/delete/${activity.id}/" class="btn btn-sm btn-danger ms-1">Delete</a>
-                                    </td>
-                                </tr>`;
-                        });
-                        tableHtml += `</tbody></table></div>`;
+                .then(data => {
+                    renderActivitiesTable(data);
+                    if (isCalendarRendered) {
+                        calendar.removeAllEvents();
+                        calendar.addEventSource(data);
                     }
-                    activitiesTableContainer.innerHTML = tableHtml;
                 })
                 .catch(error => {
                     console.error('Error loading activities:', error);
@@ -287,33 +233,50 @@
                 });
         }
 
-        function refetchCalendarEvents() {
-            const selectedSubjectIds = getSelectedSubjectIds();
-             if (selectedSubjectIds.length === 0) {
-                if (isCalendarRendered) calendar.removeAllEvents();
-                return;
-            }
-            // Suponiendo una URL que devuelve eventos de calendario en formato JSON
-            fetch(`{% url 'get_filtered_activities' %}?subject_ids=${selectedSubjectIds.join(',')}`)
-                .then(response => response.json())
-                .then(events => {
-                    calendar.removeAllEvents();
-                    calendar.addEventSource(events);
+        function renderActivitiesTable(data) {
+            let tableHtml = '<p>No activities found for the selected subjects.</p>';
+            if (data.length > 0) {
+                tableHtml = `
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Name</th><th>Subjects</th><th>Type</th><th>Start Date</th><th>Actions</th>
+                                </tr>
+                            </thead><tbody>`;
+                data.forEach(activity => {
+                    const isOwn = activity.extendedProps.is_own;
+                    const rowClass = isOwn ? '' : 'contextual-activity';
+                    const buttons = isOwn ? 
+                        `<a href="/activity/edit/${activity.id}/" class="btn btn-sm btn-info">Edit</a>
+                         <a href="/activity/delete/${activity.id}/" class="btn btn-sm btn-danger ms-1">Delete</a>` : '<span class="text-muted small">Read-only</span>';
+                    
+                    tableHtml += `
+                        <tr class="${rowClass}">
+                            <td>${activity.title}</td>
+                            <td>${activity.extendedProps.subjects}</td>
+                            <td>${activity.extendedProps.activity_type}</td>
+                            <td>${new Date(activity.start).toLocaleString()}</td>
+                            <td>${buttons}</td>
+                        </tr>`;
                 });
+                tableHtml += `</tbody></table></div>`;
+            }
+            activitiesTableContainer.innerHTML = tableHtml;
         }
 
-        document.querySelectorAll('.subject-checkbox').forEach(checkbox => {
-            checkbox.addEventListener('change', () => {
-                loadActivities();
-                if (document.getElementById('calendar-view').classList.contains('show')) {
-                    refetchCalendarEvents();
-                }
-            });
+        document.querySelectorAll('.subject-checkbox, #show_context_activities').forEach(element => {
+            element.addEventListener('change', fetchData);
         });
-        
-        loadActivities(); // Carga inicial
 
-        // --- OTROS LISTENERS ---
+        document.getElementById('calendar-tab').addEventListener('shown.bs.tab', function () {
+            if (!isCalendarRendered) {
+                calendar.render();
+                isCalendarRendered = true;
+            }
+            fetchData();
+        });
+
         document.getElementById('createActivityBtn').addEventListener('click', function() {
             const selectedSubjectIds = getSelectedSubjectIds();
             if (selectedSubjectIds.length === 0) {
@@ -325,24 +288,14 @@
 
         document.querySelectorAll('.copyIcalLinkBtn').forEach(button => {
             button.addEventListener('click', function() {
-                const icalUrl = this.dataset.icalUrl;
-                navigator.clipboard.writeText(icalUrl).then(() => {
+                navigator.clipboard.writeText(this.dataset.icalUrl).then(() => {
                     alert('iCal link copied to clipboard!');
-                }).catch(err => {
-                    alert('Failed to copy iCal link.');
                 });
             });
         });
 
-        document.getElementById('filter-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const formData = new FormData(this);
-            const params = new URLSearchParams(formData);
-            
-            // Lógica para filtrar y mostrar resultados aquí
-            // Por ejemplo, podrías hacer un fetch y reemplazar el contenido de la tabla de actividades.
-            alert('Filtering logic needs to be implemented. Query: ' + params.toString());
-        });
+        // Initial load
+        fetchData();
     });
     </script>
 {% endblock %}
