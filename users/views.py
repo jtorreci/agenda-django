@@ -411,6 +411,9 @@ def coordinator_dashboard(request):
     if not request.user.role == 'ADMIN': # Admins see all activities
         activities = activities.filter(asignaturas__titulacion__in=user_coordinated_titulaciones).distinct()
 
+    # Separate active and inactive activities
+    active_activities = activities.filter(activa=True)
+    inactive_activities = activities.filter(activa=False)
 
     # Check if user has any coordinated titulaciones
     show_no_titulaciones_message = not user_coordinated_titulaciones.exists() and request.user.role != 'ADMIN'
@@ -421,7 +424,8 @@ def coordinator_dashboard(request):
         'cursos': cursos_with_labels,
         'semestres': semestres,
         'tipos_actividad': tipos_actividad,
-        'activities': activities.distinct(),
+        'active_activities': active_activities.distinct(),
+        'inactive_activities': inactive_activities.distinct(),
         'selected_titulaciones': selected_titulaciones,
         'selected_asignaturas': selected_asignaturas,
         'selected_cursos': selected_cursos,

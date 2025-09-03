@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Confirmar Copia de Actividad" %}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>{% trans "Actividad Bloqueada" %}</h2>
+    <p>
+        La actividad <strong>"{{ activity.nombre }}"</strong> forma parte del contrato inicial y no puede ser modificada directamente porque la fecha de bloqueo ya ha pasado.
+    </p>
+    <p>
+        Para realizar cambios, se creará una copia editable de esta actividad. La actividad original permanecerá sin cambios.
+    </p>
+    <p><strong>{% trans "¿Desea continuar y crear una copia editable?" %}</strong></p>
+
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary">{% trans "Sí, crear copia" %}</button>
+        <a href="{{ request.META.HTTP_REFERER|default:'home' }}" class="btn btn-secondary">{% trans "Cancelar" %}</a>
+    </form>
+</div>
+{% endblock %}

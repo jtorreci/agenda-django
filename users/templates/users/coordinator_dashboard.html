@@ -210,6 +210,7 @@
                             <span class="badge bg-secondary rounded-pill">{{ activities|length }} found</span>
                         </div>
                         <div class="table-responsive">
+                            <h4 class="mt-4">Active Activities</h4>
                             <table class="table table-striped table-bordered table-hover">
                                 <thead class="table-dark">
                                     <tr>
@@ -217,7 +218,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {% for activity in activities %}
+                                    {% for activity in active_activities %}
                                     <tr>
                                         <td>{{ activity.nombre }}</td>
                                         <td>{% for asignatura in activity.asignaturas.all %}{{ asignatura.nombre }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
@@ -238,7 +239,35 @@
                                         </td>
                                     </tr>
                                     {% empty %}
-                                    <tr><td colspan="9" class="text-center">No activities found.</td></tr>
+                                    <tr><td colspan="9" class="text-center">No active activities found.</td></tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+
+                            <h4 class="mt-5">Deleted Activities</h4>
+                            <table class="table table-striped table-bordered table-hover">
+                                <thead class="table-secondary">
+                                    <tr>
+                                        <th>Activity Name</th><th>Subjects</th><th>Type</th><th>Start Date</th><th>End Date</th><th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for activity in inactive_activities %}
+                                    <tr>
+                                        <td>{{ activity.nombre }}</td>
+                                        <td>{% for asignatura in activity.asignaturas.all %}{{ asignatura.nombre }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+                                        <td>{{ activity.tipo_actividad.nombre }}</td>
+                                        <td>{{ activity.fecha_inicio }}</td>
+                                        <td>{{ activity.fecha_fin }}</td>
+                                        <td>
+                                            <form action="{% url 'reactivate_activity' activity.pk %}" method="post" class="d-inline">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-sm btn-success">Restore</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr><td colspan="6" class="text-center">No deleted activities found.</td></tr>
                                     {% endfor %}
                                 </tbody>
                             </table>

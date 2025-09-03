@@ -1159,3 +1159,89 @@ def ical_management(request):
     }
     
     return render(request, 'schedule/ical_management.html', context)
+
+@login_required
+@user_passes_test(is_coordinator_or_admin)
+@require_POST
+def delete_all_icals(request):
+    """Delete all iCal feeds for the current user"""
+    
+    feeds = VistaCalendario.objects.filter(usuario=request.user)
+    count = feeds.count()
+    feeds.delete()
+    
+    # Log the action
+    LogActividad.objects.create(
+        object_type='actividad',
+        object_name="Delete All iCals",
+        usuario=request.user,
+        tipo_log=_('iCal Deletion'),
+        details=f'Deleted {count} iCal feeds for user {request.user.username}'
+    )
+    
+    return JsonResponse({'success': True, 'deleted_count': count})
+
+from django.utils import timezone # Need this for date comparison
+
+@login_required
+@user_passes_test(is_teacher)
+def check_and_edit_activity(request, pk):
+    """
+    Intermediate view to check if an activity is a "contract" activity
+    before allowing an edit or forcing a copy.
+    """
+    activity = get_object_or_404(Actividad, pk=pk)
+    
+    # IDOR check
+    if not request.user.is_staff and not activity.asignaturas.filter(id__in=request.user.subjects.all()).exists():
+        return redirect(get_user_dashboard_url(request.user))
+
+    try:
+        lock_date = AgendaSettings.load().closing_date
+        creation_log = LogActividad.objects.filter(actividad=activity, tipo_log='Creation').order_by('timestamp').first()
+        
+        is_contract_activity = creation_log and creation_log.timestamp.date() < lock_date
+        is_after_lock_date = timezone.now().date() >= lock_date
+
+        # The special copy logic is triggered only when editing a contract activity after the lock date
+        if is_contract_activity and is_after_lock_date:
+            if request.method == 'POST':
+                # User confirmed, let's create the copy
+                
+                # 1. Create a new activity instance in memory
+                new_activity = activity
+                new_activity.pk = None # This is the key to creating a new object
+                new_activity.id = None
+
+                # 2. Modify the name as requested
+                new_activity.nombre = f"{activity.nombre} [Modificación de actividad inicial]"
+                
+                # 3. Save the new base object
+                new_activity.save()
+
+                # 4. Copy the ManyToMany relationship
+                new_activity.asignaturas.set(activity.asignaturas.all())
+
+                # 5. Create a log entry for the copy action
+                LogActividad.objects.create(
+                    object_type='actividad',
+                    object_name=new_activity.nombre,
+                    object_id=new_activity.id,
+                    actividad=new_activity,
+                    usuario=request.user,
+                    tipo_log='Copia',
+                    details=f'Copia creada desde la actividad de contrato ID {activity.pk}: "{activity.nombre}"'
+                )
+
+                # 6. Redirect to the edit form of the NEW activity
+                return redirect('activity_edit', pk=new_activity.pk)
+            
+            # On GET, show the confirmation page
+            return render(request, 'schedule/activity_confirm_copy.html', {'activity': activity})
+
+    except (AgendaSettings.DoesNotExist, LogActividad.DoesNotExist):
+        # If settings or log don't exist, fail safe and proceed to normal edit
+        pass
+
+    # If any condition fails or an exception occurs, proceed to the normal edit form
+    return redirect('activity_edit', pk=activity.pk)

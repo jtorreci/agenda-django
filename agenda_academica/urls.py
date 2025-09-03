@@ -33,6 +33,7 @@ urlpatterns = [
     path('ajax/get_filtered_asignaturas/', schedule_views.get_filtered_asignaturas, name='get_filtered_asignaturas'),
     path('activity/new/', schedule_views.activity_form, name='activity_new'),
     path('activity/edit/<int:pk>/', schedule_views.activity_form, name='activity_edit'),
+    path('activity/check-edit/<int:pk>/', schedule_views.check_and_edit_activity, name='activity_check_edit'),
     path('activity/details/<int:pk>/', schedule_views.activity_form, {'read_only': True}, name='activity_details_readonly'),
     path('activity/delete/<int:pk>/', schedule_views.activity_delete, name='activity_delete'),
     path('activity/list/', schedule_views.activity_list, name='activity_list'),
