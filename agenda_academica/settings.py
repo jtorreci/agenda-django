@@ -202,3 +202,26 @@ STUDENT_EMAIL_DOMAINS = os.environ.get('STUDENT_EMAIL_DOMAINS', 'alumnos.unex.es
 
 LOGIN_REDIRECT_URL = '/users/dashboard_redirect/'
 LOGIN_URL = '/login/'
+
+# settings.py
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+    },
+}
