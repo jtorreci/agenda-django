@@ -6,6 +6,7 @@ from .forms import PasswordResetByUsernameForm
 urlpatterns = [
     path('register/', views.register, name='register'),
     path('activate/<uidb64>/<token>/', views.activate, name='activate'),
+    path('resend_activation/', views.resend_activation, name='resend_activation'),
     path('password_reset/', auth_views.PasswordResetView.as_view(
         template_name='users/password_reset_form.html',
         form_class=PasswordResetByUsernameForm,

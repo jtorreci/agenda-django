@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Registro Exitoso" %}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header {% if resent %}bg-info{% else %}bg-success{% endif %} text-white">
+                    <h4 class="mb-0">
+                        <i class="bi bi-{% if resent %}envelope-arrow-up{% else %}check-circle-fill{% endif %}"></i> 
+                        {% if resent %}
+                            {% trans "¡Email Reenviado!" %}
+                        {% else %}
+                            {% trans "¡Registro Exitoso!" %}
+                        {% endif %}
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <h5 class="alert-heading">
+                            <i class="bi bi-envelope-fill"></i> {% trans "Confirma tu correo electrónico" %}
+                        </h5>
+                        <p>{% trans "Hemos enviado un enlace de confirmación a:" %}</p>
+                        <p class="fw-bold">{{ email }}</p>
+                        <hr>
+                        <p class="mb-0">
+                            <i class="bi bi-info-circle"></i> 
+                            {% trans "Por favor, revisa tu bandeja de entrada y la carpeta de spam/correo no deseado." %}
+                        </p>
+                    </div>
+                    
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle"></i> 
+                        <strong>{% trans "Importante:" %}</strong> 
+                        {% trans "Debes confirmar tu correo electrónico antes de poder iniciar sesión." %}
+                    </div>
+                    
+                    <div class="text-center mt-4">
+                        <a href="{% url 'login' %}" class="btn btn-primary">
+                            <i class="bi bi-box-arrow-in-right"></i> {% trans "Ir a Iniciar Sesión" %}
+                        </a>
+                    </div>
+                    
+                    <div class="mt-3 text-center text-muted">
+                        <small>
+                            {% trans "¿No recibiste el correo?" %} 
+                            <a href="{% url 'resend_activation' %}">{% trans "Reenviar email de confirmación" %}</a>
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

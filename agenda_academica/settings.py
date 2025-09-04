@@ -79,6 +79,11 @@ INSTALLED_APPS = [
 
 AUTH_USER_MODEL = 'users.CustomUser'
 
+# Authentication backends
+AUTHENTICATION_BACKENDS = [
+    'users.backends.EmailVerificationBackend',  # Custom backend with email verification
+    'django.contrib.auth.backends.ModelBackend',  # Default backend as fallback
+]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

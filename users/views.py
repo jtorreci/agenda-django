@@ -62,18 +62,26 @@ def register(request):
             user.save()
 
             # Send confirmation email
-            current_site = get_current_site(request)
-            mail_subject = _('Activate your account')
-            message = render_to_string('users/account_activation_email.html', {
-                'user': user,
-                'domain': current_site.domain,
-                'uid': urlsafe_base64_encode(force_bytes(user.pk)),
-                'token': default_token_generator.make_token(user),
-            })
-            send_mail(mail_subject, message, 'from@example.com', [user.email])
+            try:
+                current_site = get_current_site(request)
+                mail_subject = _('Activa tu cuenta - Agenda Académica')
+                message = render_to_string('users/account_activation_email.html', {
+                    'user': user,
+                    'domain': current_site.domain,
+                    'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+                    'token': default_token_generator.make_token(user),
+                })
+                from_email = settings.DEFAULT_FROM_EMAIL or 'noreply@example.com'
+                send_mail(mail_subject, message, from_email, [user.email], fail_silently=False)
+            except Exception as e:
+                # Log the error but don't stop the registration
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.error(f"Error sending activation email: {e}")
+                messages.warning(request, _('Usuario creado, pero hubo un problema enviando el email de confirmación. Contacta al administrador.'))
             
-            messages.success(request, _('Please check your email to complete the registration.'))
-            return redirect('login')
+            # Render success page instead of redirect
+            return render(request, 'users/registration_success.html', {'email': user.email})
     else:
         form = CustomUserCreationForm() # Use CustomUserCreationForm
     return render(request, 'users/registration.html', {'form': form})
@@ -93,6 +101,40 @@ def activate(request, uidb64, token):
     else:
         messages.error(request, _('The activation link is invalid.'))
         return redirect('login')
+
+def resend_activation(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        try:
+            user = CustomUser.objects.get(username=username)
+            if user.is_active:
+                messages.info(request, _('Esta cuenta ya está activada.'))
+                return redirect('login')
+            
+            # Send activation email again
+            try:
+                current_site = get_current_site(request)
+                mail_subject = _('Reenvío - Activa tu cuenta - Agenda Académica')
+                message = render_to_string('users/account_activation_email.html', {
+                    'user': user,
+                    'domain': current_site.domain,
+                    'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+                    'token': default_token_generator.make_token(user),
+                })
+                from_email = settings.DEFAULT_FROM_EMAIL or 'noreply@example.com'
+                send_mail(mail_subject, message, from_email, [user.email], fail_silently=False)
+                
+                return render(request, 'users/registration_success.html', {
+                    'email': user.email, 
+                    'resent': True
+                })
+            except Exception as e:
+                messages.error(request, _('Error enviando el email. Inténtalo más tarde.'))
+                
+        except CustomUser.DoesNotExist:
+            messages.error(request, _('No se encontró ningún usuario con ese nombre.'))
+    
+    return render(request, 'users/resend_activation.html')
 
 @login_required
 @user_passes_test(is_teacher)

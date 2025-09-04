@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load widget_tweaks %}
+
+{% block title %}{% trans "Reenviar Email de Activación" %}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h4 class="mb-0">
+                        <i class="bi bi-envelope-arrow-up"></i> {% trans "Reenviar Email de Activación" %}
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <p>{% trans "Introduce tu nombre de usuario para reenviar el email de activación:" %}</p>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="username" class="form-label">{% trans "Nombre de usuario" %}</label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="username" 
+                                   name="username" 
+                                   required
+                                   placeholder="{% trans 'Tu nombre de usuario' %}">
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-info">
+                                <i class="bi bi-send"></i> {% trans "Reenviar Email" %}
+                            </button>
+                            <a href="{% url 'login' %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left"></i> {% trans "Volver al Login" %}
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
