@@ -121,20 +121,38 @@ WSGI_APPLICATION = 'agenda_academica.wsgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 # Flexible Database Configuration:
-# Reads PostgreSQL settings from environment variables if they exist (for production).
-# Falls back to SQLite for local development if they don't.
-if 'DB_NAME' in os.environ:
+# 1. First check for DATABASE_URL (common in production)
+# 2. Then check for individual DB settings
+# 3. Falls back to SQLite for local development
+
+import dj_database_url
+
+# Check for DATABASE_URL first (Heroku, production style)
+DATABASE_URL = os.environ.get('DATABASE_URL')
+
+if DATABASE_URL:
+    # Parse DATABASE_URL for production
+    DATABASES = {
+        'default': dj_database_url.parse(DATABASE_URL, conn_max_age=600)
+    }
+elif 'DB_NAME' in os.environ:
+    # Use individual settings for production
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
             'NAME': os.environ.get('DB_NAME'),
             'USER': os.environ.get('DB_USER'),
             'PASSWORD': os.environ.get('DB_PASSWORD'),
-            'HOST': os.environ.get('DB_HOST'),
+            'HOST': os.environ.get('DB_HOST', 'localhost'),
             'PORT': os.environ.get('DB_PORT', '5432'),
+            'CONN_MAX_AGE': 600,  # Connection pooling
+            'OPTIONS': {
+                'connect_timeout': 10,
+            }
         }
     }
 else:
+    # Development: use SQLite
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
