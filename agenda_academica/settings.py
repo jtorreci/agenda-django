@@ -209,12 +209,17 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Email Backend Configuration
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
+# Configuración SMTP para UNEX
+EMAIL_HOST = os.environ.get('EMAIL_HOST', 'mailout.unex.es')  # Servidor SMTP oficial de UNEX
+EMAIL_PORT = int(os.environ.get('EMAIL_PORT', '587'))  # Puerto con STARTTLS
+EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True').lower() == 'true'
+EMAIL_USE_SSL = os.environ.get('EMAIL_USE_SSL', 'False').lower() == 'true'
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
-DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'jtorrecilla.agenda@gmail.com')
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'secretaria_epcc@unex.es')
+
+# Timeout para evitar bloqueos
+EMAIL_TIMEOUT = 30
 
 # Custom Email Domain Settings
 TEACHER_EMAIL_DOMAINS = os.environ.get('TEACHER_EMAIL_DOMAINS', 'unex.es').split(',')

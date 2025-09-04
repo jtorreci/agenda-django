@@ -1,6 +1,7 @@
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth import get_user_model
 from django.contrib import messages
+from django.contrib.auth.forms import AuthenticationForm
 
 UserModel = get_user_model()
 
@@ -10,9 +11,15 @@ class EmailVerificationBackend(ModelBackend):
     """
     
     def authenticate(self, request, username=None, password=None, **kwargs):
+        if username is None:
+            username = kwargs.get(UserModel.USERNAME_FIELD)
+        
+        if username is None or password is None:
+            return None
+            
         try:
-            # Try to get user by username
-            user = UserModel.objects.get(username=username)
+            # Try to get user by username (case insensitive)
+            user = UserModel.objects.get(username__iexact=username)
             
             # Check if password is correct
             if user.check_password(password):
@@ -27,15 +34,16 @@ class EmailVerificationBackend(ModelBackend):
                         )
                     return None
                 
-                # Everything is OK
+                # Everything is OK - return user for successful login
                 return user
+            else:
+                # Password is incorrect - let Django handle the default error message
+                return None
             
         except UserModel.DoesNotExist:
-            # Run the default password hasher once to reduce the timing
-            # difference between an existing and a non-existing user
+            # User doesn't exist - run password hasher to prevent timing attacks
             UserModel().set_password(password)
-        
-        return None
+            return None
     
     def get_user(self, user_id):
         try:
