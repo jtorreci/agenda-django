@@ -78,6 +78,7 @@ AUTH_USER_MODEL = 'users.CustomUser'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',  # Add this for i18n support
     'django.middleware.common.CommonMiddleware',
@@ -179,6 +180,7 @@ LOCALE_PATHS = [
 
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles' # Added for deployment
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
