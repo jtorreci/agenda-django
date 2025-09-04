@@ -36,8 +36,12 @@ if DEBUG:
     ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 else:
     # Producción: usar hosts de las variables de entorno
-    production_hosts = os.environ.get('ALLOWED_HOSTS', 'jtorreci.pythonanywhere.com,www.jtorreci.pythonanywhere.com')
+    production_hosts = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1')
     ALLOWED_HOSTS = [host.strip() for host in production_hosts.split(',')]
+    # Añadir el dominio del servidor si está configurado
+    if os.environ.get('SERVER_DOMAIN'):
+        ALLOWED_HOSTS.append(os.environ.get('SERVER_DOMAIN'))
+        ALLOWED_HOSTS.append(f"www.{os.environ.get('SERVER_DOMAIN')}")
 
 # Security settings - diferentes para desarrollo y producción
 if DEBUG:
@@ -178,12 +182,18 @@ LOCALE_PATHS = [
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles' # Added for deployment
+
+# Additional directories for static files
+STATICFILES_DIRS = []
 
 # Use WhiteNoise storage only in production
 if not DEBUG:
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+    # Ensure WhiteNoise can serve admin static files
+    WHITENOISE_USE_FINDERS = True
+    WHITENOISE_AUTOREFRESH = True
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

@@ -5,9 +5,29 @@ from academics.models import Asignatura
 from django.contrib.auth import get_user_model
 
 class CustomUserCreationForm(UserCreationForm):
+    email = forms.EmailField(required=True)
+    
     class Meta(UserCreationForm.Meta):
         model = CustomUser
-        fields = UserCreationForm.Meta.fields + ('email',)
+        fields = ('username', 'email', 'password1', 'password2')
+    
+    def clean_username(self):
+        username = self.cleaned_data.get('username')
+        if CustomUser.objects.filter(username__iexact=username).exists():
+            raise forms.ValidationError("Este nombre de usuario ya está registrado.")
+        return username
+    
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        # Permitir múltiples usuarios con el mismo email
+        return email
+    
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.email = self.cleaned_data['email']
+        if commit:
+            user.save()
+        return user
 
 class NotificationForm(forms.Form):
     subject = forms.CharField(max_length=100)
@@ -42,4 +62,8 @@ class PasswordResetByUsernameForm(PasswordResetForm):
         Ahora busca por username (que se pasa en la variable 'email').
         """
         UserModel = get_user_model()
-        return UserModel._default_manager.filter(username__iexact=email)
+        active_users = UserModel._default_manager.filter(
+            username__iexact=email,
+            is_active=True
+        )
+        return (u for u in active_users if u.has_usable_password())

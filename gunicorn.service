@@ -1,0 +1,23 @@
+[Unit]
+Description=Gunicorn daemon for agenda-django
+After=network.target
+
+[Service]
+User=jtorreci
+Group=www-data
+WorkingDirectory=/home/jtorreci/agenda/agenda-django
+Environment="PATH=/home/jtorreci/agenda/venv/bin"
+ExecStart=/home/jtorreci/agenda/venv/bin/gunicorn \
+          --access-logfile /var/log/gunicorn/access.log \
+          --error-logfile /var/log/gunicorn/error.log \
+          --workers 3 \
+          --bind unix:/home/jtorreci/agenda/agenda-django/gunicorn.sock \
+          --timeout 60 \
+          --log-level info \
+          agenda_academica.wsgi:application
+
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target
