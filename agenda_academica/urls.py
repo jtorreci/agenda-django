@@ -19,6 +19,8 @@ from django.urls import path, include
 from django.contrib.auth import views as auth_views
 from schedule import views as schedule_views
 from agenda_academica import views as agenda_views
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -70,3 +72,6 @@ urlpatterns = [
     path('agenda_settings/', agenda_views.agenda_settings, name='agenda_settings'),
     path('ajax/agenda_settings/update/', agenda_views.ajax_update_agenda_settings, name='ajax_update_agenda_settings'),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
