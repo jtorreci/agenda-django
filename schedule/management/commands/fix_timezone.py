@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 from django.utils import timezone
-from schedule.models import Actividad, ActividadVersion
+from schedule.models import Actividad
 import pytz
 from datetime import timedelta
 
@@ -52,23 +52,28 @@ class Command(BaseCommand):
             
             actividades_count += 1
         
-        # Corregir versiones de actividades
-        versiones = ActividadVersion.objects.all()
+        # Corregir versiones de actividades si el modelo existe
         versiones_count = 0
-        
-        for version in versiones:
-            old_inicio = version.fecha_inicio
-            old_fin = version.fecha_fin
+        try:
+            from schedule.models import ActividadVersion
+            versiones = ActividadVersion.objects.all()
             
-            nueva_inicio = old_inicio + timedelta(hours=offset_hours)
-            nueva_fin = old_fin + timedelta(hours=offset_hours)
-            
-            if not dry_run:
-                version.fecha_inicio = nueva_inicio
-                version.fecha_fin = nueva_fin
-                version.save()
-            
-            versiones_count += 1
+            for version in versiones:
+                old_inicio = version.fecha_inicio
+                old_fin = version.fecha_fin
+                
+                nueva_inicio = old_inicio + timedelta(hours=offset_hours)
+                nueva_fin = old_fin + timedelta(hours=offset_hours)
+                
+                if not dry_run:
+                    version.fecha_inicio = nueva_inicio
+                    version.fecha_fin = nueva_fin
+                    version.save()
+                
+                versiones_count += 1
+        except ImportError:
+            # ActividadVersion no existe en esta versión
+            self.stdout.write("Modelo ActividadVersion no encontrado, omitiendo...")
         
         self.stdout.write(
             self.style.SUCCESS(
