@@ -18,14 +18,6 @@
             background-color: #f8f9fa; /* Gris claro para actividades contextuales */
             opacity: 0.8;
         }
-        .deleted-activity {
-            background-color: #f8f9fa; /* Fondo gris claro */
-            opacity: 0.5; /* Más difuminado que las contextuales */
-            text-decoration: line-through; /* Tachado para indicar eliminación */
-        }
-        .deleted-activity td {
-            color: #6c757d !important; /* Color gris para el texto */
-        }
     </style>
 {% endblock %}
 
@@ -145,6 +137,7 @@
             <button type="submit" class="btn btn-secondary">Logout</button>
         </form>
     </p>
+{% endblock %}
 
 <!-- Activity Details Modal -->
 <div class="modal fade" id="activityDetailModal" tabindex="-1" aria-labelledby="activityDetailModalLabel" aria-hidden="true">
@@ -173,6 +166,8 @@
     </div>
 </div>
 
+{% endblock %}
+
 <!-- Copy Activity Modal -->
 <div class="modal fade" id="copyActivityModal" tabindex="-1" aria-labelledby="copyActivityModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -198,7 +193,6 @@
         </div>
     </div>
 </div>
-{% endblock %}
 
 {% block extra_js %}
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'></script>
@@ -281,36 +275,19 @@
                             </thead><tbody>`;
                 data.forEach(activity => {
                     const isOwn = activity.extendedProps.is_own;
-                    const isActive = activity.extendedProps.is_active;
-                    
-                    let rowClass = '';
-                    if (!isActive) {
-                        rowClass = 'deleted-activity';
-                    } else if (!isOwn) {
-                        rowClass = 'contextual-activity';
-                    }
-                    
-                    let buttons = '';
-                    if (!isActive) {
-                        // Activity is deleted - show only status
-                        buttons = '<span class="text-muted small"><i class="bi bi-archive"></i> Eliminada</span>';
-                    } else if (isOwn) {
-                        // Active activity owned by teacher - show all buttons
-                        buttons = `<div class="btn-group" role="group">
-                            <a href="/activity/edit/${activity.id}/" class="btn btn-outline-primary" title="Editar actividad" data-bs-toggle="tooltip" style="padding: 0.375rem 0.5rem;">
-                                <i class="bi bi-pencil" style="font-size: 1rem;"></i>
+                    const rowClass = isOwn ? '' : 'contextual-activity';
+                    const buttons = isOwn ? 
+                        `<div class="btn-group" role="group">
+                            <a href="/activity/edit/${activity.id}/" class="btn btn-sm btn-outline-primary" title="Editar actividad" data-bs-toggle="tooltip">
+                                <i class="bi bi-pencil"></i>
                             </a>
-                            <button class="btn btn-outline-success" onclick="showCopyModal(${activity.id}, '${activity.title.replace(/'/g, "\\'")}', event)" title="Copiar actividad" data-bs-toggle="tooltip" style="padding: 0.375rem 0.5rem;">
-                                <i class="bi bi-clipboard" style="font-size: 1rem;"></i>
+                            <button class="btn btn-sm btn-outline-success" onclick="showCopyModal(${activity.id}, ${JSON.stringify(activity.title)})" title="Copiar actividad" data-bs-toggle="tooltip">
+                                <i class="bi bi-clipboard"></i>
                             </button>
-                            <a href="/activity/delete/${activity.id}/" class="btn btn-outline-danger" title="Eliminar actividad" data-bs-toggle="tooltip" style="padding: 0.375rem 0.5rem;">
-                                <i class="bi bi-trash" style="font-size: 1rem;"></i>
+                            <a href="/activity/delete/${activity.id}/" class="btn btn-sm btn-outline-danger" title="Eliminar actividad" data-bs-toggle="tooltip">
+                                <i class="bi bi-trash"></i>
                             </a>
-                        </div>`;
-                    } else {
-                        // Contextual activity - read only
-                        buttons = '<span class="text-muted small">Read-only</span>';
-                    }
+                        </div>` : '<span class="text-muted small">Read-only</span>';
                     
                     tableHtml += `
                         <tr class="${rowClass}">
@@ -334,19 +311,6 @@
 
         document.querySelectorAll('.subject-checkbox, #show_context_activities').forEach(element => {
             element.addEventListener('change', fetchData);
-        });
-
-        // Detect when user returns to page (e.g., from editing an activity)
-        document.addEventListener('visibilitychange', function() {
-            if (!document.hidden) {
-                // Page became visible again, refresh data
-                fetchData();
-            }
-        });
-
-        // Also refresh when the page gets focus (alternative approach)
-        window.addEventListener('focus', function() {
-            fetchData();
         });
 
         document.getElementById('calendar-tab').addEventListener('shown.bs.tab', function () {
@@ -386,11 +350,7 @@
         // Copy activity functionality
         let currentActivityIdToCopy = null;
         
-        window.showCopyModal = function(activityId, activityName, event) {
-            if (event) {
-                event.preventDefault();
-                event.stopPropagation();
-            }
+        window.showCopyModal = function(activityId, activityName) {
             currentActivityIdToCopy = activityId;
             document.getElementById('copyActivityName').textContent = activityName;
             const modal = new bootstrap.Modal(document.getElementById('copyActivityModal'));

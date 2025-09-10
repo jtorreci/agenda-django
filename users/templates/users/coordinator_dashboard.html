@@ -234,8 +234,14 @@
                                                    {% if activity.aprobada %}checked{% endif %}>
                                         </td>
                                         <td>
-                                            <a href="{% url 'activity_details_readonly' activity.id %}" class="btn btn-sm btn-info">View Details</a>
-                                            <a href="{% url 'activity_delete' activity.id %}" class="btn btn-sm btn-danger ms-1">Delete</a>
+                                            <div class="btn-group" role="group">
+                                                <a href="{% url 'activity_details_readonly' activity.id %}" class="btn btn-outline-info" title="Ver detalles de la actividad" data-bs-toggle="tooltip" style="padding: 0.375rem 0.5rem;">
+                                                    <i class="bi bi-eye" style="font-size: 1rem;"></i>
+                                                </a>
+                                                <a href="{% url 'activity_delete' activity.id %}" class="btn btn-outline-danger" title="Eliminar actividad" data-bs-toggle="tooltip" style="padding: 0.375rem 0.5rem;">
+                                                    <i class="bi bi-trash" style="font-size: 1rem;"></i>
+                                                </a>
+                                            </div>
                                         </td>
                                     </tr>
                                     {% empty %}
@@ -262,7 +268,9 @@
                                         <td>
                                             <form action="{% url 'reactivate_activity' activity.pk %}" method="post" class="d-inline">
                                                 {% csrf_token %}
-                                                <button type="submit" class="btn btn-sm btn-success">Restore</button>
+                                                <button type="submit" class="btn btn-outline-success" title="Restaurar actividad" data-bs-toggle="tooltip" style="padding: 0.375rem 0.5rem;">
+                                                    <i class="bi bi-arrow-clockwise" style="font-size: 1rem;"></i>
+                                                </button>
                                             </form>
                                         </td>
                                     </tr>
@@ -502,6 +510,12 @@
             const btn = this.querySelector('button[type="submit"]');
             btn.disabled = true;
             btn.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Filtering...`;
+        });
+
+        // Initialize tooltips for action buttons
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function(tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
         });
     });
     </script>

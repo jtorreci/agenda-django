@@ -108,12 +108,30 @@
     <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Inicializamos Tom Select en el campo de asignaturas
-            new TomSelect('#id_asignaturas', {
-                plugins: ['remove_button'],
-                create: false,
-                placeholder: 'Search and select subjects...'
-            });
+            // Inicializamos Tom Select en el campo de asignaturas con limpieza previa
+            const asignaturasElement = document.getElementById('id_asignaturas');
+            if (asignaturasElement) {
+                // Clean up any empty or invalid options before initializing TomSelect
+                const options = asignaturasElement.querySelectorAll('option');
+                options.forEach(option => {
+                    if (!option.value || option.value.trim() === '' || option.value === 'undefined') {
+                        // Don't remove the empty option if it's the placeholder
+                        if (option.value !== '' || option.textContent.trim() === '') {
+                            option.remove();
+                        }
+                    }
+                });
+
+                try {
+                    new TomSelect('#id_asignaturas', {
+                        plugins: ['remove_button'],
+                        create: false,
+                        placeholder: 'Search and select subjects...'
+                    });
+                } catch (error) {
+                    console.warn('TomSelect initialization failed:', error);
+                }
+            }
         });
     </script>
 {% endblock %}

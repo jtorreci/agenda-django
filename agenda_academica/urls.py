@@ -36,6 +36,9 @@ urlpatterns = [
     path('activity/new/', schedule_views.activity_form, name='activity_new'),
     path('activity/multi-group/new/', schedule_views.multi_group_activity_form, name='multi_group_activity_new'),
     path('activity/multi-group/edit/<uuid:grupo_id>/', schedule_views.multi_group_activity_form, name='multi_group_activity_edit'),
+    # Copy activities
+    path('activity/copy/<int:activity_id>/individual/', schedule_views.copy_activity_individual, name='copy_activity_individual'),
+    path('activity/copy/<int:activity_id>/multi-group/', schedule_views.copy_activity_multi_group, name='copy_activity_multi_group'),
     path('activity/edit/<int:pk>/', schedule_views.activity_form, name='activity_edit'),
     path('activity/check-edit/<int:pk>/', schedule_views.check_and_edit_activity, name='activity_check_edit'),
     path('activity/details/<int:pk>/', schedule_views.activity_form, {'read_only': True}, name='activity_details_readonly'),

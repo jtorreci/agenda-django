@@ -20,10 +20,6 @@ class ActividadForm(forms.ModelForm):
             self.base_fields['asignaturas'].queryset = user.subjects.all()
         super().__init__(*args, **kwargs)
 
-        # Configure datetime input formats for datetime-local
-        self.fields['fecha_inicio'].input_formats = ['%Y-%m-%dT%H:%M', '%Y-%m-%d %H:%M:%S', '%Y-%m-%d %H:%M']
-        self.fields['fecha_fin'].input_formats = ['%Y-%m-%dT%H:%M', '%Y-%m-%d %H:%M:%S', '%Y-%m-%d %H:%M']
-
         if read_only: # Apply read-only attributes
             for field_name, field in self.fields.items():
                 if field_name in ['fecha_inicio', 'fecha_fin']:

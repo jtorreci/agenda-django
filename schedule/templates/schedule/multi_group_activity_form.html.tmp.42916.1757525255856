@@ -148,25 +148,28 @@
     <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Initialize multi-select for subjects with cleanup
+            // Initialize multi-select for subjects with error handling
             const asignaturasElement = document.getElementById('id_asignaturas');
             if (asignaturasElement) {
-                // Clean up any empty or invalid options before initializing TomSelect
-                const options = asignaturasElement.querySelectorAll('option');
-                options.forEach(option => {
-                    if (!option.value || option.value.trim() === '' || option.value === 'undefined') {
-                        // Don't remove the empty option if it's the placeholder
-                        if (option.value !== '' || option.textContent.trim() === '') {
-                            option.remove();
-                        }
-                    }
-                });
-
                 try {
                     new TomSelect("#id_asignaturas", {
                         plugins: ['remove_button'],
                         maxItems: null,
-                        closeAfterSelect: true
+                        closeAfterSelect: true,
+                        onItemAdd: function(value, item) {
+                            // Ensure value is not undefined
+                            if (value && value.toString().trim() !== '') {
+                                return true;
+                            }
+                            return false;
+                        },
+                        onOptionAdd: function(value, data) {
+                            // Ensure value is valid
+                            if (!value || value.toString().trim() === '') {
+                                return false;
+                            }
+                            return true;
+                        }
                     });
                 } catch (error) {
                     console.warn('TomSelect initialization failed:', error);
