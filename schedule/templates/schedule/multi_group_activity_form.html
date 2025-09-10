@@ -144,10 +144,12 @@
 </div>
 {% endblock %}
 
-{% block extra_scripts %}
+{% block extra_js %}
     <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('=== MULTI-GROUP FORM SCRIPT STARTED ===');
+            
             // Initialize multi-select for subjects with cleanup
             const asignaturasElement = document.getElementById('id_asignaturas');
             if (asignaturasElement) {
@@ -177,6 +179,20 @@
             const groupsContainer = document.getElementById('groups-container');
             const groupsDataInput = document.getElementById('id_grupos_data');
             const addGroupBtn = document.getElementById('add-group-btn');
+            
+            // Debug: verify elements exist
+            if (!groupsContainer) {
+                console.error('groups-container element not found!');
+                return;
+            }
+            if (!groupsDataInput) {
+                console.error('id_grupos_data element not found!');
+                return;
+            }
+            if (!addGroupBtn) {
+                console.error('add-group-btn element not found!');
+                return;
+            }
 
             // Template for new group row
             function createGroupRow(data = {}) {
@@ -187,8 +203,8 @@
                 
                 row.innerHTML = `
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h6 class="text-primary mb-0">
-                            <i class="bi bi-people-fill"></i> Grupo #${groupCounter}
+                        <h6 class="text-primary mb-0 group-title">
+                            <i class="bi bi-people-fill"></i> <span class="group-number">Grupo #1</span>
                         </h6>
                         <button type="button" class="remove-group-btn" onclick="removeGroup(${groupCounter})">
                             <i class="bi bi-x"></i> Eliminar
@@ -226,31 +242,57 @@
             }
 
             // Add group button event
-            addGroupBtn.addEventListener('click', function() {
-                const newRow = createGroupRow();
-                groupsContainer.appendChild(newRow);
-                updateGroupsData();
+            addGroupBtn.addEventListener('click', function(e) {
+                console.log('Add group button clicked!');
+                e.preventDefault();
+                try {
+                    const newRow = createGroupRow();
+                    console.log('New row created:', newRow);
+                    groupsContainer.appendChild(newRow);
+                    console.log('Row appended to container');
+                    renumberGroups(); // Renumber after adding
+                    updateGroupsData();
+                    console.log('Groups data updated');
+                } catch (error) {
+                    console.error('Error adding group:', error);
+                }
             });
+
+            // Renumber all groups consecutively
+            function renumberGroups() {
+                const groupRows = document.querySelectorAll('.group-row');
+                groupRows.forEach((row, index) => {
+                    const groupNumber = row.querySelector('.group-number');
+                    if (groupNumber) {
+                        groupNumber.textContent = `Grupo #${index + 1}`;
+                    }
+                });
+            }
 
             // Remove group function
             window.removeGroup = function(groupId) {
                 const row = document.querySelector(`[data-group-id="${groupId}"]`);
                 if (row) {
                     row.remove();
+                    renumberGroups(); // Renumber after removal
                     updateGroupsData();
                 }
             };
 
             // Update hidden field with groups data
             function updateGroupsData() {
+                console.log('Updating groups data...');
                 const groups = [];
                 const groupRows = document.querySelectorAll('.group-row');
+                console.log('Found', groupRows.length, 'group rows');
                 
-                groupRows.forEach(row => {
-                    const grupo = row.querySelector('.group-name').value;
-                    const fechaInicio = row.querySelector('.group-start').value;
-                    const fechaFin = row.querySelector('.group-end').value;
-                    const descripcion = row.querySelector('.group-desc').value;
+                groupRows.forEach((row, index) => {
+                    const grupo = row.querySelector('.group-name')?.value || '';
+                    const fechaInicio = row.querySelector('.group-start')?.value || '';
+                    const fechaFin = row.querySelector('.group-end')?.value || '';
+                    const descripcion = row.querySelector('.group-desc')?.value || '';
+                    
+                    console.log(`Group ${index}:`, {grupo, fechaInicio, fechaFin, descripcion});
                     
                     if (grupo && fechaInicio && fechaFin) {
                         groups.push({
@@ -262,7 +304,9 @@
                     }
                 });
                 
+                console.log('Final groups array:', groups);
                 groupsDataInput.value = JSON.stringify(groups);
+                console.log('Hidden input updated with:', groupsDataInput.value);
             }
 
             // Update data on input changes
@@ -275,11 +319,13 @@
                     const newRow = createGroupRow(groupData);
                     groupsContainer.appendChild(newRow);
                 });
+                renumberGroups(); // Ensure proper numbering
                 updateGroupsData();
             {% else %}
                 // Add one empty group by default
                 const defaultRow = createGroupRow();
                 groupsContainer.appendChild(defaultRow);
+                renumberGroups(); // Ensure proper numbering
                 updateGroupsData();
             {% endif %}
         });
