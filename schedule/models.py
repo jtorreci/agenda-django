@@ -21,6 +21,7 @@ class Actividad(models.Model):
     no_recuperable = models.BooleanField(default=False)
     aprobada = models.BooleanField(default=False)
     activa = models.BooleanField(default=True)
+    grupo_id = models.UUIDField(blank=True, null=True, help_text="Identificador para agrupar actividades de múltiples grupos")
 
     def save(self, *args, **kwargs):
         # Apply automatic approval logic only when creating a new activity or when approval status hasn't been manually set

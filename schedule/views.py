@@ -5,7 +5,7 @@ from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.db import transaction
 from django.http import HttpResponseRedirect
 from users.views import is_teacher, is_coordinator, is_coordinator_or_admin
-from .forms import ActividadForm, VistaCalendarioForm
+from .forms import ActividadForm, VistaCalendarioForm, MultiGroupActivityForm
 from .models import Actividad, VistaCalendario, LogActividad, TipoActividad, ActividadVersion
 from icalendar import Calendar, Event
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
@@ -1259,3 +1259,87 @@ def check_and_edit_activity(request, pk):
 
     # If any condition fails or an exception occurs, proceed to the normal edit form
     return redirect('activity_edit', pk=activity.pk)
+
+@login_required
+@user_passes_test(is_teacher)
+def multi_group_activity_form(request, grupo_id=None):
+    initial_groups = []
+    existing_activities = Actividad.objects.none()  # Initialize as empty QuerySet
+    
+    if grupo_id:
+        existing_activities = Actividad.objects.filter(grupo_id=grupo_id, activa=True)
+        if existing_activities.exists():
+            first_activity = existing_activities.first()
+            initial_groups = []
+            for activity in existing_activities:
+                initial_groups.append({
+                    'grupo': activity.descripcion.split(':')[0].replace('Grupo ', '') if ':' in activity.descripcion else '',
+                    'fecha_inicio': activity.fecha_inicio.isoformat(),
+                    'fecha_fin': activity.fecha_fin.isoformat(),
+                    'descripcion': activity.descripcion.split(':', 1)[1].strip() if ':' in activity.descripcion else activity.descripcion
+                })
+
+    if request.method == 'POST':
+        form = MultiGroupActivityForm(request.POST, user=request.user)
+        if form.is_valid():
+            try:
+                with transaction.atomic():
+                    if grupo_id:
+                        existing_activities.update(activa=False)
+                        for activity in existing_activities:
+                            LogActividad.objects.create(
+                                object_type='actividad',
+                                object_name=activity.nombre,
+                                object_id=activity.id,
+                                actividad=activity,
+                                usuario=request.user,
+                                tipo_log=_('Modification'),
+                                details=_('Multi-group activity updated - old version deactivated')
+                            )
+                    
+                    actividades_creadas = form.save(user=request.user)
+                    
+                    for activity in actividades_creadas:
+                        LogActividad.objects.create(
+                            object_type='actividad',
+                            object_name=activity.nombre,
+                            object_id=activity.id,
+                            actividad=activity,
+                            usuario=request.user,
+                            tipo_log=_('Creation') if not grupo_id else _('Modification'),
+                            details=_('Multi-group activity created/updated')
+                        )
+                    
+                    return redirect(get_user_dashboard_url(request.user))
+            except Exception as e:
+                form.add_error(None, f"Error al guardar: {str(e)}")
+    else:
+        initial_data = {}
+        if existing_activities.exists():
+            first_activity = existing_activities.first()
+            initial_data = {
+                'nombre': first_activity.nombre,
+                'asignaturas': first_activity.asignaturas.all(),
+                'tipo_actividad': first_activity.tipo_actividad,
+                'evaluable': first_activity.evaluable,
+                'porcentaje_evaluacion': first_activity.porcentaje_evaluacion,
+                'no_recuperable': first_activity.no_recuperable,
+            }
+        else:
+            # Handle pre-selected subjects from URL parameter
+            subjects_param = request.GET.get('subjects')
+            if subjects_param:
+                try:
+                    subject_ids = [int(id) for id in subjects_param.split(',')]
+                    pre_selected_subjects = request.user.subjects.filter(id__in=subject_ids)
+                    initial_data['asignaturas'] = pre_selected_subjects
+                except (ValueError, TypeError):
+                    pass  # Ignore invalid subject IDs
+        
+        form = MultiGroupActivityForm(initial=initial_data, user=request.user, initial_groups=initial_groups)
+
+    return render(request, 'schedule/multi_group_activity_form.html', {
+        'form': form, 
+        'grupo_id': grupo_id,
+        'is_edit': bool(grupo_id)
+    })

@@ -64,8 +64,9 @@
                     </label>
                 </div>
 
-                <div class="d-grid">
+                <div class="d-grid gap-2">
                     <button id="createActivityBtn" class="btn btn-primary">Create Activity for Selected</button>
+                    <button id="createMultiGroupActivityBtn" class="btn btn-outline-primary">Create Multi-Group Activity</button>
                 </div>
                 
                 <hr class="my-4">
@@ -283,6 +284,15 @@
                 alert('Please select at least one subject to create an activity.');
             } else {
                 window.location.href = `{% url 'activity_new' %}?subjects=${selectedSubjectIds.join(',')}`;
+            }
+        });
+
+        document.getElementById('createMultiGroupActivityBtn').addEventListener('click', function() {
+            const selectedSubjectIds = getSelectedSubjectIds();
+            if (selectedSubjectIds.length === 0) {
+                alert('Please select at least one subject to create a multi-group activity.');
+            } else {
+                window.location.href = `{% url 'multi_group_activity_new' %}?subjects=${selectedSubjectIds.join(',')}`;
             }
         });
 

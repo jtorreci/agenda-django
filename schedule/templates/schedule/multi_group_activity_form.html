@@ -1,0 +1,269 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}{% if is_edit %}Editar{% else %}Crear{% endif %} Actividad Multi-Grupo{% endblock %}
+
+{% block extra_head %}
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.bootstrap5.min.css" rel="stylesheet">
+    <style>
+        .group-row {
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 10px;
+            background-color: #f8f9fa;
+        }
+        .remove-group-btn {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        .remove-group-btn:hover {
+            background-color: #c82333;
+        }
+        #groups-container {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h3 class="mb-0">
+                        {% if is_edit %}
+                            <i class="bi bi-pencil"></i> Editar Actividad Multi-Grupo
+                        {% else %}
+                            <i class="bi bi-plus-circle"></i> Crear Actividad Multi-Grupo
+                        {% endif %}
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i>
+                        <strong>¿Qué es una actividad multi-grupo?</strong><br>
+                        Use este formulario cuando la misma actividad se realice en diferentes grupos de la misma asignatura, 
+                        cada uno con fechas/horarios específicos. La aplicación creará automáticamente actividades 
+                        individuales para cada grupo.
+                    </div>
+
+                    {% if form.errors %}
+                        <div class="alert alert-danger">
+                            <ul class="mb-0">
+                                {% for field, errors in form.errors.items %}
+                                    {% for error in errors %}
+                                        <li>{{ error }}</li>
+                                    {% endfor %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+                    
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        
+                        <!-- Datos comunes de la actividad -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.nombre.id_for_label }}" class="form-label">Nombre de la Actividad</label>
+                                {% render_field form.nombre class="form-control" placeholder="ej. Examen Final" %}
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.tipo_actividad.id_for_label }}" class="form-label">Tipo de Actividad</label>
+                                {% render_field form.tipo_actividad class="form-select" %}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label for="{{ form.asignaturas.id_for_label }}" class="form-label">Asignaturas</label>
+                                {% render_field form.asignaturas id="id_asignaturas" %}
+                                <div class="form-text">Seleccione las asignaturas para las que se realizará esta actividad.</div>
+                            </div>
+                        </div>
+
+                        <!-- Campos de evaluación -->
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <div class="form-check">
+                                    {% render_field form.evaluable class="form-check-input" %}
+                                    <label for="{{ form.evaluable.id_for_label }}" class="form-check-label">Evaluable</label>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4 mb-3">
+                                <label for="{{ form.porcentaje_evaluacion.id_for_label }}" class="form-label">% Evaluación</label>
+                                {% render_field form.porcentaje_evaluacion class="form-control" %}
+                            </div>
+                            
+                            <div class="col-md-4 mb-3">
+                                <div class="form-check">
+                                    {% render_field form.no_recuperable class="form-check-input" %}
+                                    <label for="{{ form.no_recuperable.id_for_label }}" class="form-check-label">No Recuperable</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <!-- Sección de grupos -->
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5><i class="bi bi-people"></i> Grupos y Horarios</h5>
+                            <button type="button" id="add-group-btn" class="btn btn-success btn-sm">
+                                <i class="bi bi-plus"></i> Añadir Grupo
+                            </button>
+                        </div>
+
+                        <div id="groups-container">
+                            <!-- Los grupos se añadirán aquí dinámicamente -->
+                        </div>
+
+                        {% render_field form.grupos_data %}
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="javascript:history.back()" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check"></i> {% if is_edit %}Actualizar{% else %}Crear{% endif %} Actividades
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize multi-select for subjects
+            new TomSelect("#id_asignaturas", {
+                plugins: ['remove_button'],
+                maxItems: null,
+                closeAfterSelect: true
+            });
+
+            let groupCounter = 0;
+            const groupsContainer = document.getElementById('groups-container');
+            const groupsDataInput = document.getElementById('id_grupos_data');
+            const addGroupBtn = document.getElementById('add-group-btn');
+
+            // Template for new group row
+            function createGroupRow(data = {}) {
+                groupCounter++;
+                const row = document.createElement('div');
+                row.className = 'group-row';
+                row.setAttribute('data-group-id', groupCounter);
+                
+                row.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="text-primary mb-0">
+                            <i class="bi bi-people-fill"></i> Grupo #${groupCounter}
+                        </h6>
+                        <button type="button" class="remove-group-btn" onclick="removeGroup(${groupCounter})">
+                            <i class="bi bi-x"></i> Eliminar
+                        </button>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Nombre del Grupo</label>
+                            <input type="text" class="form-control group-name" 
+                                   placeholder="ej. A, B, 1, 2" value="${data.grupo || ''}">
+                        </div>
+                        
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Fecha/Hora Inicio</label>
+                            <input type="datetime-local" class="form-control group-start" 
+                                   value="${data.fecha_inicio || ''}">
+                        </div>
+                        
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Fecha/Hora Fin</label>
+                            <input type="datetime-local" class="form-control group-end" 
+                                   value="${data.fecha_fin || ''}">
+                        </div>
+                        
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Descripción/Lugar</label>
+                            <textarea class="form-control group-desc" rows="2" 
+                                      placeholder="ej. Aula A1">${data.descripcion || ''}</textarea>
+                        </div>
+                    </div>
+                `;
+                
+                return row;
+            }
+
+            // Add group button event
+            addGroupBtn.addEventListener('click', function() {
+                const newRow = createGroupRow();
+                groupsContainer.appendChild(newRow);
+                updateGroupsData();
+            });
+
+            // Remove group function
+            window.removeGroup = function(groupId) {
+                const row = document.querySelector(`[data-group-id="${groupId}"]`);
+                if (row) {
+                    row.remove();
+                    updateGroupsData();
+                }
+            };
+
+            // Update hidden field with groups data
+            function updateGroupsData() {
+                const groups = [];
+                const groupRows = document.querySelectorAll('.group-row');
+                
+                groupRows.forEach(row => {
+                    const grupo = row.querySelector('.group-name').value;
+                    const fechaInicio = row.querySelector('.group-start').value;
+                    const fechaFin = row.querySelector('.group-end').value;
+                    const descripcion = row.querySelector('.group-desc').value;
+                    
+                    if (grupo && fechaInicio && fechaFin) {
+                        groups.push({
+                            grupo: grupo,
+                            fecha_inicio: fechaInicio,
+                            fecha_fin: fechaFin,
+                            descripcion: descripcion
+                        });
+                    }
+                });
+                
+                groupsDataInput.value = JSON.stringify(groups);
+            }
+
+            // Update data on input changes
+            groupsContainer.addEventListener('input', updateGroupsData);
+
+            // Load initial groups if editing
+            {% if form.grupos_data.value %}
+                const initialGroups = JSON.parse('{{ form.grupos_data.value|escapejs }}');
+                initialGroups.forEach(groupData => {
+                    const newRow = createGroupRow(groupData);
+                    groupsContainer.appendChild(newRow);
+                });
+                updateGroupsData();
+            {% else %}
+                // Add one empty group by default
+                const defaultRow = createGroupRow();
+                groupsContainer.appendChild(defaultRow);
+                updateGroupsData();
+            {% endif %}
+        });
+    </script>
+{% endblock %}
