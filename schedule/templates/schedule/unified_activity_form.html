@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load widget_tweaks %}
 
-{% block title %}{% if is_edit %}Editar{% else %}Crear{% endif %} Actividad Multi-Grupo{% endblock %}
+{% block title %}{% if is_edit %}Editar{% else %}Crear{% endif %} Actividad{% endblock %}
 
 {% block extra_head %}
     <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.bootstrap5.min.css" rel="stylesheet">
@@ -28,6 +28,19 @@
             max-height: 400px;
             overflow-y: auto;
         }
+        .activity-type-info {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .individual-info {
+            background-color: #e3f2fd;
+            border-left: 4px solid #2196f3;
+        }
+        .multi-group-info {
+            background-color: #fff3e0;
+            border-left: 4px solid #ff9800;
+        }
     </style>
 {% endblock %}
 
@@ -39,21 +52,13 @@
                 <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
                     <h3 class="mb-0">
                         {% if is_edit %}
-                            <i class="bi bi-pencil"></i> Editar Actividad Multi-Grupo
+                            <i class="bi bi-pencil"></i> Editar Actividad
                         {% else %}
-                            <i class="bi bi-plus-circle"></i> Crear Actividad Multi-Grupo
+                            <i class="bi bi-plus-circle"></i> Crear Actividad
                         {% endif %}
                     </h3>
                 </div>
                 <div class="card-body">
-                    <div class="alert alert-info">
-                        <i class="bi bi-info-circle"></i>
-                        <strong>¿Qué es una actividad multi-grupo?</strong><br>
-                        Use este formulario cuando la misma actividad se realice en diferentes grupos de la misma asignatura, 
-                        cada uno con fechas/horarios específicos. La aplicación creará automáticamente actividades 
-                        individuales para cada grupo.
-                    </div>
-
                     {% if form.errors %}
                         <div class="alert alert-danger">
                             <ul class="mb-0">
@@ -114,16 +119,45 @@
 
                         <hr>
 
-                        <!-- Sección de grupos -->
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h5><i class="bi bi-people"></i> Grupos y Horarios</h5>
-                            <button type="button" id="add-group-btn" class="btn btn-success btn-sm">
-                                <i class="bi bi-plus"></i> Añadir Grupo
-                            </button>
+                        <!-- Selector de tipo de actividad -->
+                        <div class="mb-3">
+                            <h5><i class="bi bi-gear"></i> Configuración de Grupos</h5>
+                            <div class="btn-group w-100" role="group" aria-label="Tipo de actividad">
+                                <input type="radio" class="btn-check" name="activity_type" id="individual_type" value="individual" checked>
+                                <label class="btn btn-outline-primary" for="individual_type">
+                                    <i class="bi bi-person"></i> Actividad Individual
+                                </label>
+
+                                <input type="radio" class="btn-check" name="activity_type" id="multi_group_type" value="multi_group">
+                                <label class="btn btn-outline-warning" for="multi_group_type">
+                                    <i class="bi bi-people"></i> Actividad Multi-Grupo
+                                </label>
+                            </div>
                         </div>
 
-                        <div id="groups-container">
-                            <!-- Los grupos se añadirán aquí dinámicamente -->
+                        <!-- Información del tipo seleccionado -->
+                        <div id="individual-info" class="activity-type-info individual-info">
+                            <i class="bi bi-info-circle"></i>
+                            <strong>Actividad Individual:</strong> Se creará una actividad con un solo grupo y horario.
+                        </div>
+
+                        <div id="multi-group-info" class="activity-type-info multi-group-info" style="display: none;">
+                            <i class="bi bi-info-circle"></i>
+                            <strong>Actividad Multi-Grupo:</strong> Misma actividad para diferentes grupos con horarios específicos.
+                        </div>
+
+                        <!-- Contenedor para grupos (siempre presente) -->
+                        <div id="groups-section">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 id="groups-title"><i class="bi bi-calendar"></i> Horario</h5>
+                                <button type="button" id="add-group-btn" class="btn btn-success btn-sm" style="display: none;">
+                                    <i class="bi bi-plus"></i> Añadir Grupo
+                                </button>
+                            </div>
+
+                            <div id="groups-container">
+                                <!-- Los grupos se añadirán aquí dinámicamente -->
+                            </div>
                         </div>
 
                         {% render_field form.grupos_data %}
@@ -133,7 +167,7 @@
                                 <i class="bi bi-arrow-left"></i> Cancelar
                             </a>
                             <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-check"></i> {% if is_edit %}Actualizar{% else %}Crear{% endif %} Actividades
+                                <i class="bi bi-check"></i> {% if is_edit %}Actualizar{% else %}Crear{% endif %} Actividad
                             </button>
                         </div>
                     </form>
@@ -148,16 +182,14 @@
     <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('=== MULTI-GROUP FORM SCRIPT STARTED ===');
+            console.log('=== UNIFIED ACTIVITY FORM SCRIPT STARTED ===');
             
-            // Initialize multi-select for subjects with cleanup
+            // Initialize multi-select for subjects
             const asignaturasElement = document.getElementById('id_asignaturas');
             if (asignaturasElement) {
-                // Clean up any empty or invalid options before initializing TomSelect
                 const options = asignaturasElement.querySelectorAll('option');
                 options.forEach(option => {
                     if (!option.value || option.value.trim() === '' || option.value === 'undefined') {
-                        // Don't remove the empty option if it's the placeholder
                         if (option.value !== '' || option.textContent.trim() === '') {
                             option.remove();
                         }
@@ -179,75 +211,106 @@
             const groupsContainer = document.getElementById('groups-container');
             const groupsDataInput = document.getElementById('id_grupos_data');
             const addGroupBtn = document.getElementById('add-group-btn');
-            
-            // Debug: verify elements exist
-            if (!groupsContainer) {
-                console.error('groups-container element not found!');
-                return;
-            }
-            if (!groupsDataInput) {
-                console.error('id_grupos_data element not found!');
-                return;
-            }
-            if (!addGroupBtn) {
-                console.error('add-group-btn element not found!');
-                return;
+            const groupsTitle = document.getElementById('groups-title');
+            const individualRadio = document.getElementById('individual_type');
+            const multiGroupRadio = document.getElementById('multi_group_type');
+            const individualInfo = document.getElementById('individual-info');
+            const multiGroupInfo = document.getElementById('multi-group-info');
+
+            // Activity type change handlers
+            function updateActivityType() {
+                const isMultiGroup = multiGroupRadio.checked;
+                
+                if (isMultiGroup) {
+                    // Multi-group mode
+                    addGroupBtn.style.display = 'inline-block';
+                    groupsTitle.innerHTML = '<i class="bi bi-people"></i> Grupos y Horarios';
+                    individualInfo.style.display = 'none';
+                    multiGroupInfo.style.display = 'block';
+                    
+                    // Ensure at least one group exists
+                    if (groupsContainer.children.length === 0) {
+                        addGroup();
+                    }
+                } else {
+                    // Individual mode
+                    addGroupBtn.style.display = 'none';
+                    groupsTitle.innerHTML = '<i class="bi bi-calendar"></i> Horario';
+                    individualInfo.style.display = 'block';
+                    multiGroupInfo.style.display = 'none';
+                    
+                    // Clear all groups and add a single one
+                    groupsContainer.innerHTML = '';
+                    addGroup('Principal');
+                }
+                
+                updateSyncControlsVisibility();
+                updateGroupsData();
             }
 
+            individualRadio.addEventListener('change', updateActivityType);
+            multiGroupRadio.addEventListener('change', updateActivityType);
+
             // Template for new group row
-            function createGroupRow(data = {}) {
+            function createGroupRow(data = {}, groupName = '') {
                 groupCounter++;
                 const row = document.createElement('div');
                 row.className = 'group-row';
                 row.setAttribute('data-group-id', groupCounter);
                 
+                const isMultiGroup = multiGroupRadio.checked;
+                const showRemoveButton = isMultiGroup && groupsContainer.children.length > 0;
+                
                 row.innerHTML = `
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h6 class="text-primary mb-0 group-title">
-                            <i class="bi bi-people-fill"></i> <span class="group-number">Grupo #1</span>
+                            <i class="bi bi-${isMultiGroup ? 'people-fill' : 'calendar-event'}"></i> 
+                            <span class="group-number">${isMultiGroup ? 'Grupo #1' : 'Horario'}</span>
                         </h6>
+                        ${showRemoveButton ? `
                         <button type="button" class="remove-group-btn" onclick="removeGroup(${groupCounter})">
                             <i class="bi bi-x"></i> Eliminar
                         </button>
+                        ` : ''}
                     </div>
                     
                     <div class="row">
-                        <div class="col-md-3 mb-3">
+                        <div class="col-md-${isMultiGroup ? '2' : '3'} mb-3" ${isMultiGroup ? '' : 'style="display: none;"'}>
                             <label class="form-label">Nombre del Grupo</label>
                             <input type="text" class="form-control group-name" 
-                                   placeholder="ej. A, B, 1, 2" value="${data.grupo || ''}">
+                                   placeholder="ej. A, B, 1, 2" value="${groupName || data.grupo || ''}">
                         </div>
                         
-                        <div class="col-md-3 mb-3">
+                        <div class="col-md-${isMultiGroup ? '2' : '3'} mb-3">
                             <label class="form-label">Fecha/Hora Inicio</label>
                             <input type="datetime-local" class="form-control group-start" 
-                                   value="${data.fecha_inicio || ''}">
+                                   value="${data.fecha_inicio || ''}" required>
                         </div>
                         
-                        <div class="col-md-3 mb-3">
+                        <div class="col-md-${isMultiGroup ? '2' : '3'} mb-3">
                             <label class="form-label">Fecha/Hora Fin</label>
                             <input type="datetime-local" class="form-control group-end" 
-                                   value="${data.fecha_fin || ''}">
+                                   value="${data.fecha_fin || ''}" required>
                         </div>
                         
-                        <div class="col-md-3 mb-3">
+                        <div class="col-md-${isMultiGroup ? '3' : '3'} mb-3">
                             <label class="form-label">Lugar</label>
                             <input type="text" class="form-control group-lugar" 
                                    placeholder="ej. Aula A1, Lab. Informática" value="${data.lugar || ''}">
                         </div>
                         
-                        <div class="col-md-12 mb-3">
+                        <div class="col-md-${isMultiGroup ? '3' : '12'} mb-3">
                             <label class="form-label">Descripción</label>
                             <textarea class="form-control group-desc" rows="2" 
-                                      placeholder="Instrucciones específicas para este grupo">${data.descripcion || ''}</textarea>
+                                      placeholder="Instrucciones específicas del grupo">${data.descripcion || ''}</textarea>
                         </div>
                         
-                        <!-- Checkboxes de sincronización (solo visible para grupos 2+) -->
+                        <!-- Checkboxes de sincronización (solo visible para grupos 2+ en multi-group) -->
                         <div class="col-md-12 sync-controls" style="display: none;">
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-check">
-                                        <input class="form-check-input sync-prefix" type="checkbox" checked>
+                                        <input class="form-check-input sync-prefix" type="checkbox">
                                         <label class="form-check-label">
                                             <i class="bi bi-arrow-down-square"></i> Copiar prefijo de descripción del Grupo #1
                                         </label>
@@ -256,7 +319,7 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-check">
-                                        <input class="form-check-input sync-full" type="checkbox" checked>
+                                        <input class="form-check-input sync-full" type="checkbox">
                                         <label class="form-check-label">
                                             <i class="bi bi-arrow-repeat"></i> Sincronizar completamente con Grupo #1
                                         </label>
@@ -272,32 +335,71 @@
                 return row;
             }
 
+            // Add group function
+            function addGroup(groupName = '') {
+                // Get previous group's description for auto-copy
+                const existingGroups = groupsContainer.querySelectorAll('.group-row');
+                let previousDescription = '';
+                
+                if (existingGroups.length > 0) {
+                    const lastGroup = existingGroups[existingGroups.length - 1];
+                    previousDescription = lastGroup.querySelector('.group-desc')?.value || '';
+                }
+                
+                // Generate unique group name if not provided
+                if (!groupName && multiGroupRadio.checked) {
+                    const existingNames = new Set();
+                    existingGroups.forEach(group => {
+                        const nameInput = group.querySelector('.group-name');
+                        if (nameInput && nameInput.value.trim()) {
+                            existingNames.add(nameInput.value.trim());
+                        }
+                    });
+                    
+                    let counter = existingGroups.length + 1;
+                    while (existingNames.has(String(counter))) {
+                        counter++;
+                    }
+                    groupName = String(counter);
+                }
+                
+                const newGroupData = {
+                    descripcion: previousDescription  // Auto-copy description from previous group
+                };
+                
+                const newRow = createGroupRow(newGroupData, groupName);
+                groupsContainer.appendChild(newRow);
+                renumberGroups();
+                updateSyncControlsVisibility();
+                updateGroupsData();
+            }
+
             // Add group button event
             addGroupBtn.addEventListener('click', function(e) {
-                console.log('Add group button clicked!');
                 e.preventDefault();
-                try {
-                    const newRow = createGroupRow();
-                    console.log('New row created:', newRow);
-                    groupsContainer.appendChild(newRow);
-                    console.log('Row appended to container');
-                    renumberGroups(); // Renumber after adding
-                    updateSyncControlsVisibility(); // Update sync controls visibility
-                    updateGroupsData();
-                    console.log('Groups data updated');
-                    console.log('Total groups now:', groupsContainer.querySelectorAll('.group-row').length);
-                } catch (error) {
-                    console.error('Error adding group:', error);
-                }
+                addGroup();
             });
 
             // Renumber all groups consecutively
             function renumberGroups() {
                 const groupRows = document.querySelectorAll('.group-row');
+                const isMultiGroup = multiGroupRadio.checked;
+                
                 groupRows.forEach((row, index) => {
                     const groupNumber = row.querySelector('.group-number');
+                    const removeBtn = row.querySelector('.remove-group-btn');
+                    
                     if (groupNumber) {
-                        groupNumber.textContent = `Grupo #${index + 1}`;
+                        if (isMultiGroup) {
+                            groupNumber.textContent = `Grupo #${index + 1}`;
+                        } else {
+                            groupNumber.textContent = 'Horario';
+                        }
+                    }
+                    
+                    // Show/hide remove button based on mode and count
+                    if (removeBtn) {
+                        removeBtn.style.display = (isMultiGroup && groupRows.length > 1) ? 'inline-block' : 'none';
                     }
                 });
             }
@@ -305,31 +407,50 @@
             // Remove group function
             window.removeGroup = function(groupId) {
                 const row = document.querySelector(`[data-group-id="${groupId}"]`);
-                if (row) {
+                if (row && groupsContainer.children.length > 1) {
                     row.remove();
-                    renumberGroups(); // Renumber after removal
-                    updateSyncControlsVisibility(); // Update sync controls visibility
+                    renumberGroups();
+                    updateSyncControlsVisibility();
                     updateGroupsData();
                 }
             };
 
             // Update hidden field with groups data
             function updateGroupsData() {
-                console.log('Updating groups data...');
                 const groups = [];
                 const groupRows = document.querySelectorAll('.group-row');
-                console.log('Found', groupRows.length, 'group rows');
+                const isMultiGroup = multiGroupRadio.checked;
+                const usedNames = new Set();
                 
                 groupRows.forEach((row, index) => {
-                    const grupo = row.querySelector('.group-name')?.value || '';
+                    let grupo;
+                    if (isMultiGroup) {
+                        const groupNameInput = row.querySelector('.group-name');
+                        let baseName = groupNameInput?.value?.trim() || `${index + 1}`;
+                        
+                        // Ensure unique group names
+                        grupo = baseName;
+                        let counter = 1;
+                        while (usedNames.has(grupo)) {
+                            grupo = `${baseName}_${counter}`;
+                            counter++;
+                        }
+                        usedNames.add(grupo);
+                        
+                        // Update the input with the unique name if it was auto-generated
+                        if (!groupNameInput?.value?.trim()) {
+                            groupNameInput.value = grupo;
+                        }
+                    } else {
+                        grupo = 'Principal';
+                    }
+                    
                     const fechaInicio = row.querySelector('.group-start')?.value || '';
                     const fechaFin = row.querySelector('.group-end')?.value || '';
                     const lugar = row.querySelector('.group-lugar')?.value || '';
                     const descripcion = row.querySelector('.group-desc')?.value || '';
                     
-                    console.log(`Group ${index}:`, {grupo, fechaInicio, fechaFin, lugar, descripcion});
-                    
-                    if (grupo && fechaInicio && fechaFin) {
+                    if (fechaInicio && fechaFin) {
                         groups.push({
                             grupo: grupo,
                             fecha_inicio: fechaInicio,
@@ -340,9 +461,7 @@
                     }
                 });
                 
-                console.log('Final groups array:', groups);
                 groupsDataInput.value = JSON.stringify(groups);
-                console.log('Hidden input updated with:', groupsDataInput.value);
             }
 
             // Update data on input changes
@@ -355,30 +474,39 @@
                     const firstGroup = groupsContainer.querySelector('.group-row:first-child');
                     
                     if (firstGroup && currentRow !== firstGroup) {
-                        if (e.target.classList.contains('sync-prefix') && e.target.checked) {
-                            // Copy prefix from first group description
-                            const firstDesc = firstGroup.querySelector('.group-desc').value || '';
-                            const currentDesc = currentRow.querySelector('.group-desc');
-                            const prefix = firstDesc.length > 50 ? firstDesc.substring(0, 50) + '...' : firstDesc;
-                            
-                            // Keep existing text after the prefix if any
-                            const existingDesc = currentDesc.value || '';
-                            if (!existingDesc.startsWith(prefix)) {
-                                currentDesc.value = prefix + (existingDesc ? '\n\n' + existingDesc : '');
+                        // Make checkboxes mutually exclusive
+                        if (e.target.checked) {
+                            if (e.target.classList.contains('sync-prefix')) {
+                                // Disable sync-full when sync-prefix is checked
+                                const syncFull = currentRow.querySelector('.sync-full');
+                                if (syncFull) syncFull.checked = false;
+                                
+                                // Copy prefix from first group description
+                                const firstDesc = firstGroup.querySelector('.group-desc').value || '';
+                                const currentDesc = currentRow.querySelector('.group-desc');
+                                const prefix = firstDesc.length > 50 ? firstDesc.substring(0, 50) + '...' : firstDesc;
+                                
+                                // Keep existing text after the prefix if any
+                                const existingDesc = currentDesc.value || '';
+                                if (!existingDesc.startsWith(prefix)) {
+                                    currentDesc.value = prefix + (existingDesc ? '\n\n' + existingDesc : '');
+                                }
+                            } else if (e.target.classList.contains('sync-full')) {
+                                // Disable sync-prefix when sync-full is checked
+                                const syncPrefix = currentRow.querySelector('.sync-prefix');
+                                if (syncPrefix) syncPrefix.checked = false;
+                                
+                                // Full synchronization with first group
+                                const firstStart = firstGroup.querySelector('.group-start').value;
+                                const firstEnd = firstGroup.querySelector('.group-end').value;
+                                const firstLugar = firstGroup.querySelector('.group-lugar').value;
+                                const firstDesc = firstGroup.querySelector('.group-desc').value;
+                                
+                                currentRow.querySelector('.group-start').value = firstStart;
+                                currentRow.querySelector('.group-end').value = firstEnd;
+                                currentRow.querySelector('.group-lugar').value = firstLugar;
+                                currentRow.querySelector('.group-desc').value = firstDesc;
                             }
-                        }
-                        
-                        if (e.target.classList.contains('sync-full') && e.target.checked) {
-                            // Full synchronization with first group
-                            const firstStart = firstGroup.querySelector('.group-start').value;
-                            const firstEnd = firstGroup.querySelector('.group-end').value;
-                            const firstLugar = firstGroup.querySelector('.group-lugar').value;
-                            const firstDesc = firstGroup.querySelector('.group-desc').value;
-                            
-                            currentRow.querySelector('.group-start').value = firstStart;
-                            currentRow.querySelector('.group-end').value = firstEnd;
-                            currentRow.querySelector('.group-lugar').value = firstLugar;
-                            currentRow.querySelector('.group-desc').value = firstDesc;
                         }
                         
                         updateGroupsData();
@@ -386,42 +514,41 @@
                 }
             });
             
+            // Function to update sync controls visibility
             function updateSyncControlsVisibility() {
                 const allGroups = groupsContainer.querySelectorAll('.group-row');
-                console.log('updateSyncControlsVisibility: Found', allGroups.length, 'groups');
+                const isMultiGroup = multiGroupRadio.checked;
                 
                 allGroups.forEach((group, index) => {
                     const syncControls = group.querySelector('.sync-controls');
-                    console.log(`Group ${index}:`, syncControls ? 'has sync-controls' : 'NO sync-controls');
                     if (syncControls) {
-                        const shouldShow = (index > 0 && allGroups.length > 1);
-                        console.log(`Group ${index}: shouldShow = ${shouldShow} (index > 0: ${index > 0}, length > 1: ${allGroups.length > 1})`);
+                        // Show sync controls for groups 2+ in multi-group mode only
+                        const shouldShow = isMultiGroup && index > 0 && allGroups.length > 1;
                         syncControls.style.display = shouldShow ? 'block' : 'none';
                     }
                 });
             }
 
+            // Initialize with default state
+            updateActivityType();
+
             // Load initial groups if editing
             {% if form.grupos_data.value %}
                 const initialGroups = JSON.parse('{{ form.grupos_data.value|escapejs }}');
+                if (initialGroups.length > 1) {
+                    multiGroupRadio.checked = true;
+                    updateActivityType();
+                }
+                
+                groupsContainer.innerHTML = '';
                 initialGroups.forEach(groupData => {
                     const newRow = createGroupRow(groupData);
                     groupsContainer.appendChild(newRow);
                 });
-                renumberGroups(); // Ensure proper numbering
-                updateSyncControlsVisibility(); // Update sync controls visibility
-                updateGroupsData();
-            {% else %}
-                // Add one empty group by default
-                const defaultRow = createGroupRow();
-                groupsContainer.appendChild(defaultRow);
-                renumberGroups(); // Ensure proper numbering
-                updateSyncControlsVisibility(); // Update sync controls visibility
+                renumberGroups();
+                updateSyncControlsVisibility();
                 updateGroupsData();
             {% endif %}
-            
-            // Ensure sync controls are visible after initial load
-            updateSyncControlsVisibility();
         });
     </script>
 {% endblock %}

@@ -5,8 +5,8 @@ from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.db import transaction
 from django.http import HttpResponseRedirect
 from users.views import is_teacher, is_coordinator, is_coordinator_or_admin
-from .forms import ActividadForm, VistaCalendarioForm, MultiGroupActivityForm
-from .models import Actividad, VistaCalendario, LogActividad, TipoActividad, ActividadVersion
+from .forms import ActividadForm, VistaCalendarioForm, MultiGroupActivityForm, UnifiedActivityForm
+from .models import Actividad, ActividadGrupo, VistaCalendario, LogActividad, TipoActividad, ActividadVersion
 from icalendar import Calendar, Event
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from agenda_academica.models import AgendaSettings
@@ -162,35 +162,160 @@ def get_filtered_activities(request):
     teacher_subject_ids = set(request.user.subjects.all().values_list('id', flat=True))
 
     for activity in activities:
-        event_class_names = []
-        if activity.fecha_inicio.date() < closing_date:
-            event_class_names.append('past-event')
-        else:
-            event_class_names.append('future-event')
-
-        subject_names = ", ".join([s.nombre for s in activity.asignaturas.all()])
+        # Get groups for this activity (new system) or use legacy fields
+        grupos = activity.grupos.all().order_by('orden')
         
-        # Check if the activity belongs to the current teacher
-        activity_subject_ids = set(activity.asignaturas.all().values_list('id', flat=True))
-        is_own = not teacher_subject_ids.isdisjoint(activity_subject_ids)
+        if grupos.exists():
+            # New system: 
+            # For multi-group activities: show as single row in table, multiple events in calendar
+            # For single-group activities: show normally
+            
+            if grupos.count() > 1:
+                # Multi-group activity: create single entry for table display
+                primer_grupo = grupos.first()
+                event_class_names = []
+                if primer_grupo.fecha_inicio.date() < closing_date:
+                    event_class_names.append('past-event')
+                else:
+                    event_class_names.append('future-event')
 
-        activities_data.append({
-            'id': activity.id,
-            'title': activity.nombre,
-            'start': activity.fecha_inicio.isoformat(),
-            'end': activity.fecha_fin.isoformat(),
-            'classNames': event_class_names,
-            'extendedProps': {
-                'description': activity.descripcion,
-                'activity_type': activity.tipo_actividad.nombre,
-                'subjects': subject_names,
-                'is_approved': activity.aprobada,
-                'is_active': activity.activa,
-                'evaluable': activity.evaluable,
-                'percentage': activity.porcentaje_evaluacion,
-                'is_own': is_own
-            }
-        })
+                subject_names = ", ".join([s.nombre for s in activity.asignaturas.all()])
+                
+                # Check if the activity belongs to the current teacher
+                activity_subject_ids = set(activity.asignaturas.all().values_list('id', flat=True))
+                is_own = not teacher_subject_ids.isdisjoint(activity_subject_ids)
+
+                # Create summary info for multi-group activity
+                grupos_info = []
+                for g in grupos:
+                    grupos_info.append({
+                        'nombre': g.nombre_grupo,
+                        'fecha_inicio': g.fecha_inicio.isoformat(),
+                        'fecha_fin': g.fecha_fin.isoformat(),
+                        'lugar': g.lugar or '',
+                        'descripcion': g.descripcion or ''
+                    })
+
+                activities_data.append({
+                    'id': activity.id,  # Use activity ID for table display
+                    'activity_id': activity.id,
+                    'title': f"{activity.nombre} ({grupos.count()} grupos)",
+                    'start': primer_grupo.fecha_inicio.isoformat(),
+                    'end': primer_grupo.fecha_fin.isoformat(), 
+                    'classNames': event_class_names,
+                    'extendedProps': {
+                        'description': activity.descripcion or primer_grupo.descripcion,
+                        'activity_type': activity.tipo_actividad.nombre,
+                        'subjects': subject_names,
+                        'is_approved': activity.aprobada,
+                        'is_active': activity.activa,
+                        'evaluable': activity.evaluable,
+                        'percentage': activity.porcentaje_evaluacion,
+                        'is_own': is_own,
+                        'is_multi_group': True,
+                        'grupos_count': grupos.count(),
+                        'grupos_info': grupos_info
+                    }
+                })
+                
+                # Also add individual events for calendar display
+                for grupo in grupos:
+                    event_class_names = []
+                    if grupo.fecha_inicio.date() < closing_date:
+                        event_class_names.append('past-event')
+                    else:
+                        event_class_names.append('future-event')
+
+                    activities_data.append({
+                        'id': f"{activity.id}_grupo_{grupo.id}",  # Unique ID for calendar
+                        'activity_id': activity.id,
+                        'grupo_id': grupo.id,
+                        'title': f"{activity.nombre} - Grupo {grupo.nombre_grupo}",
+                        'start': grupo.fecha_inicio.isoformat(),
+                        'end': grupo.fecha_fin.isoformat(),
+                        'classNames': event_class_names + ['calendar-only'],  # Mark as calendar-only
+                        'extendedProps': {
+                            'description': grupo.descripcion or activity.descripcion,
+                            'activity_type': activity.tipo_actividad.nombre,
+                            'subjects': subject_names,
+                            'is_approved': activity.aprobada,
+                            'is_active': activity.activa,
+                            'evaluable': activity.evaluable,
+                            'percentage': activity.porcentaje_evaluacion,
+                            'is_own': is_own,
+                            'grupo_nombre': grupo.nombre_grupo,
+                            'is_multi_group': True,
+                            'is_calendar_event': True  # Mark as calendar-only event
+                        }
+                    })
+            else:
+                # Single group activity: show normally
+                grupo = grupos.first()
+                event_class_names = []
+                if grupo.fecha_inicio.date() < closing_date:
+                    event_class_names.append('past-event')
+                else:
+                    event_class_names.append('future-event')
+
+                subject_names = ", ".join([s.nombre for s in activity.asignaturas.all()])
+                
+                # Check if the activity belongs to the current teacher
+                activity_subject_ids = set(activity.asignaturas.all().values_list('id', flat=True))
+                is_own = not teacher_subject_ids.isdisjoint(activity_subject_ids)
+
+                activities_data.append({
+                    'id': activity.id,
+                    'activity_id': activity.id,
+                    'grupo_id': grupo.id,
+                    'title': activity.nombre,
+                    'start': grupo.fecha_inicio.isoformat(),
+                    'end': grupo.fecha_fin.isoformat(),
+                    'classNames': event_class_names,
+                    'extendedProps': {
+                        'description': grupo.descripcion or activity.descripcion,
+                        'activity_type': activity.tipo_actividad.nombre,
+                        'subjects': subject_names,
+                        'is_approved': activity.aprobada,
+                        'is_active': activity.activa,
+                        'evaluable': activity.evaluable,
+                        'percentage': activity.porcentaje_evaluacion,
+                        'is_own': is_own,
+                        'is_multi_group': False
+                    }
+                })
+        else:
+            # Legacy system: use activity's direct fields
+            event_class_names = []
+            if activity.fecha_inicio.date() < closing_date:
+                event_class_names.append('past-event')
+            else:
+                event_class_names.append('future-event')
+
+            subject_names = ", ".join([s.nombre for s in activity.asignaturas.all()])
+            
+            # Check if the activity belongs to the current teacher
+            activity_subject_ids = set(activity.asignaturas.all().values_list('id', flat=True))
+            is_own = not teacher_subject_ids.isdisjoint(activity_subject_ids)
+
+            activities_data.append({
+                'id': activity.id,
+                'activity_id': activity.id,
+                'title': activity.nombre,
+                'start': activity.fecha_inicio.isoformat(),
+                'end': activity.fecha_fin.isoformat(),
+                'classNames': event_class_names,
+                'extendedProps': {
+                    'description': activity.descripcion,
+                    'activity_type': activity.tipo_actividad.nombre,
+                    'subjects': subject_names,
+                    'is_approved': activity.aprobada,
+                    'is_active': activity.activa,
+                    'evaluable': activity.evaluable,
+                    'percentage': activity.porcentaje_evaluacion,
+                    'is_own': is_own,
+                    'is_multi_group': False
+                }
+            })
     
     return JsonResponse(activities_data, safe=False)
 
@@ -487,31 +612,75 @@ def all_activities(request):
 
     data = []
     for activity in activities.distinct():
-        event_class_names = []
-        if activity.fecha_inicio.date() < closing_date:
-            event_class_names.append('past-event')
+        # Get groups for this activity (new system) or use legacy fields
+        grupos = activity.grupos.all().order_by('orden')
+        
+        if grupos.exists():
+            # New system: create an event for each group
+            for grupo in grupos:
+                event_class_names = []
+                if grupo.fecha_inicio.date() < closing_date:
+                    event_class_names.append('past-event')
+                else:
+                    event_class_names.append('future-event')
+
+                # Get assigned subject names
+                subject_names = ", ".join([s.nombre for s in activity.asignaturas.all()])
+
+                # Activity title with group name if multiple groups
+                title = activity.nombre
+                if grupos.count() > 1:
+                    title = f"{activity.nombre} - Grupo {grupo.nombre_grupo}"
+
+                data.append({
+                    'id': f"{activity.id}_grupo_{grupo.id}",  # Unique ID for each group
+                    'activity_id': activity.id,  # Keep original activity ID for editing
+                    'grupo_id': grupo.id,
+                    'title': title,
+                    'start': grupo.fecha_inicio.isoformat(),
+                    'end': grupo.fecha_fin.isoformat(),
+                    'classNames': event_class_names,
+                    'extendedProps': {
+                        'description': grupo.descripcion or activity.descripcion,
+                        'activity_type': activity.tipo_actividad.nombre,
+                        'subjects': subject_names,
+                        'is_approved': activity.aprobada,
+                        'is_active': activity.activa,
+                        'evaluable': activity.evaluable,
+                        'percentage': activity.porcentaje_evaluacion,
+                        'grupo_nombre': grupo.nombre_grupo,
+                        'is_multi_group': grupos.count() > 1
+                    }
+                })
         else:
-            event_class_names.append('future-event')
+            # Legacy system: use activity's direct fields
+            event_class_names = []
+            if activity.fecha_inicio.date() < closing_date:
+                event_class_names.append('past-event')
+            else:
+                event_class_names.append('future-event')
 
-        # Get assigned subject names
-        subject_names = ", ".join([s.nombre for s in activity.asignaturas.all()])
+            # Get assigned subject names
+            subject_names = ", ".join([s.nombre for s in activity.asignaturas.all()])
 
-        data.append({
-            'id': activity.id, # Add activity ID for eventClick
-            'title': activity.nombre,
-            'start': activity.fecha_inicio.isoformat(),
-            'end': activity.fecha_fin.isoformat(),
-            'classNames': event_class_names, # Add class for styling
-            'extendedProps': { # Add more details for eventClick
-                'description': activity.descripcion,
-                'activity_type': activity.tipo_actividad.nombre,
-                'subjects': subject_names,
-                'is_approved': activity.aprobada,
-                'is_active': activity.activa,
-                'evaluable': activity.evaluable,
-                'percentage': activity.porcentaje_evaluacion,
-            }
-        })
+            data.append({
+                'id': activity.id, # Add activity ID for eventClick
+                'activity_id': activity.id,
+                'title': activity.nombre,
+                'start': activity.fecha_inicio.isoformat(),
+                'end': activity.fecha_fin.isoformat(),
+                'classNames': event_class_names, # Add class for styling
+                'extendedProps': { # Add more details for eventClick
+                    'description': activity.descripcion,
+                    'activity_type': activity.tipo_actividad.nombre,
+                    'subjects': subject_names,
+                    'is_approved': activity.aprobada,
+                    'is_active': activity.activa,
+                    'evaluable': activity.evaluable,
+                    'percentage': activity.porcentaje_evaluacion,
+                    'is_multi_group': False
+                }
+            })
     return JsonResponse(data, safe=False)
 
 class TipoActividadListView(ListView):
@@ -1347,7 +1516,7 @@ def multi_group_activity_form(request, grupo_id=None):
 @login_required
 @user_passes_test(is_teacher)
 def copy_activity_individual(request, activity_id):
-    """Copy an existing activity as an individual activity"""
+    """Copy an existing activity as an individual activity using the unified system"""
     original_activity = get_object_or_404(Actividad, pk=activity_id)
     
     # Check if user can access this activity (must be in their subjects)
@@ -1356,39 +1525,64 @@ def copy_activity_individual(request, activity_id):
         return HttpResponseRedirect(get_user_dashboard_url(request.user))
     
     if request.method == 'POST':
-        form = ActividadForm(request.POST, user=request.user)
+        form = UnifiedActivityForm(request.POST, user=request.user)
         if form.is_valid():
-            activity = form.save()
-            
-            # Log the activity creation
-            LogActividad.objects.create(
-                object_type='actividad',
-                object_name=activity.nombre,
-                object_id=activity.id,
-                actividad=activity,
-                usuario=request.user,
-                tipo_log='Creation',
-                details=f'Activity copied from "{original_activity.nombre}"'
-            )
-            
-            return redirect(get_user_dashboard_url(request.user))
+            try:
+                with transaction.atomic():
+                    activity = form.save(user=request.user)
+                    
+                    # Log the activity creation
+                    LogActividad.objects.create(
+                        object_type='actividad',
+                        object_name=activity.nombre,
+                        object_id=activity.id,
+                        actividad=activity,
+                        usuario=request.user,
+                        tipo_log='Creation',
+                        details=f'Activity copied from "{original_activity.nombre}"'
+                    )
+                    
+                    return redirect(get_user_dashboard_url(request.user))
+            except Exception as e:
+                print(f"Error copying activity: {e}")
+                form.add_error(None, f"Error al copiar la actividad: {str(e)}")
     else:
         # Prepare initial data from the original activity
         initial_data = {
             'nombre': f"Copia de {original_activity.nombre}",
             'asignaturas': original_activity.asignaturas.all(),
             'tipo_actividad': original_activity.tipo_actividad,
-            'descripcion': original_activity.descripcion,
             'evaluable': original_activity.evaluable,
             'porcentaje_evaluacion': original_activity.porcentaje_evaluacion,
             'no_recuperable': original_activity.no_recuperable,
-            # Don't copy dates - let user set new dates
         }
         
+        # Create single group data from original activity
+        grupos_data = []
+        if hasattr(original_activity, 'grupos') and original_activity.grupos.exists():
+            # Use first group from multi-group activity
+            primer_grupo = original_activity.grupos.first()
+            grupos_data.append({
+                'grupo': 'Principal',
+                'fecha_inicio': primer_grupo.fecha_inicio.strftime('%Y-%m-%dT%H:%M'),
+                'fecha_fin': primer_grupo.fecha_fin.strftime('%Y-%m-%dT%H:%M'),
+                'lugar': primer_grupo.lugar or '',
+                'descripcion': primer_grupo.descripcion or original_activity.descripcion or '',
+            })
+        else:
+            # Use legacy activity data
+            grupos_data.append({
+                'grupo': 'Principal',
+                'fecha_inicio': original_activity.fecha_inicio.strftime('%Y-%m-%dT%H:%M'),
+                'fecha_fin': original_activity.fecha_fin.strftime('%Y-%m-%dT%H:%M'),
+                'lugar': '',
+                'descripcion': original_activity.descripcion or '',
+            })
+        
         # Create form with pre-filled data
-        form = ActividadForm(initial=initial_data, user=request.user)
+        form = UnifiedActivityForm(initial=initial_data, user=request.user, initial_groups=grupos_data)
     
-    return render(request, 'schedule/activity_form.html', {
+    return render(request, 'schedule/unified_activity_form.html', {
         'form': form,
         'is_copy': True,
         'original_activity': original_activity
@@ -1397,7 +1591,7 @@ def copy_activity_individual(request, activity_id):
 @login_required
 @user_passes_test(is_teacher)
 def copy_activity_multi_group(request, activity_id):
-    """Copy an existing activity as a multi-group activity"""
+    """Copy an existing activity as a multi-group activity using the unified system"""
     original_activity = get_object_or_404(Actividad, pk=activity_id)
     
     # Check if user can access this activity
@@ -1405,21 +1599,209 @@ def copy_activity_multi_group(request, activity_id):
     if not original_activity.asignaturas.filter(id__in=user_subjects.values_list('id', flat=True)).exists():
         return HttpResponseRedirect(get_user_dashboard_url(request.user))
     
-    # Prepare initial data
-    initial_data = {
-        'nombre': f"Copia de {original_activity.nombre}",
-        'asignaturas': original_activity.asignaturas.all(),
-        'tipo_actividad': original_activity.tipo_actividad,
-        'evaluable': original_activity.evaluable,
-        'porcentaje_evaluacion': original_activity.porcentaje_evaluacion,
-        'no_recuperable': original_activity.no_recuperable,
-    }
+    if request.method == 'POST':
+        form = UnifiedActivityForm(request.POST, user=request.user)
+        if form.is_valid():
+            try:
+                with transaction.atomic():
+                    activity = form.save(user=request.user)
+                    
+                    # Log the activity creation
+                    LogActividad.objects.create(
+                        object_type='actividad',
+                        object_name=activity.nombre,
+                        object_id=activity.id,
+                        actividad=activity,
+                        usuario=request.user,
+                        tipo_log='Creation',
+                        details=f'Multi-group activity copied from "{original_activity.nombre}"'
+                    )
+                    
+                    return redirect(get_user_dashboard_url(request.user))
+            except Exception as e:
+                print(f"Error copying activity: {e}")
+                form.add_error(None, f"Error al copiar la actividad: {str(e)}")
+    else:
+        # Prepare initial data
+        initial_data = {
+            'nombre': f"Copia de {original_activity.nombre}",
+            'asignaturas': original_activity.asignaturas.all(),
+            'tipo_actividad': original_activity.tipo_actividad,
+            'evaluable': original_activity.evaluable,
+            'porcentaje_evaluacion': original_activity.porcentaje_evaluacion,
+            'no_recuperable': original_activity.no_recuperable,
+        }
+        
+        # Copy group structure if original activity has groups
+        grupos_data = []
+        if hasattr(original_activity, 'grupos') and original_activity.grupos.exists():
+            for grupo in original_activity.grupos.all():
+                grupos_data.append({
+                    'grupo': grupo.nombre_grupo,
+                    'fecha_inicio': grupo.fecha_inicio.strftime('%Y-%m-%dT%H:%M') if grupo.fecha_inicio else '',
+                    'fecha_fin': grupo.fecha_fin.strftime('%Y-%m-%dT%H:%M') if grupo.fecha_fin else '',
+                    'lugar': grupo.lugar or '',
+                    'descripcion': grupo.descripcion or '',
+                })
+        else:
+            # If no groups exist, create two from main activity data for multi-group
+            grupos_data.append({
+                'grupo': '1',
+                'fecha_inicio': original_activity.fecha_inicio.strftime('%Y-%m-%dT%H:%M') if original_activity.fecha_inicio else '',
+                'fecha_fin': original_activity.fecha_fin.strftime('%Y-%m-%dT%H:%M') if original_activity.fecha_fin else '',
+                'lugar': '',
+                'descripcion': original_activity.descripcion or '',
+            })
+            grupos_data.append({
+                'grupo': '2',
+                'fecha_inicio': original_activity.fecha_inicio.strftime('%Y-%m-%dT%H:%M') if original_activity.fecha_inicio else '',
+                'fecha_fin': original_activity.fecha_fin.strftime('%Y-%m-%dT%H:%M') if original_activity.fecha_fin else '',
+                'lugar': '',
+                'descripcion': original_activity.descripcion or '',
+            })
+        
+        # Create form with pre-filled data
+        form = UnifiedActivityForm(initial=initial_data, user=request.user, initial_groups=grupos_data)
     
-    # Create form with pre-filled data
-    form = MultiGroupActivityForm(initial=initial_data, user=request.user)
-    
-    return render(request, 'schedule/multi_group_activity_form.html', {
+    return render(request, 'schedule/unified_activity_form.html', {
         'form': form,
         'is_copy': True,
         'original_activity': original_activity
+    })
+
+@login_required
+@user_passes_test(is_teacher)
+def unified_activity_form(request, pk=None):
+    """
+    Vista unificada para crear/editar actividades individuales o multi-grupo
+    usando el nuevo modelo ActividadGrupo
+    """
+    activity = None
+    initial_groups = []
+    
+    if pk:
+        # Modo edición
+        activity = get_object_or_404(Actividad, pk=pk)
+        
+        # IDOR check
+        if not request.user.is_staff and not activity.asignaturas.filter(id__in=request.user.subjects.all()).exists():
+            return redirect(get_user_dashboard_url(request.user))
+            
+        # Cargar grupos existentes
+        grupos = activity.grupos.all().order_by('orden')
+        for grupo in grupos:
+            initial_groups.append({
+                'grupo': grupo.nombre_grupo,
+                'fecha_inicio': grupo.fecha_inicio.strftime('%Y-%m-%dT%H:%M'),
+                'fecha_fin': grupo.fecha_fin.strftime('%Y-%m-%dT%H:%M'),
+                'descripcion': grupo.descripcion or '',
+                'lugar': grupo.lugar or ''
+            })
+    else:
+        # Modo creación - verificar si hay asignaturas preseleccionadas
+        subject_ids_str = request.GET.get('subjects')
+        if subject_ids_str:
+            try:
+                subject_ids = [int(s_id) for s_id in subject_ids_str.split(',') if s_id.isdigit()]
+                # Validar que las asignaturas pertenecen al usuario
+                user_subject_ids = set(request.user.subjects.all().values_list('id', flat=True))
+                valid_subject_ids = [sid for sid in subject_ids if sid in user_subject_ids]
+                if valid_subject_ids:
+                    initial_subjects = Asignatura.objects.filter(id__in=valid_subject_ids)
+                else:
+                    initial_subjects = []
+            except (ValueError, TypeError):
+                initial_subjects = []
+        else:
+            initial_subjects = []
+
+    if request.method == 'POST':
+        form = UnifiedActivityForm(request.POST, user=request.user)
+        if form.is_valid():
+            try:
+                with transaction.atomic():
+                    if activity:
+                        # Modo edición - actualizar actividad existente
+                        activity.nombre = form.cleaned_data['nombre']
+                        activity.tipo_actividad = form.cleaned_data['tipo_actividad']
+                        activity.evaluable = form.cleaned_data['evaluable']
+                        activity.porcentaje_evaluacion = form.cleaned_data['porcentaje_evaluacion']
+                        activity.no_recuperable = form.cleaned_data['no_recuperable']
+                        
+                        # Actualizar campos temporales de compatibilidad
+                        grupos_data = form.cleaned_data['grupos_data']
+                        if grupos_data:
+                            activity.fecha_inicio = grupos_data[0]['fecha_inicio']
+                            activity.fecha_fin = grupos_data[0]['fecha_fin']
+                            activity.descripcion = grupos_data[0].get('descripcion', '')
+                        
+                        activity.save()
+                        activity.asignaturas.set(form.cleaned_data['asignaturas'])
+                        
+                        # Eliminar grupos existentes y crear nuevos
+                        activity.grupos.all().delete()
+                        for i, grupo_info in enumerate(grupos_data, 1):
+                            ActividadGrupo.objects.create(
+                                actividad=activity,
+                                nombre_grupo=grupo_info['grupo'],
+                                fecha_inicio=grupo_info['fecha_inicio'],
+                                fecha_fin=grupo_info['fecha_fin'],
+                                descripcion=grupo_info.get('descripcion', ''),
+                                lugar=grupo_info.get('lugar', ''),
+                                orden=i
+                            )
+                        
+                        # Log de modificación
+                        LogActividad.objects.create(
+                            object_type='actividad',
+                            object_name=activity.nombre,
+                            object_id=activity.id,
+                            actividad=activity,
+                            usuario=request.user,
+                            tipo_log=_('Modification'),
+                            details=f'Actividad actualizada con {len(grupos_data)} grupo(s) usando nuevo sistema'
+                        )
+                    else:
+                        # Modo creación - crear nueva actividad
+                        activity = form.save(user=request.user)
+                        
+                        # Log de creación
+                        LogActividad.objects.create(
+                            object_type='actividad',
+                            object_name=activity.nombre,
+                            object_id=activity.id,
+                            actividad=activity,
+                            usuario=request.user,
+                            tipo_log=_('Creation'),
+                            details=f'Actividad creada con {activity.grupos.count()} grupo(s) usando nuevo sistema'
+                        )
+                    
+                    return redirect(get_user_dashboard_url(request.user))
+                    
+            except Exception as e:
+                form.add_error(None, f"Error al guardar: {str(e)}")
+    else:
+        # GET request
+        if activity:
+            # Preparar datos iniciales para edición
+            initial_data = {
+                'nombre': activity.nombre,
+                'asignaturas': activity.asignaturas.all(),
+                'tipo_actividad': activity.tipo_actividad,
+                'evaluable': activity.evaluable,
+                'porcentaje_evaluacion': activity.porcentaje_evaluacion,
+                'no_recuperable': activity.no_recuperable,
+            }
+        else:
+            # Preparar datos iniciales para creación
+            initial_data = {}
+            if 'initial_subjects' in locals() and initial_subjects:
+                initial_data['asignaturas'] = initial_subjects
+        
+        form = UnifiedActivityForm(initial=initial_data, user=request.user, initial_groups=initial_groups)
+
+    return render(request, 'schedule/unified_activity_form.html', {
+        'form': form,
+        'activity': activity,
+        'is_edit': bool(pk)
     })

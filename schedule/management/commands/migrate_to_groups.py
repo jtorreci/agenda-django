@@ -1,0 +1,151 @@
+from django.core.management.base import BaseCommand
+from django.db import transaction
+from schedule.models import Actividad, ActividadGrupo
+import uuid
+
+class Command(BaseCommand):
+    help = 'Migra actividades existentes al nuevo esquema de grupos'
+
+    def add_arguments(self, parser):
+        parser.add_argument(
+            '--dry-run',
+            action='store_true',
+            help='Simular la migración sin aplicar cambios',
+        )
+
+    def handle(self, *args, **options):
+        dry_run = options['dry_run']
+        
+        self.stdout.write(f"{'SIMULANDO' if dry_run else 'APLICANDO'} migración a grupos...")
+        
+        # Contar actividades a migrar
+        actividades_existentes = Actividad.objects.all()
+        grupos_existentes = ActividadGrupo.objects.count()
+        
+        self.stdout.write(f"Actividades encontradas: {actividades_existentes.count()}")
+        self.stdout.write(f"Grupos existentes: {grupos_existentes}")
+        
+        migrated_count = 0
+        multi_group_count = 0
+        
+        with transaction.atomic():
+            # Crear un savepoint para rollback en dry-run
+            if dry_run:
+                sid = transaction.savepoint()
+            
+            try:
+                # Agrupar actividades por grupo_id (para actividades multi-grupo)
+                grupos_por_id = {}
+                actividades_individuales = []
+                
+                for actividad in actividades_existentes:
+                    # Saltar si ya tiene grupos asociados
+                    if actividad.grupos.exists():
+                        self.stdout.write(f"Actividad '{actividad.nombre}' ya tiene grupos, saltando...")
+                        continue
+                    
+                    if actividad.grupo_id:
+                        # Actividad multi-grupo
+                        if actividad.grupo_id not in grupos_por_id:
+                            grupos_por_id[actividad.grupo_id] = []
+                        grupos_por_id[actividad.grupo_id].append(actividad)
+                    else:
+                        # Actividad individual
+                        actividades_individuales.append(actividad)
+                
+                # Migrar actividades individuales
+                for actividad in actividades_individuales:
+                    ActividadGrupo.objects.create(
+                        actividad=actividad,
+                        nombre_grupo="Principal",
+                        fecha_inicio=actividad.fecha_inicio,
+                        fecha_fin=actividad.fecha_fin,
+                        descripcion=actividad.descripcion or "",
+                        lugar="",  # Campo lugar vacío por defecto en migración
+                        orden=1
+                    )
+                    migrated_count += 1
+                    
+                    self.stdout.write(f"✓ Migrada actividad individual: '{actividad.nombre}'")
+                
+                # Migrar grupos multi-actividad (actividades que comparten grupo_id)
+                for grupo_id, actividades in grupos_por_id.items():
+                    multi_group_count += 1
+                    
+                    if len(actividades) == 1:
+                        # Solo una actividad con grupo_id - tratar como individual
+                        actividad = actividades[0]
+                        ActividadGrupo.objects.create(
+                            actividad=actividad,
+                            nombre_grupo="Principal",
+                            fecha_inicio=actividad.fecha_inicio,
+                            fecha_fin=actividad.fecha_fin,
+                            descripcion=actividad.descripcion or "",
+                            lugar="",  # Campo lugar vacío por defecto en migración
+                            orden=1
+                        )
+                        self.stdout.write(f"✓ Migrada actividad con grupo único: '{actividad.nombre}'")
+                    else:
+                        # ESTRATEGIA CORREGIDA: Consolidar múltiples actividades en una
+                        
+                        # 1. Seleccionar actividad principal (la primera por fecha)
+                        actividades_ordenadas = sorted(actividades, key=lambda a: a.fecha_inicio)
+                        actividad_principal = actividades_ordenadas[0]
+                        
+                        self.stdout.write(f"✓ Consolidando {len(actividades)} actividades en '{actividad_principal.nombre}':")
+                        
+                        # 2. Crear grupos para cada actividad original
+                        for i, actividad in enumerate(actividades_ordenadas, 1):
+                            # Extraer nombre del grupo de la descripción
+                            grupo_nombre = f"{i}"
+                            descripcion_grupo = actividad.descripcion or ""
+                            
+                            # Si la descripción tiene formato "Grupo X: descripción", extraer
+                            if descripcion_grupo.startswith("Grupo ") and ":" in descripcion_grupo:
+                                partes = descripcion_grupo.split(":", 1)
+                                grupo_extracted = partes[0].replace("Grupo ", "").strip()
+                                descripcion_grupo = partes[1].strip() if len(partes) > 1 else ""
+                                if grupo_extracted:
+                                    grupo_nombre = grupo_extracted
+                            
+                            # Crear grupo en la actividad principal
+                            ActividadGrupo.objects.create(
+                                actividad=actividad_principal,
+                                nombre_grupo=grupo_nombre,
+                                fecha_inicio=actividad.fecha_inicio,
+                                fecha_fin=actividad.fecha_fin,
+                                descripcion=descripcion_grupo,
+                                lugar="",  # Campo lugar vacío por defecto en migración
+                                orden=i
+                            )
+                            
+                            self.stdout.write(f"  → Grupo '{grupo_nombre}': {actividad.fecha_inicio} - {descripcion_grupo[:50]}...")
+                            
+                            # 3. Desactivar actividades secundarias (no eliminar aún)
+                            if actividad != actividad_principal:
+                                actividad.activa = False
+                                actividad.save()
+                                self.stdout.write(f"    (Actividad original desactivada: ID {actividad.id})")
+                        
+                        migrated_count += len(actividades)
+                
+                if dry_run:
+                    transaction.savepoint_rollback(sid)
+                    self.stdout.write(
+                        self.style.WARNING("DRY RUN completado - cambios no aplicados")
+                    )
+                else:
+                    self.stdout.write(
+                        self.style.SUCCESS(
+                            f"Migración completada: {migrated_count} actividades, "
+                            f"{multi_group_count} grupos multi-actividad procesados"
+                        )
+                    )
+                    
+            except Exception as e:
+                if dry_run:
+                    transaction.savepoint_rollback(sid)
+                self.stdout.write(
+                    self.style.ERROR(f"Error durante la migración: {str(e)}")
+                )
+                raise

@@ -43,7 +43,10 @@ Thumbs.db
 *.pot
 *.mo
 *.sqlite3
+db.sqlite3
 media/
+staticfiles/
+migrations/__pycache__/
 
 # My stuff
 *.csv

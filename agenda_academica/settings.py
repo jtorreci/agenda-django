@@ -129,12 +129,17 @@ WSGI_APPLICATION = 'agenda_academica.wsgi.application'
 # 2. Then check for individual DB settings
 # 3. Falls back to SQLite for local development
 
-import dj_database_url
+# Try to import dj_database_url, but don't fail if not available
+try:
+    import dj_database_url
+    HAS_DJ_DATABASE_URL = True
+except ImportError:
+    HAS_DJ_DATABASE_URL = False
 
 # Check for DATABASE_URL first (Heroku, production style)
 DATABASE_URL = os.environ.get('DATABASE_URL')
 
-if DATABASE_URL:
+if DATABASE_URL and HAS_DJ_DATABASE_URL:
     # Parse DATABASE_URL for production
     DATABASES = {
         'default': dj_database_url.parse(DATABASE_URL, conn_max_age=600)

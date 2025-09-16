@@ -34,6 +34,8 @@ urlpatterns = [
     path('ajax/get_filtered_activities/', schedule_views.get_filtered_activities, name='get_filtered_activities'),
     path('ajax/get_filtered_asignaturas/', schedule_views.get_filtered_asignaturas, name='get_filtered_asignaturas'),
     path('activity/new/', schedule_views.activity_form, name='activity_new'),
+    path('activity/unified/new/', schedule_views.unified_activity_form, name='unified_activity_new'),
+    path('activity/unified/edit/<int:pk>/', schedule_views.unified_activity_form, name='unified_activity_edit'),
     path('activity/multi-group/new/', schedule_views.multi_group_activity_form, name='multi_group_activity_new'),
     path('activity/multi-group/edit/<uuid:grupo_id>/', schedule_views.multi_group_activity_form, name='multi_group_activity_edit'),
     # Copy activities

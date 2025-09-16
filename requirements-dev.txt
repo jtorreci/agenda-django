@@ -1,3 +1,4 @@
+# Requirements for development (Windows/Mac/Linux with SQLite)
 asgiref==3.9.1
 charset-normalizer==3.4.3
 Django==5.2.5
@@ -12,10 +13,3 @@ six==1.17.0
 sqlparse==0.5.3
 tzdata==2025.2
 whitenoise==6.7.0
-
-# Database support (Production only)
-dj-database-url==2.2.0
-psycopg2-binary==2.9.9
-
-# Production server (Linux/Unix only)
-gunicorn==23.0.0
