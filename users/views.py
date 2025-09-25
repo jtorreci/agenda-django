@@ -453,9 +453,9 @@ def coordinator_dashboard(request):
     if not request.user.role == 'ADMIN': # Admins see all activities
         activities = activities.filter(asignaturas__titulacion__in=user_coordinated_titulaciones).distinct()
 
-    # Separate active and inactive activities
-    active_activities = activities.filter(activa=True)
-    inactive_activities = activities.filter(activa=False)
+    # Separate activities by state
+    active_activities = activities.filter(estado='visible')
+    inactive_activities = activities.filter(estado='borrada')  # Solo borradas, no archivadas
 
     # Check if user has any coordinated titulaciones
     show_no_titulaciones_message = not user_coordinated_titulaciones.exists() and request.user.role != 'ADMIN'
@@ -978,5 +978,56 @@ def ajax_delete_tipo_perfil(request, pk):
         
     except TipoPerfil.DoesNotExist:
         return JsonResponse({'success': False, 'error': 'Tipo de perfil no encontrado'})
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
+
+@login_required
+@user_passes_test(is_coordinator)
+@require_http_methods(["POST"])
+def archivar_actividad_ajax(request):
+    """Vista AJAX para archivar una actividad (coordinador)"""
+    try:
+        data = json.loads(request.body)
+        actividad_id = data.get('actividad_id')
+
+        if not actividad_id:
+            return JsonResponse({'success': False, 'error': 'ID de actividad requerido'})
+
+        try:
+            actividad = Actividad.objects.get(id=actividad_id)
+        except Actividad.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Actividad no encontrada'})
+
+        # Verificar que la actividad esté en estado 'borrada'
+        if not actividad.es_borrada():
+            return JsonResponse({
+                'success': False,
+                'error': 'Solo se pueden archivar actividades que estén borradas'
+            })
+
+        # Verificar permisos: solo coordinadores de la titulación pueden archivar
+        if request.user.role != 'ADMIN':
+            user_coordinated_titulaciones = Titulacion.objects.filter(coordinador=request.user)
+            activity_titulaciones = Titulacion.objects.filter(
+                asignatura__actividad=actividad
+            ).distinct()
+
+            # Verificar que el coordinador tenga permisos sobre al menos una titulación de la actividad
+            if not activity_titulaciones.intersection(user_coordinated_titulaciones).exists():
+                return JsonResponse({
+                    'success': False,
+                    'error': 'No tienes permisos para archivar esta actividad'
+                })
+
+        # Archivar la actividad
+        actividad.archivar(usuario=request.user)
+
+        return JsonResponse({
+            'success': True,
+            'message': f'Actividad "{actividad.nombre}" archivada correctamente'
+        })
+
+    except json.JSONDecodeError:
+        return JsonResponse({'success': False, 'error': 'Datos JSON inválidos'})
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)})

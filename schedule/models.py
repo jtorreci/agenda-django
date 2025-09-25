@@ -31,10 +31,64 @@ class ActividadGrupo(models.Model):
     def __str__(self):
         return f"{self.actividad.nombre} - Grupo {self.nombre_grupo}"
 
+class ActividadQuerySet(models.QuerySet):
+    """QuerySet personalizado para filtrar por estados"""
+
+    def visible(self):
+        """Actividades visibles (no borradas ni archivadas)"""
+        return self.filter(estado='visible')
+
+    def borradas(self):
+        """Actividades borradas por profesores (coordinador puede restaurar)"""
+        return self.filter(estado='borrada')
+
+    def archivadas(self):
+        """Actividades archivadas por coordinadores (solo admin puede ver)"""
+        return self.filter(estado='archivada')
+
+    def activas_legacy(self):
+        """Compatibilidad con campo legacy activa"""
+        return self.exclude(estado='archivada').filter(activa=True)
+
+class ActividadManager(models.Manager):
+    """Manager personalizado con métodos de filtrado por estado"""
+
+    def get_queryset(self):
+        return ActividadQuerySet(self.model, using=self._db)
+
+    def visible(self):
+        return self.get_queryset().visible()
+
+    def borradas(self):
+        return self.get_queryset().borradas()
+
+    def archivadas(self):
+        return self.get_queryset().archivadas()
+
 class Actividad(models.Model):
+    # Estados de actividad
+    ESTADO_VISIBLE = 'visible'
+    ESTADO_BORRADA = 'borrada'
+    ESTADO_ARCHIVADA = 'archivada'
+
+    ESTADO_CHOICES = [
+        (ESTADO_VISIBLE, 'Visible'),
+        (ESTADO_BORRADA, 'Borrada'),
+        (ESTADO_ARCHIVADA, 'Archivada'),
+    ]
+
     nombre = models.CharField(max_length=255)
     asignaturas = models.ManyToManyField(Asignatura)
     tipo_actividad = models.ForeignKey(TipoActividad, on_delete=models.CASCADE)
+
+    # Campo estado principal
+    estado = models.CharField(
+        max_length=20,
+        choices=ESTADO_CHOICES,
+        default=ESTADO_VISIBLE,
+        help_text="Estado actual de la actividad"
+    )
+
     # Campos que se migrarán a ActividadGrupo - mantener temporalmente
     fecha_inicio = models.DateTimeField()
     fecha_fin = models.DateTimeField()
@@ -42,9 +96,14 @@ class Actividad(models.Model):
     evaluable = models.BooleanField(default=False)
     porcentaje_evaluacion = models.DecimalField(max_digits=5, decimal_places=2, default=0.0)
     no_recuperable = models.BooleanField(default=False)
-    aprobada = models.BooleanField(default=False)
-    activa = models.BooleanField(default=True)
+    aprobada = models.BooleanField(default=False)  # Mantiene lógica de workflow independiente
+
+    # Campos legacy - mantener por compatibilidad
+    activa = models.BooleanField(default=True, help_text="LEGACY: Usar campo 'estado' en su lugar")
     grupo_id = models.UUIDField(blank=True, null=True, help_text="Identificador para agrupar actividades de múltiples grupos - DEPRECATED")
+
+    # Manager personalizado
+    objects = ActividadManager()
     
     @property
     def grupos_count(self):
@@ -60,6 +119,10 @@ class Actividad(models.Model):
         # Apply automatic approval logic only when creating a new activity or when approval status hasn't been manually set
         if not self.pk or not hasattr(self, '_approval_manually_set'):
             self.aprobada = self._get_default_approval_status()
+
+        # Sincronizar campo legacy 'activa' con nuevo campo 'estado'
+        self.activa = (self.estado == self.ESTADO_VISIBLE)
+
         super().save(*args, **kwargs)
 
     def _get_default_approval_status(self):
@@ -87,6 +150,93 @@ class Actividad(models.Model):
             self._modified_by = modified_by
             self._version_comment = f'Approval status changed to {approved_status}'
         self.save()
+
+    # Métodos para gestión de estados
+    def es_visible(self):
+        """Retorna True si la actividad es visible"""
+        return self.estado == self.ESTADO_VISIBLE
+
+    def es_borrada(self):
+        """Retorna True si la actividad está borrada"""
+        return self.estado == self.ESTADO_BORRADA
+
+    def es_archivada(self):
+        """Retorna True si la actividad está archivada"""
+        return self.estado == self.ESTADO_ARCHIVADA
+
+    def borrar(self, usuario=None):
+        """Borra la actividad (profesor) - coordinador puede restaurar"""
+        self.estado = self.ESTADO_BORRADA
+        self.save()
+        # Crear log si se proporciona usuario
+        if usuario:
+            from schedule.models import LogActividad
+            LogActividad.objects.create(
+                object_type='actividad',
+                object_name=self.nombre,
+                object_id=self.id,
+                actividad=self,
+                usuario=usuario,
+                tipo_log='Deletion',
+                details=f'Actividad borrada (estado: {self.estado})'
+            )
+
+    def restaurar(self, usuario=None):
+        """Restaura la actividad desde borrada a visible"""
+        if self.es_borrada():
+            self.estado = self.ESTADO_VISIBLE
+            self.save()
+            # Crear log si se proporciona usuario
+            if usuario:
+                from schedule.models import LogActividad
+                LogActividad.objects.create(
+                    object_type='actividad',
+                    object_name=self.nombre,
+                    object_id=self.id,
+                    actividad=self,
+                    usuario=usuario,
+                    tipo_log='Restoration',
+                    details=f'Actividad restaurada (estado: {self.estado})'
+                )
+
+    def archivar(self, usuario=None):
+        """Archiva la actividad (coordinador) - solo admin puede restaurar"""
+        self.estado = self.ESTADO_ARCHIVADA
+        self.save()
+        # Crear log si se proporciona usuario
+        if usuario:
+            from schedule.models import LogActividad
+            LogActividad.objects.create(
+                object_type='actividad',
+                object_name=self.nombre,
+                object_id=self.id,
+                actividad=self,
+                usuario=usuario,
+                tipo_log='Archive',
+                details=f'Actividad archivada (estado: {self.estado})'
+            )
+
+    def restaurar_desde_archivo(self, usuario=None):
+        """Restaura la actividad desde archivada a borrada (solo admin)"""
+        if self.es_archivada():
+            self.estado = self.ESTADO_BORRADA
+            self.save()
+            # Crear log si se proporciona usuario
+            if usuario:
+                from schedule.models import LogActividad
+                LogActividad.objects.create(
+                    object_type='actividad',
+                    object_name=self.nombre,
+                    object_id=self.id,
+                    actividad=self,
+                    usuario=usuario,
+                    tipo_log='Restoration',
+                    details=f'Actividad restaurada desde archivo (estado: {self.estado})'
+                )
+
+    def get_estado_display_custom(self):
+        """Retorna el estado en formato display personalizado"""
+        return dict(self.ESTADO_CHOICES).get(self.estado, self.estado)
 
     def __str__(self):
         return self.nombre

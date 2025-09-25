@@ -43,4 +43,5 @@ urlpatterns = [
     path('ajax/tipo-perfil/create/', views.ajax_create_tipo_perfil, name='ajax_create_tipo_perfil'),
     path('ajax/tipo-perfil/<int:pk>/update/', views.ajax_update_tipo_perfil, name='ajax_update_tipo_perfil'),
     path('ajax/tipo-perfil/<int:pk>/delete/', views.ajax_delete_tipo_perfil, name='ajax_delete_tipo_perfil'),
+    path('ajax/actividad/archivar/', views.archivar_actividad_ajax, name='archivar_actividad_ajax'),
 ]

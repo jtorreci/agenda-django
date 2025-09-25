@@ -272,6 +272,9 @@
                                                     <i class="bi bi-arrow-clockwise" style="font-size: 1rem;"></i>
                                                 </button>
                                             </form>
+                                            <button type="button" class="btn btn-outline-danger ms-1" title="Archivar actividad" data-bs-toggle="tooltip" style="padding: 0.375rem 0.5rem;" onclick="archivarActividad({{ activity.pk }}, '{{ activity.nombre|escapejs }}')">
+                                                <i class="bi bi-archive" style="font-size: 1rem;"></i>
+                                            </button>
                                         </td>
                                     </tr>
                                     {% empty %}
@@ -531,5 +534,55 @@
             return new bootstrap.Tooltip(tooltipTriggerEl);
         });
     });
+
+    // Función para archivar actividad
+    function archivarActividad(actividadId, actividadNombre) {
+        if (!confirm(`¿Está seguro de que desea archivar la actividad "${actividadNombre}"?\n\nUna vez archivada, solo los administradores podrán restaurarla.`)) {
+            return;
+        }
+
+        fetch('{% url "archivar_actividad_ajax" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({
+                'actividad_id': actividadId
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Mostrar mensaje de éxito
+                alert(data.message);
+                // Recargar la página para actualizar la tabla
+                window.location.reload();
+            } else {
+                // Mostrar mensaje de error
+                alert('Error: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error al archivar la actividad');
+        });
+    }
+
+    // Función auxiliar para obtener CSRF token
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
     </script>
 {% endblock %}
