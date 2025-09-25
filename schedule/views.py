@@ -257,7 +257,7 @@ def activity_pdf_convocatoria(request, pk):
         group_data = [['Grupo', 'Fecha/Hora Inicio', 'Fecha/Hora Fin', 'Lugar', 'Descripción']]
         for grupo in grupos:
             group_data.append([
-                grupo.grupo,
+                grupo.nombre_grupo,
                 grupo.fecha_inicio.strftime('%d/%m/%Y %H:%M'),
                 grupo.fecha_fin.strftime('%d/%m/%Y %H:%M'),
                 grupo.lugar or 'No especificado',
