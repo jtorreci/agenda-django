@@ -125,30 +125,219 @@ def activity_delete(request, pk):
 
 @login_required
 @user_passes_test(is_teacher)
+def activity_detail_view(request, pk):
+    """
+    Vista para mostrar los detalles completos de una actividad con opción de generar PDF
+    """
+    activity = get_object_or_404(Actividad, pk=pk)
+
+    # IDOR check
+    if not request.user.is_staff and not activity.asignaturas.filter(id__in=request.user.subjects.all()).exists():
+        return redirect(get_user_dashboard_url(request.user))
+
+    # Get activity groups if available
+    grupos = activity.grupos.all().order_by('orden')
+
+    context = {
+        'activity': activity,
+        'grupos': grupos,
+        'is_multi_group': grupos.count() > 1,
+    }
+
+    return render(request, 'schedule/activity_detail.html', context)
+
+@login_required
+@user_passes_test(is_teacher)
+def activity_pdf_convocatoria(request, pk):
+    """
+    Genera un PDF con formato de convocatoria oficial para una actividad
+    """
+    from reportlab.lib.pagesizes import A4
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.lib.units import cm
+    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+    from reportlab.lib import colors
+    from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT
+    from django.http import HttpResponse
+    from django.utils import timezone
+    import os
+
+    activity = get_object_or_404(Actividad, pk=pk)
+
+    # IDOR check
+    if not request.user.is_staff and not activity.asignaturas.filter(id__in=request.user.subjects.all()).exists():
+        return redirect(get_user_dashboard_url(request.user))
+
+    # Create HTTP response with PDF content type
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="convocatoria_{activity.nombre.replace(" ", "_")}.pdf"'
+
+    # Create PDF document
+    doc = SimpleDocTemplate(response, pagesize=A4,
+                          rightMargin=2*cm, leftMargin=2*cm,
+                          topMargin=2*cm, bottomMargin=2*cm)
+
+    # Define styles
+    styles = getSampleStyleSheet()
+    title_style = ParagraphStyle(
+        'CustomTitle',
+        parent=styles['Heading1'],
+        fontSize=18,
+        spaceAfter=30,
+        alignment=TA_CENTER,
+        textColor=colors.darkblue
+    )
+
+    subtitle_style = ParagraphStyle(
+        'CustomSubtitle',
+        parent=styles['Heading2'],
+        fontSize=14,
+        spaceAfter=12,
+        textColor=colors.darkblue
+    )
+
+    normal_style = ParagraphStyle(
+        'CustomNormal',
+        parent=styles['Normal'],
+        fontSize=11,
+        spaceAfter=6
+    )
+
+    # Build content
+    content = []
+
+    # Title
+    content.append(Paragraph("CONVOCATORIA DE ACTIVIDAD", title_style))
+    content.append(Spacer(1, 0.5*cm))
+
+    # Activity basic info
+    content.append(Paragraph("INFORMACIÓN GENERAL", subtitle_style))
+
+    info_data = [
+        ['Nombre de la Actividad:', activity.nombre],
+        ['Tipo de Actividad:', activity.tipo_actividad.nombre],
+        ['Fecha de Inicio:', activity.fecha_inicio.strftime('%d de %B de %Y, %H:%M')],
+        ['Fecha de Fin:', activity.fecha_fin.strftime('%d de %B de %Y, %H:%M')],
+    ]
+
+    # Add subjects
+    asignaturas = ', '.join([asig.nombre for asig in activity.asignaturas.all()])
+    info_data.append(['Asignaturas:', asignaturas])
+
+    # Add evaluation info if applicable
+    if activity.evaluable:
+        info_data.append(['Evaluable:', f'Sí ({activity.porcentaje_evaluacion}%)'])
+        if activity.no_recuperable:
+            info_data.append(['Recuperable:', 'No'])
+        else:
+            info_data.append(['Recuperable:', 'Sí'])
+    else:
+        info_data.append(['Evaluable:', 'No'])
+
+    info_table = Table(info_data, colWidths=[5*cm, 10*cm])
+    info_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (0, -1), colors.lightgrey),
+        ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
+        ('FONTNAME', (1, 0), (1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+    ]))
+
+    content.append(info_table)
+    content.append(Spacer(1, 0.5*cm))
+
+    # Groups information (if multi-group)
+    grupos = activity.grupos.all().order_by('orden')
+    if grupos.exists():
+        content.append(Paragraph("GRUPOS Y HORARIOS", subtitle_style))
+
+        group_data = [['Grupo', 'Fecha/Hora Inicio', 'Fecha/Hora Fin', 'Lugar', 'Descripción']]
+        for grupo in grupos:
+            group_data.append([
+                grupo.grupo,
+                grupo.fecha_inicio.strftime('%d/%m/%Y %H:%M'),
+                grupo.fecha_fin.strftime('%d/%m/%Y %H:%M'),
+                grupo.lugar or 'No especificado',
+                grupo.descripcion or '-'
+            ])
+
+        groups_table = Table(group_data, colWidths=[2*cm, 3.5*cm, 3.5*cm, 3*cm, 3*cm])
+        groups_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.darkblue),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+            ('FONTSIZE', (0, 0), (-1, -1), 9),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ]))
+
+        content.append(groups_table)
+        content.append(Spacer(1, 0.5*cm))
+
+    # Description
+    if activity.descripcion:
+        content.append(Paragraph("DESCRIPCIÓN", subtitle_style))
+        content.append(Paragraph(activity.descripcion, normal_style))
+        content.append(Spacer(1, 0.5*cm))
+
+    # Footer
+    content.append(Spacer(1, 1*cm))
+    footer_style = ParagraphStyle(
+        'Footer',
+        parent=styles['Normal'],
+        fontSize=9,
+        alignment=TA_CENTER,
+        textColor=colors.grey
+    )
+
+    content.append(Paragraph(
+        f"Documento generado el {timezone.now().strftime('%d de %B de %Y a las %H:%M')}",
+        footer_style
+    ))
+
+    # Build PDF
+    doc.build(content)
+
+    return response
+
+@login_required
+@user_passes_test(is_teacher)
 def get_filtered_activities(request):
     subject_ids_str = request.GET.get('subject_ids')
     show_context = request.GET.get('show_context') == 'true'
+    show_deleted = request.GET.get('show_deleted') == 'true'  # New parameter
 
     if not subject_ids_str:
         return JsonResponse([], safe=False)
 
     subject_ids = [int(s_id) for s_id in subject_ids_str.split(',') if s_id.isdigit()]
-    
+
     final_subject_ids = set(subject_ids)
 
     if show_context and subject_ids:
         # Find all subjects that share the same course and titulacion
         selected_subjects = Asignatura.objects.filter(id__in=subject_ids)
         titulacion_curso_pairs = selected_subjects.values_list('titulacion_id', 'curso').distinct()
-        
+
         contextual_subjects = Asignatura.objects.none()
         for titulacion_id, curso in titulacion_curso_pairs:
             contextual_subjects |= Asignatura.objects.filter(titulacion_id=titulacion_id, curso=curso)
-        
+
         final_subject_ids.update(contextual_subjects.values_list('id', flat=True))
 
-    # Get all activities that are linked to any of the final subjects
-    activities = Actividad.objects.filter(asignaturas__id__in=list(final_subject_ids)).distinct().order_by('fecha_inicio')
+    # Get activities filtered by active/deleted status
+    activities_filter = {'asignaturas__id__in': list(final_subject_ids)}
+    if show_deleted:
+        activities_filter['activa'] = False  # Show only deleted activities
+    else:
+        activities_filter['activa'] = True   # Show only active activities (default)
+
+    activities = Actividad.objects.filter(**activities_filter).distinct().order_by('fecha_inicio')
 
     # Manually serialize the data to include related fields
     from django.utils import timezone

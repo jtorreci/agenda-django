@@ -1,0 +1,312 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load widget_tweaks %}
+
+{% block title %}{% trans "Activity Details" %} - {{ activity.nombre }}{% endblock %}
+
+{% block extra_head %}
+<style>
+    .activity-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 0.5rem;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .info-card {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .info-label {
+        font-weight: bold;
+        color: #495057;
+        margin-bottom: 0.5rem;
+    }
+
+    .info-value {
+        color: #212529;
+        margin-bottom: 1rem;
+    }
+
+    .group-card {
+        border-left: 4px solid #28a745;
+        background-color: #f8fff9;
+        border-radius: 0.25rem;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .group-title {
+        color: #28a745;
+        font-weight: bold;
+        margin-bottom: 0.75rem;
+    }
+
+    .btn-pdf {
+        background: linear-gradient(45deg, #dc3545, #e74c3c);
+        border: none;
+        box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+        transition: all 0.2s ease-in-out;
+    }
+
+    .btn-pdf:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(220, 53, 69, 0.4);
+    }
+
+    .badge-evaluation {
+        background-color: #28a745;
+        color: white;
+    }
+
+    .badge-no-evaluation {
+        background-color: #6c757d;
+        color: white;
+    }
+
+    .subjects-list {
+        background-color: #e7f3ff;
+        border-radius: 0.25rem;
+        padding: 0.75rem;
+        border-left: 4px solid #007bff;
+    }
+
+    .description-box {
+        background-color: #fff3e0;
+        border-radius: 0.25rem;
+        padding: 1rem;
+        border-left: 4px solid #ff9800;
+        font-style: italic;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <!-- Activity Header -->
+    <div class="activity-header text-center">
+        <h1 class="mb-2">
+            <i class="bi bi-calendar-event"></i>
+            {{ activity.nombre }}
+        </h1>
+        <p class="mb-3 lead">{{ activity.tipo_actividad.nombre }}</p>
+
+        <!-- Action Buttons -->
+        <div class="d-flex justify-content-center gap-3">
+            <a href="{% url 'activity_pdf_convocatoria' activity.pk %}"
+               class="btn btn-pdf btn-lg text-white" target="_blank">
+                <i class="bi bi-file-earmark-pdf"></i>
+                {% trans "Download PDF Convocatoria" %}
+            </a>
+            <a href="javascript:window.history.back();" class="btn btn-outline-light btn-lg">
+                <i class="bi bi-arrow-left"></i>
+                {% trans "Back" %}
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Main Information -->
+        <div class="col-lg-8">
+            <!-- Basic Information Card -->
+            <div class="info-card">
+                <h4 class="mb-3">
+                    <i class="bi bi-info-circle text-primary"></i>
+                    {% trans "General Information" %}
+                </h4>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="info-label">{% trans "Start Date & Time" %}</div>
+                        <div class="info-value">
+                            <i class="bi bi-calendar"></i>
+                            {{ activity.fecha_inicio|date:"l, d F Y" }}<br>
+                            <i class="bi bi-clock"></i>
+                            {{ activity.fecha_inicio|date:"H:i" }}
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="info-label">{% trans "End Date & Time" %}</div>
+                        <div class="info-value">
+                            <i class="bi bi-calendar"></i>
+                            {{ activity.fecha_fin|date:"l, d F Y" }}<br>
+                            <i class="bi bi-clock"></i>
+                            {{ activity.fecha_fin|date:"H:i" }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-label">{% trans "Subjects" %}</div>
+                <div class="subjects-list">
+                    {% for asignatura in activity.asignaturas.all %}
+                        <span class="badge bg-primary me-2 mb-2">
+                            {{ asignatura.nombre }}
+                            <small class="text-light">({{ asignatura.get_curso_display }} - {{ asignatura.get_semestre_display }})</small>
+                        </span>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Groups Information (if multi-group) -->
+            {% if is_multi_group %}
+            <div class="info-card">
+                <h4 class="mb-3">
+                    <i class="bi bi-people text-success"></i>
+                    {% trans "Groups and Schedules" %}
+                </h4>
+
+                {% for grupo in grupos %}
+                <div class="group-card">
+                    <div class="group-title">
+                        <i class="bi bi-person-circle"></i>
+                        {% trans "Group" %}: {{ grupo.grupo }}
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-3">
+                            <strong>{% trans "Start" %}:</strong><br>
+                            {{ grupo.fecha_inicio|date:"d/m/Y H:i" }}
+                        </div>
+                        <div class="col-md-3">
+                            <strong>{% trans "End" %}:</strong><br>
+                            {{ grupo.fecha_fin|date:"d/m/Y H:i" }}
+                        </div>
+                        <div class="col-md-3">
+                            <strong>{% trans "Location" %}:</strong><br>
+                            {{ grupo.lugar|default:"No especificado" }}
+                        </div>
+                        <div class="col-md-3">
+                            <strong>{% trans "Students" %}:</strong><br>
+                            {{ grupo.estudiantes_asignados|default:"Por asignar" }}
+                        </div>
+                    </div>
+
+                    {% if grupo.descripcion %}
+                    <div class="mt-2">
+                        <strong>{% trans "Description" %}:</strong> {{ grupo.descripcion }}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- Description -->
+            {% if activity.descripcion %}
+            <div class="info-card">
+                <h4 class="mb-3">
+                    <i class="bi bi-file-text text-warning"></i>
+                    {% trans "Description" %}
+                </h4>
+                <div class="description-box">
+                    {{ activity.descripcion|linebreaks }}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Sidebar Information -->
+        <div class="col-lg-4">
+            <!-- Evaluation Information -->
+            <div class="info-card">
+                <h5 class="mb-3">
+                    <i class="bi bi-award text-info"></i>
+                    {% trans "Evaluation" %}
+                </h5>
+
+                {% if activity.evaluable %}
+                    <span class="badge badge-evaluation fs-6 mb-2">
+                        <i class="bi bi-check-circle"></i>
+                        {% trans "Evaluable" %}
+                    </span>
+                    <div class="info-value">
+                        <strong>{% trans "Weight" %}:</strong> {{ activity.porcentaje_evaluacion }}%
+                    </div>
+                    <div class="info-value">
+                        <strong>{% trans "Recoverable" %}:</strong>
+                        {% if activity.no_recuperable %}
+                            <span class="text-danger">
+                                <i class="bi bi-x-circle"></i> {% trans "No" %}
+                            </span>
+                        {% else %}
+                            <span class="text-success">
+                                <i class="bi bi-check-circle"></i> {% trans "Yes" %}
+                            </span>
+                        {% endif %}
+                    </div>
+                {% else %}
+                    <span class="badge badge-no-evaluation fs-6">
+                        <i class="bi bi-x-circle"></i>
+                        {% trans "Not Evaluable" %}
+                    </span>
+                {% endif %}
+            </div>
+
+            <!-- Status Information -->
+            <div class="info-card">
+                <h5 class="mb-3">
+                    <i class="bi bi-gear text-secondary"></i>
+                    {% trans "Status" %}
+                </h5>
+
+                <div class="info-value">
+                    <strong>{% trans "Active" %}:</strong>
+                    {% if activity.activa %}
+                        <span class="text-success">
+                            <i class="bi bi-check-circle"></i> {% trans "Yes" %}
+                        </span>
+                    {% else %}
+                        <span class="text-danger">
+                            <i class="bi bi-x-circle"></i> {% trans "Deleted" %}
+                        </span>
+                    {% endif %}
+                </div>
+
+                <div class="info-value">
+                    <strong>{% trans "Approved" %}:</strong>
+                    {% if activity.aprobada %}
+                        <span class="text-success">
+                            <i class="bi bi-check-circle"></i> {% trans "Yes" %}
+                        </span>
+                    {% else %}
+                        <span class="text-warning">
+                            <i class="bi bi-clock"></i> {% trans "Pending" %}
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Actions Card -->
+            <div class="info-card">
+                <h5 class="mb-3">
+                    <i class="bi bi-tools text-primary"></i>
+                    {% trans "Actions" %}
+                </h5>
+
+                <div class="d-grid gap-2">
+                    {% if activity.activa %}
+                        <a href="{% url 'activity_check_edit' activity.pk %}" class="btn btn-outline-primary">
+                            <i class="bi bi-pencil"></i> {% trans "Edit Activity" %}
+                        </a>
+                        <a href="{% url 'copy_activity_individual' activity.pk %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-files"></i> {% trans "Copy Activity" %}
+                        </a>
+                    {% endif %}
+
+                    <a href="{% url 'activity_pdf_convocatoria' activity.pk %}"
+                       class="btn btn-danger" target="_blank">
+                        <i class="bi bi-download"></i> {% trans "Download PDF" %}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

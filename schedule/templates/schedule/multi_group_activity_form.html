@@ -144,12 +144,48 @@
 </div>
 {% endblock %}
 
+{% block extra_css %}
+<style>
+/* Ensure datetime-local inputs have adequate width and visibility */
+input[type="datetime-local"].group-start,
+input[type="datetime-local"].group-end {
+    min-width: 180px !important;
+    width: 100% !important;
+    font-size: 0.9rem;
+}
+
+/* Ensure responsive behavior on smaller screens */
+@media (max-width: 768px) {
+    input[type="datetime-local"].group-start,
+    input[type="datetime-local"].group-end {
+        min-width: 160px !important;
+        font-size: 0.85rem;
+    }
+}
+</style>
+{% endblock %}
+
 {% block extra_js %}
     <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             console.log('=== MULTI-GROUP FORM SCRIPT STARTED ===');
-            
+
+            // Timezone utility functions
+            function convertUTCToLocal(utcDateString) {
+                if (!utcDateString) return '';
+                const date = new Date(utcDateString);
+                // Get local timezone offset and adjust
+                const localDate = new Date(date.getTime() - (date.getTimezoneOffset() * 60000));
+                return localDate.toISOString().slice(0, 16); // Format for datetime-local
+            }
+
+            function convertLocalToUTC(localDateString) {
+                if (!localDateString) return '';
+                const date = new Date(localDateString);
+                return date.toISOString();
+            }
+
             // Initialize multi-select for subjects with cleanup
             const asignaturasElement = document.getElementById('id_asignaturas');
             if (asignaturasElement) {
@@ -212,27 +248,27 @@
                     </div>
                     
                     <div class="row">
-                        <div class="col-md-3 mb-3">
+                        <div class="col-md-2 mb-3">
                             <label class="form-label">Nombre del Grupo</label>
-                            <input type="text" class="form-control group-name" 
+                            <input type="text" class="form-control group-name"
                                    placeholder="ej. A, B, 1, 2" value="${data.grupo || ''}">
                         </div>
-                        
-                        <div class="col-md-3 mb-3">
+
+                        <div class="col-md-4 mb-3">
                             <label class="form-label">Fecha/Hora Inicio</label>
-                            <input type="datetime-local" class="form-control group-start" 
+                            <input type="datetime-local" class="form-control group-start"
                                    value="${data.fecha_inicio || ''}">
                         </div>
-                        
-                        <div class="col-md-3 mb-3">
+
+                        <div class="col-md-4 mb-3">
                             <label class="form-label">Fecha/Hora Fin</label>
-                            <input type="datetime-local" class="form-control group-end" 
+                            <input type="datetime-local" class="form-control group-end"
                                    value="${data.fecha_fin || ''}">
                         </div>
-                        
-                        <div class="col-md-3 mb-3">
+
+                        <div class="col-md-2 mb-3">
                             <label class="form-label">Lugar</label>
-                            <input type="text" class="form-control group-lugar" 
+                            <input type="text" class="form-control group-lugar"
                                    placeholder="ej. Aula A1, Lab. Informática" value="${data.lugar || ''}">
                         </div>
                         

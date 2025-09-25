@@ -223,8 +223,8 @@
                                         <td>{{ activity.nombre }}</td>
                                         <td>{% for asignatura in activity.asignaturas.all %}{{ asignatura.nombre }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
                                         <td>{{ activity.tipo_actividad.nombre }}</td>
-                                        <td>{{ activity.fecha_inicio }}</td>
-                                        <td>{{ activity.fecha_fin }}</td>
+                                        <td>{{ activity.fecha_inicio|date:"d M Y, H:i" }}</td>
+                                        <td>{{ activity.fecha_fin|date:"d M Y, H:i" }}</td>
                                         <td><input type="checkbox" {% if activity.evaluable %}checked{% endif %} disabled></td>
                                         <td>{{ activity.porcentaje_evaluacion }}%</td>
                                         <td class="approval-cell" data-activity-id="{{ activity.id }}">
@@ -263,8 +263,8 @@
                                         <td>{{ activity.nombre }}</td>
                                         <td>{% for asignatura in activity.asignaturas.all %}{{ asignatura.nombre }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
                                         <td>{{ activity.tipo_actividad.nombre }}</td>
-                                        <td>{{ activity.fecha_inicio }}</td>
-                                        <td>{{ activity.fecha_fin }}</td>
+                                        <td>{{ activity.fecha_inicio|date:"d M Y, H:i" }}</td>
+                                        <td>{{ activity.fecha_fin|date:"d M Y, H:i" }}</td>
                                         <td>
                                             <form action="{% url 'reactivate_activity' activity.pk %}" method="post" class="d-inline">
                                                 {% csrf_token %}
@@ -333,6 +333,19 @@
     <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
     
     <script>
+    // Utility function to format date in 24h format
+    function formatDateTo24h(date) {
+        const options = {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false // Force 24-hour format
+        };
+        return date.toLocaleDateString('es-ES', options);
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
         // --- 3. Inicialización de Tom Select ---
         new TomSelect('#titulacion',{ plugins: ['remove_button'], create: false });
@@ -357,8 +370,8 @@
                 document.getElementById('modalActivityDescription').innerText = info.event.extendedProps.description || 'N/A';
                 document.getElementById('modalActivityType').innerText = info.event.extendedProps.activity_type || 'N/A';
                 document.getElementById('modalActivitySubjects').innerText = info.event.extendedProps.subjects || 'N/A';
-                document.getElementById('modalActivityStart').innerText = info.event.start ? info.event.start.toLocaleString() : 'N/A';
-                document.getElementById('modalActivityEnd').innerText = info.event.end ? info.event.end.toLocaleString() : 'N/A';
+                document.getElementById('modalActivityStart').innerText = info.event.start ? formatDateTo24h(info.event.start) : 'N/A';
+                document.getElementById('modalActivityEnd').innerText = info.event.end ? formatDateTo24h(info.event.end) : 'N/A';
                 document.getElementById('modalActivityApproved').innerText = info.event.extendedProps.is_approved ? 'Yes' : 'No';
                 document.getElementById('modalActivityActive').innerText = info.event.extendedProps.is_active ? 'Yes' : 'No';
                 document.getElementById('modalActivityEvaluable').innerText = info.event.extendedProps.evaluable ? 'Yes' : 'No';
