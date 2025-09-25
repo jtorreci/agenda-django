@@ -1,15 +1,28 @@
-# Requirements for development (Windows/Mac/Linux with SQLite)
-asgiref==3.9.1
-charset-normalizer==3.4.3
+# Dependencias para desarrollo local (sin PostgreSQL)
+# Para instalar: pip install -r requirements-dev.txt
+
+# Django core
 Django==5.2.5
-python-dotenv==1.0.1
-django-widget-tweaks==1.5.0
-icalendar==6.3.1
-pillow==11.3.0
-python-dateutil==2.9.0.post0
-pytz==2024.2
-reportlab==4.4.3
-six==1.17.0
+asgiref==3.9.1
 sqlparse==0.5.3
-tzdata==2025.2
+
+# Django packages
+django-widget-tweaks==1.5.0
 whitenoise==6.7.0
+
+# Environment and configuration
+python-dotenv==1.0.1
+
+# Calendar and timezone support
+icalendar==6.3.1
+pytz==2024.2
+python-dateutil==2.9.0.post0
+
+# PDF generation
+reportlab==4.4.3
+pillow==11.3.0
+
+# Utilities
+charset-normalizer==3.4.3
+six==1.17.0
+tzdata==2025.2

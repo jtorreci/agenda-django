@@ -686,9 +686,43 @@ def teacher_select_subjects(request):
 @login_required
 @user_passes_test(is_teacher)
 def teacher_student_view(request):
+    # Get teacher's subjects (what student would see)
     user_subjects = request.user.subjects.all()
-    activities = Actividad.objects.filter(asignaturas__in=user_subjects).order_by('fecha_inicio')
-    return render(request, 'users/teacher_student_view.html', {'activities': activities})
+
+    # Check if context activities should be shown (from referrer or session)
+    show_context = request.GET.get('show_context', 'false') == 'true'
+
+    # Only show active and approved activities (like real student dashboard)
+    activities_query = Actividad.objects.filter(
+        activa=True,
+        aprobada=True
+    ).order_by('fecha_inicio')
+
+    if show_context:
+        # Show activities from same titulacion and curso
+        context_subjects = Asignatura.objects.none()
+        for subject in user_subjects:
+            context_subjects = context_subjects | Asignatura.objects.filter(
+                titulacion=subject.titulacion,
+                curso=subject.curso
+            )
+        activities = activities_query.filter(asignaturas__in=context_subjects).distinct()
+    else:
+        # Show only activities from teacher's subjects
+        activities = activities_query.filter(asignaturas__in=user_subjects).distinct()
+
+    # Get additional data for template (like real student dashboard)
+    titulaciones = Titulacion.objects.filter(asignatura__in=user_subjects).distinct()
+    tipos_actividad = TipoActividad.objects.all()
+
+    return render(request, 'users/teacher_student_view.html', {
+        'activities': activities,
+        'enrolled_subjects': user_subjects,
+        'titulaciones': titulaciones,
+        'tipos_actividad': tipos_actividad,
+        'show_context': show_context,
+        'user_role': 'TEACHER_AS_STUDENT'  # Flag to identify this view
+    })
 
 @login_required
 @user_passes_test(lambda u: u.role == 'ADMIN' or u.is_superuser)

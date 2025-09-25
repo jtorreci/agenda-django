@@ -30,10 +30,10 @@ class LocalDateTimeWidget(forms.DateTimeInput):
         if isinstance(value, str):
             return value
 
-        # Si el valor viene de la BD (timezone aware), convertir a local
+        # Si el valor viene de la BD (timezone aware), convertir a local usando Django
         if timezone.is_aware(value):
-            local_tz = pytz.timezone(settings.TIME_ZONE)
-            local_time = value.astimezone(local_tz)
+            # Usar timezone.localtime() que respeta la configuración de Django
+            local_time = timezone.localtime(value)
             return local_time.strftime(self.format_key)
 
         # Si no tiene timezone, asumir que ya es local

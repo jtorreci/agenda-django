@@ -95,20 +95,7 @@
             <i class="bi bi-calendar-event"></i>
             {{ activity.nombre }}
         </h1>
-        <p class="mb-3 lead">{{ activity.tipo_actividad.nombre }}</p>
-
-        <!-- Action Buttons -->
-        <div class="d-flex justify-content-center gap-3">
-            <a href="{% url 'activity_pdf_convocatoria' activity.pk %}"
-               class="btn btn-pdf btn-lg text-white" target="_blank">
-                <i class="bi bi-file-earmark-pdf"></i>
-                {% trans "Download PDF Convocatoria" %}
-            </a>
-            <a href="javascript:window.history.back();" class="btn btn-outline-light btn-lg">
-                <i class="bi bi-arrow-left"></i>
-                {% trans "Back" %}
-            </a>
-        </div>
+        <p class="mb-0 lead">{{ activity.tipo_actividad.nombre }}</p>
     </div>
 
     <div class="row">
@@ -214,72 +201,77 @@
 
         <!-- Sidebar Information -->
         <div class="col-lg-4">
-            <!-- Evaluation Information -->
+            <!-- Evaluation and Status in one card with two columns -->
             <div class="info-card">
-                <h5 class="mb-3">
-                    <i class="bi bi-award text-info"></i>
-                    {% trans "Evaluation" %}
-                </h5>
+                <div class="row">
+                    <!-- Evaluation Information -->
+                    <div class="col-6">
+                        <h6 class="mb-3">
+                            <i class="bi bi-award text-info"></i>
+                            {% trans "Evaluation" %}
+                        </h6>
 
-                {% if activity.evaluable %}
-                    <span class="badge badge-evaluation fs-6 mb-2">
-                        <i class="bi bi-check-circle"></i>
-                        {% trans "Evaluable" %}
-                    </span>
-                    <div class="info-value">
-                        <strong>{% trans "Weight" %}:</strong> {{ activity.porcentaje_evaluacion }}%
-                    </div>
-                    <div class="info-value">
-                        <strong>{% trans "Recoverable" %}:</strong>
-                        {% if activity.no_recuperable %}
-                            <span class="text-danger">
-                                <i class="bi bi-x-circle"></i> {% trans "No" %}
+                        {% if activity.evaluable %}
+                            <span class="badge badge-evaluation fs-6 mb-2 d-block">
+                                <i class="bi bi-check-circle"></i>
+                                {% trans "Evaluable" %}
                             </span>
+                            <div class="info-value small">
+                                <strong>{% trans "Weight" %}:</strong> {{ activity.porcentaje_evaluacion }}%
+                            </div>
+                            <div class="info-value small">
+                                <strong>{% trans "Recoverable" %}:</strong>
+                                {% if activity.no_recuperable %}
+                                    <span class="text-danger">
+                                        <i class="bi bi-x-circle"></i> {% trans "No" %}
+                                    </span>
+                                {% else %}
+                                    <span class="text-success">
+                                        <i class="bi bi-check-circle"></i> {% trans "Yes" %}
+                                    </span>
+                                {% endif %}
+                            </div>
                         {% else %}
-                            <span class="text-success">
-                                <i class="bi bi-check-circle"></i> {% trans "Yes" %}
+                            <span class="badge badge-no-evaluation fs-6">
+                                <i class="bi bi-x-circle"></i>
+                                {% trans "Not Evaluable" %}
                             </span>
                         {% endif %}
                     </div>
-                {% else %}
-                    <span class="badge badge-no-evaluation fs-6">
-                        <i class="bi bi-x-circle"></i>
-                        {% trans "Not Evaluable" %}
-                    </span>
-                {% endif %}
-            </div>
 
-            <!-- Status Information -->
-            <div class="info-card">
-                <h5 class="mb-3">
-                    <i class="bi bi-gear text-secondary"></i>
-                    {% trans "Status" %}
-                </h5>
+                    <!-- Status Information -->
+                    <div class="col-6">
+                        <h6 class="mb-3">
+                            <i class="bi bi-gear text-secondary"></i>
+                            {% trans "Status" %}
+                        </h6>
 
-                <div class="info-value">
-                    <strong>{% trans "Active" %}:</strong>
-                    {% if activity.activa %}
-                        <span class="text-success">
-                            <i class="bi bi-check-circle"></i> {% trans "Yes" %}
-                        </span>
-                    {% else %}
-                        <span class="text-danger">
-                            <i class="bi bi-x-circle"></i> {% trans "Deleted" %}
-                        </span>
-                    {% endif %}
-                </div>
+                        <div class="info-value small">
+                            <strong>{% trans "Active" %}:</strong><br>
+                            {% if activity.activa %}
+                                <span class="text-success">
+                                    <i class="bi bi-check-circle"></i> {% trans "Yes" %}
+                                </span>
+                            {% else %}
+                                <span class="text-danger">
+                                    <i class="bi bi-x-circle"></i> {% trans "Deleted" %}
+                                </span>
+                            {% endif %}
+                        </div>
 
-                <div class="info-value">
-                    <strong>{% trans "Approved" %}:</strong>
-                    {% if activity.aprobada %}
-                        <span class="text-success">
-                            <i class="bi bi-check-circle"></i> {% trans "Yes" %}
-                        </span>
-                    {% else %}
-                        <span class="text-warning">
-                            <i class="bi bi-clock"></i> {% trans "Pending" %}
-                        </span>
-                    {% endif %}
+                        <div class="info-value small">
+                            <strong>{% trans "Approved" %}:</strong><br>
+                            {% if activity.aprobada %}
+                                <span class="text-success">
+                                    <i class="bi bi-check-circle"></i> {% trans "Yes" %}
+                                </span>
+                            {% else %}
+                                <span class="text-warning">
+                                    <i class="bi bi-clock"></i> {% trans "Pending" %}
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -290,23 +282,49 @@
                     {% trans "Actions" %}
                 </h5>
 
-                <div class="d-grid gap-2">
+                <div class="d-flex justify-content-center gap-2">
                     {% if activity.activa %}
-                        <a href="{% url 'activity_check_edit' activity.pk %}" class="btn btn-outline-primary">
-                            <i class="bi bi-pencil"></i> {% trans "Edit Activity" %}
+                        <a href="{% url 'activity_check_edit' activity.pk %}"
+                           class="btn btn-outline-primary btn-sm"
+                           data-bs-toggle="tooltip"
+                           title="{% trans 'Edit Activity' %}">
+                            <i class="bi bi-pencil"></i>
                         </a>
-                        <a href="{% url 'copy_activity_individual' activity.pk %}" class="btn btn-outline-secondary">
-                            <i class="bi bi-files"></i> {% trans "Copy Activity" %}
+                        <a href="{% url 'copy_activity_individual' activity.pk %}"
+                           class="btn btn-outline-secondary btn-sm"
+                           data-bs-toggle="tooltip"
+                           title="{% trans 'Copy Activity' %}">
+                            <i class="bi bi-files"></i>
                         </a>
                     {% endif %}
 
                     <a href="{% url 'activity_pdf_convocatoria' activity.pk %}"
-                       class="btn btn-danger" target="_blank">
-                        <i class="bi bi-download"></i> {% trans "Download PDF" %}
+                       class="btn btn-danger btn-sm"
+                       target="_blank"
+                       data-bs-toggle="tooltip"
+                       title="{% trans 'Download PDF' %}">
+                        <i class="bi bi-download"></i>
+                    </a>
+
+                    <a href="javascript:window.history.back();"
+                       class="btn btn-outline-dark btn-sm"
+                       data-bs-toggle="tooltip"
+                       title="{% trans 'Back to Dashboard' %}">
+                        <i class="bi bi-arrow-left"></i>
                     </a>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+});
+</script>
 {% endblock %}

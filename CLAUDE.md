@@ -6,15 +6,32 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is an academic agenda Django application that manages activities, subjects, and users for educational institutions. The project implements role-based access control with four user types: Students, Teachers, Coordinators, and Admins.
 
-## Development Commands
+## Development Setup
+
+### Dependencies Installation
+
+For **development environment** (Windows compatible):
+```bash
+pip install -r requirements-dev.txt
+```
+
+For **production environment** (Linux/Unix with PostgreSQL):
+```bash
+pip install -r requirements.txt
+```
+
+**Note**: `requirements.txt` includes PostgreSQL dependencies that require compilation on Windows. Use `requirements-dev.txt` for local development with SQLite.
+
+### Development Commands
 
 - **Run development server**: `python manage.py runserver`
-- **Run migrations**: `python manage.py migrate` 
+- **Run migrations**: `python manage.py migrate`
 - **Create migrations**: `python manage.py makemigrations`
 - **Create superuser**: `python manage.py createsuperuser`
 - **Import initial data**: `python manage.py importdata`
 - **Create initial activity types**: `python manage.py create_initial_activity_types`
 - **Django shell**: `python manage.py shell`
+- **System check**: `python manage.py check`
 
 ## Database
 

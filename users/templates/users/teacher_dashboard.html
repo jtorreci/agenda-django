@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
+{% load i18n %}
 
-{% block title %}Teacher Dashboard{% endblock %}
+{% block title %}{% trans "Teacher Dashboard" %}{% endblock %}
 
 {% block extra_head %}
     <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css' rel='stylesheet' />
@@ -63,20 +64,20 @@
 {% endblock %}
 
 {% block content %}
-    <h2 class="my-4">Teacher Dashboard</h2>
-    <p class="lead">Welcome, Teacher!</p>
+    <h2 class="my-4">{% trans "Teacher Dashboard" %}</h2>
+    <p class="lead">{% trans "Welcome, Teacher!" %}</p>
 
     {% if not teacher_subjects %}
         <div class="alert alert-warning">
-            No subjects assigned to you. Please <a href="{% url 'teacher_select_subjects' %}" class="alert-link">select your subjects</a> to begin.
+            {% trans "No subjects assigned to you. Please" %} <a href="{% url 'teacher_select_subjects' %}" class="alert-link">{% trans "select your subjects" %}</a> {% trans "to begin." %}
         </div>
     {% else %}
     <div class="row">
         <div class="col-md-4">
             <div class="sidebar p-3 bg-light rounded">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h4 class="mb-0">My Assigned Subjects</h4>
-                    <a href="{% url 'teacher_select_subjects' %}" class="btn btn-outline-primary btn-sm" title="Manage subject selection">Manage Selection</a>
+                    <h4 class="mb-0">{% trans "My Assigned Subjects" %}</h4>
+                    <a href="{% url 'teacher_select_subjects' %}" class="btn btn-outline-primary btn-sm" title="{% trans 'Manage subject selection' %}">{% trans "Manage Selection" %}</a>
                 </div>
                 <div class="table-responsive mb-3" style="max-height: 300px; overflow-y: auto;">
                     <table class="table table-sm">
@@ -107,7 +108,7 @@
 
                 <div class="d-grid gap-2">
                     <button id="createUnifiedActivityBtn" class="btn btn-primary">
-                        <i class="bi bi-plus-circle"></i> Crear Actividad para Seleccionadas
+                        <i class="bi bi-plus-circle"></i> {% trans "Create Activity for Selected" %}
                     </button>
                 </div>
                 
@@ -117,7 +118,7 @@
                     <div class="accordion-item">
                         <h2 class="accordion-header" id="headingIcal">
                             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseIcal" aria-expanded="false" aria-controls="collapseIcal">
-                                iCal Feed Configurations
+                                {% trans "iCal Feed Configurations" %}
                             </button>
                         </h2>
                         <div id="collapseIcal" class="accordion-collapse collapse" aria-labelledby="headingIcal" data-bs-parent="#icalAccordion">
@@ -128,61 +129,61 @@
                                     <li class="list-group-item">
                                         <strong>{{ view.nombre }}</strong>
                                         <div class="mt-2">
-                                            <button class="btn btn-sm btn-outline-secondary copyIcalLinkBtn" data-ical-url="{{ request.scheme }}://{{ request.get_host }}{% url 'ical_feed' view.token %}">Copy Link</button>
-                                            <a href="{% url 'delete_calendar_view' view.pk %}" class="btn btn-sm btn-outline-danger ms-1">Delete</a>
+                                            <button class="btn btn-sm btn-outline-secondary copyIcalLinkBtn" data-ical-url="{{ request.scheme }}://{{ request.get_host }}{% url 'ical_feed' view.token %}">{% trans "Copy Link" %}</button>
+                                            <a href="{% url 'delete_calendar_view' view.pk %}" class="btn btn-sm btn-outline-danger ms-1">{% trans "Delete" %}</a>
                                         </div>
                                     </li>
                                     {% endfor %}
                                 </ul>
                                 {% else %}
-                                <p class="text-muted small">No iCal feed configurations found.</p>
+                                <p class="text-muted small">{% trans "No iCal feed configurations found." %}</p>
                                 {% endif %}
-                                <a href="{% url 'create_calendar_view' %}" class="btn btn-secondary btn-sm mt-3">Create New iCal Feed</a>
+                                <a href="{% url 'create_calendar_view' %}" class="btn btn-secondary btn-sm mt-3">{% trans "Create New iCal Feed" %}</a>
                             </div>
                         </div>
                     </div>
                 </div>
-                 <a href="{% url 'teacher_student_view' %}" class="btn btn-outline-info w-100 mt-4">View as Student</a>
+                 <a href="{% url 'teacher_student_view' %}" id="viewAsStudentBtn" class="btn btn-outline-info w-100 mt-4">{% trans "View as Student" %}</a>
             </div>
         </div>
 
         <div class="col-md-8">
             <ul class="nav nav-tabs" id="myTab" role="tablist">
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="activities-tab" data-bs-toggle="tab" data-bs-target="#activities-view" type="button" role="tab" aria-controls="activities-view" aria-selected="true">Activities</button>
+                    <button class="nav-link active" id="activities-tab" data-bs-toggle="tab" data-bs-target="#activities-view" type="button" role="tab" aria-controls="activities-view" aria-selected="true">{% trans "Activities" %}</button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="calendar-tab" data-bs-toggle="tab" data-bs-target="#calendar-view" type="button" role="tab" aria-controls="calendar-view" aria-selected="false">Calendar</button>
+                    <button class="nav-link" id="calendar-tab" data-bs-toggle="tab" data-bs-target="#calendar-view" type="button" role="tab" aria-controls="calendar-view" aria-selected="false">{% trans "Calendar" %}</button>
                 </li>
             </ul>
 
             <div class="tab-content" id="myTabContent">
                 <div class="tab-pane fade show active p-3" id="activities-view" role="tabpanel" aria-labelledby="activities-tab">
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h4 class="mb-0">Activities for Selected Subjects</h4>
+                        <h4 class="mb-0">{% trans "Activities for Selected Subjects" %}</h4>
                         <button id="toggleDeletedActivities" class="btn btn-outline-secondary btn-sm" style="display: none;">
-                            <i class="bi bi-eye"></i> <span id="toggleText">Show Deleted Activities</span>
+                            <i class="bi bi-eye"></i> <span id="toggleText">{% trans "Show Deleted Activities" %}</span>
                         </button>
                     </div>
 
                     <!-- Active Activities Table -->
                     <div id="activitiesTableContainer">
-                        <p class="text-muted">Select subjects on the left to see their activities.</p>
+                        <p class="text-muted">{% trans "Select subjects on the left to see their activities." %}</p>
                     </div>
 
                     <!-- Deleted Activities Section -->
                     <div id="deletedActivitiesSection" style="display: none;" class="mt-4">
                         <h5 class="text-muted">
-                            <i class="bi bi-trash"></i> Deleted Activities
+                            <i class="bi bi-trash"></i> {% trans "Deleted Activities" %}
                         </h5>
                         <div id="deletedActivitiesTableContainer">
-                            <p class="text-muted">No deleted activities found.</p>
+                            <p class="text-muted">{% trans "No deleted activities found." %}</p>
                         </div>
                     </div>
                 </div>
 
                 <div class="tab-pane fade p-3" id="calendar-view" role="tabpanel" aria-labelledby="calendar-tab">
-                    <h4>Calendar for Selected Subjects</h4>
+                    <h4>{% trans "Calendar for Selected Subjects" %}</h4>
                     <div id='calendar'></div>
                 </div>
             </div>
@@ -193,7 +194,7 @@
     <p class="mt-4">
         <form action="{% url 'logout' %}" method="post" class="d-inline">
             {% csrf_token %}
-            <button type="submit" class="btn btn-secondary">Logout</button>
+            <button type="submit" class="btn btn-secondary">{% trans "Logout" %}</button>
         </form>
     </p>
 
@@ -229,22 +230,22 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="copyActivityModalLabel">Copiar Actividad</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <h5 class="modal-title" id="copyActivityModalLabel">{% trans "Copy Activity" %}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{% trans 'Close' %}"></button>
             </div>
             <div class="modal-body">
-                <p class="mb-3">¿Cómo quieres copiar la actividad "<span id="copyActivityName"></span>"?</p>
+                <p class="mb-3">{% trans "How do you want to copy the activity" %} "<span id="copyActivityName"></span>"?</p>
                 <div class="d-grid gap-2">
                     <button type="button" class="btn btn-primary" id="copyAsIndividualBtn">
-                        <i class="bi bi-file-earmark-plus"></i> Como Actividad Individual
+                        <i class="bi bi-file-earmark-plus"></i> {% trans "As Individual Activity" %}
                     </button>
                     <button type="button" class="btn btn-outline-primary" id="copyAsMultiGroupBtn">
-                        <i class="bi bi-people"></i> Como Actividad Multi-Grupo
+                        <i class="bi bi-people"></i> {% trans "As Multi-Group Activity" %}
                     </button>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% trans "Cancel" %}</button>
             </div>
         </div>
     </div>
@@ -253,6 +254,7 @@
 
 {% block extra_js %}
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'></script>
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/es.js'></script>
     <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
 
     <script>
@@ -271,8 +273,8 @@
 
     // Function to view activity details
     function viewActivity(activityId) {
-        // Open the detailed activity view in a new tab
-        window.open(`/activity/view/${activityId}/`, '_blank');
+        // Navigate to the detailed activity view in same window
+        window.location.href = `/activity/view/${activityId}/`;
     }
 
     document.addEventListener('DOMContentLoaded', function() {
@@ -282,8 +284,16 @@
         let isCalendarRendered = false;
 
         const calendar = new FullCalendar.Calendar(calendarEl, {
+            locale: 'es', // Configurar idioma español
             initialView: 'dayGridMonth',
             headerToolbar: { left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek' },
+            buttonText: {
+                today: '{% trans "Today" %}',
+                month: '{% trans "Month" %}',
+                week: '{% trans "Week" %}',
+                day: '{% trans "Day" %}',
+                list: '{% trans "List" %}'
+            },
             events: [], // Se cargará dinámicamente
             eventDataTransform: function(eventInfo) {
                 if (!eventInfo.extendedProps.is_own) {
@@ -362,7 +372,7 @@
         }
 
         function renderActivitiesTable(data) {
-            let tableHtml = '<p>No activities found for the selected subjects.</p>';
+            let tableHtml = '<p>{% trans "No activities found for the selected subjects." %}</p>';
             
             // Filter out calendar-only events for table display
             const tableData = data.filter(activity => !activity.extendedProps.is_calendar_event);
@@ -396,16 +406,16 @@
                         // Get the actual activity ID (handle both legacy and new system)
                         const actualActivityId = activity.activity_id || activity.id;
                         buttons = `<div class="btn-group" role="group">
-                            <button class="btn btn-outline-info" onclick="viewActivity(${actualActivityId})" title="Ver detalles y generar PDF" data-bs-toggle="tooltip" style="padding: 0.375rem 0.5rem;">
+                            <button class="btn btn-outline-info" onclick="viewActivity(${actualActivityId})" title="{% trans 'View details and generate PDF' %}" data-bs-toggle="tooltip" style="padding: 0.375rem 0.5rem;">
                                 <i class="bi bi-eye" style="font-size: 1rem;"></i>
                             </button>
-                            <a href="/activity/unified/edit/${actualActivityId}/" class="btn btn-outline-primary" title="Editar actividad" data-bs-toggle="tooltip" style="padding: 0.375rem 0.5rem;">
+                            <a href="/activity/unified/edit/${actualActivityId}/" class="btn btn-outline-primary" title="{% trans 'Edit activity' %}" data-bs-toggle="tooltip" style="padding: 0.375rem 0.5rem;">
                                 <i class="bi bi-pencil" style="font-size: 1rem;"></i>
                             </a>
-                            <button class="btn btn-outline-success" onclick="showCopyModal(${actualActivityId}, '${activity.title.replace(/'/g, "\\'")}', event)" title="Copiar actividad" data-bs-toggle="tooltip" style="padding: 0.375rem 0.5rem;">
+                            <button class="btn btn-outline-success" onclick="showCopyModal(${actualActivityId}, '${activity.title.replace(/'/g, "\\'")}', event)" title="{% trans 'Copy activity' %}" data-bs-toggle="tooltip" style="padding: 0.375rem 0.5rem;">
                                 <i class="bi bi-clipboard" style="font-size: 1rem;"></i>
                             </button>
-                            <a href="/activity/delete/${actualActivityId}/" class="btn btn-outline-danger" title="Eliminar actividad" data-bs-toggle="tooltip" style="padding: 0.375rem 0.5rem;">
+                            <a href="/activity/delete/${actualActivityId}/" class="btn btn-outline-danger" title="{% trans 'Delete activity' %}" data-bs-toggle="tooltip" style="padding: 0.375rem 0.5rem;">
                                 <i class="bi bi-trash" style="font-size: 1rem;"></i>
                             </a>
                         </div>`;
@@ -457,7 +467,7 @@
                     const buttons = `
                         <div class="btn-group btn-group-sm" role="group">
                             <button type="button" class="btn btn-outline-info btn-sm"
-                                    onclick="viewActivity(${activity.id})" data-bs-toggle="tooltip" title="View Details">
+                                    onclick="viewActivity(${activity.id})" data-bs-toggle="tooltip" title="{% trans 'View Details' %}">
                                 <i class="bi bi-eye"></i>
                             </button>
                         </div>`;
@@ -490,13 +500,13 @@
 
             if (deletedSection.style.display === 'none') {
                 deletedSection.style.display = 'block';
-                toggleText.textContent = 'Hide Deleted Activities';
+                toggleText.textContent = '{% trans "Hide Deleted Activities" %}';
                 toggleIcon.className = 'bi bi-eye-slash';
                 this.classList.remove('btn-outline-secondary');
                 this.classList.add('btn-outline-warning');
             } else {
                 deletedSection.style.display = 'none';
-                toggleText.textContent = 'Show Deleted Activities';
+                toggleText.textContent = '{% trans "Show Deleted Activities" %}';
                 toggleIcon.className = 'bi bi-eye';
                 this.classList.remove('btn-outline-warning');
                 this.classList.add('btn-outline-secondary');
@@ -531,7 +541,7 @@
         document.getElementById('createUnifiedActivityBtn').addEventListener('click', function() {
             const selectedSubjectIds = getSelectedSubjectIds();
             if (selectedSubjectIds.length === 0) {
-                alert('Por favor selecciona al menos una asignatura para crear una actividad.');
+                alert('{% trans "Please select at least one subject to create an activity." %}');
             } else {
                 window.location.href = `{% url 'unified_activity_new' %}?subjects=${selectedSubjectIds.join(',')}`;
             }
@@ -540,7 +550,7 @@
         document.querySelectorAll('.copyIcalLinkBtn').forEach(button => {
             button.addEventListener('click', function() {
                 navigator.clipboard.writeText(this.dataset.icalUrl).then(() => {
-                    alert('iCal link copied to clipboard!');
+                    alert('{% trans "iCal link copied to clipboard!" %}');
                 });
             });
         });
@@ -577,6 +587,14 @@
                 }
             });
         }
+
+        // View as Student button functionality
+        document.getElementById('viewAsStudentBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            const showContext = document.getElementById('show_context_activities').checked;
+            const url = `{% url 'teacher_student_view' %}?show_context=${showContext}`;
+            window.location.href = url;
+        });
 
         // Initial load
         fetchData();

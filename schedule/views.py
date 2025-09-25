@@ -18,6 +18,7 @@ from django.views.decorators.http import require_http_methods
 from django.utils.translation import gettext_lazy as _
 from django.template.loader import get_template
 from django.conf import settings
+from django.utils import formats
 import json
 import uuid
 from datetime import datetime
@@ -146,6 +147,19 @@ def activity_detail_view(request, pk):
 
     return render(request, 'schedule/activity_detail.html', context)
 
+def format_spanish_datetime(dt, format_type='long'):
+    """
+    Formatea datetime en español usando el sistema de localización de Django
+    """
+    if format_type == 'long':
+        # Formato: "25 de enero de 2025, 14:30"
+        return formats.date_format(dt, "j \\d\\e F \\d\\e Y, H:i")
+    elif format_type == 'short':
+        # Formato: "25/01/2025 14:30"
+        return formats.date_format(dt, "d/m/Y H:i")
+    else:
+        return formats.date_format(dt, format_type)
+
 @login_required
 @user_passes_test(is_teacher)
 def activity_pdf_convocatoria(request, pk):
@@ -213,16 +227,25 @@ def activity_pdf_convocatoria(request, pk):
     # Activity basic info
     content.append(Paragraph("INFORMACIÓN GENERAL", subtitle_style))
 
+    # Estilo para texto de info que puede ser largo
+    info_cell_style = ParagraphStyle(
+        'InfoCellStyle',
+        parent=styles['Normal'],
+        fontSize=10,
+        wordWrap='CJK',
+        alignment=TA_LEFT
+    )
+
     info_data = [
-        ['Nombre de la Actividad:', activity.nombre],
+        ['Nombre de la Actividad:', Paragraph(activity.nombre, info_cell_style)],
         ['Tipo de Actividad:', activity.tipo_actividad.nombre],
-        ['Fecha de Inicio:', activity.fecha_inicio.strftime('%d de %B de %Y, %H:%M')],
-        ['Fecha de Fin:', activity.fecha_fin.strftime('%d de %B de %Y, %H:%M')],
+        ['Fecha de Inicio:', format_spanish_datetime(timezone.localtime(activity.fecha_inicio), 'long')],
+        ['Fecha de Fin:', format_spanish_datetime(timezone.localtime(activity.fecha_fin), 'long')],
     ]
 
     # Add subjects
     asignaturas = ', '.join([asig.nombre for asig in activity.asignaturas.all()])
-    info_data.append(['Asignaturas:', asignaturas])
+    info_data.append(['Asignaturas:', Paragraph(asignaturas, info_cell_style)])
 
     # Add evaluation info if applicable
     if activity.evaluable:
@@ -240,10 +263,14 @@ def activity_pdf_convocatoria(request, pk):
         ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
         ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
         ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
-        ('FONTNAME', (1, 0), (1, -1), 'Helvetica'),
-        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        # No aplicar FONTNAME a columna derecha ya que puede contener Paragraphs
+        ('FONTSIZE', (0, 0), (0, -1), 10),  # Solo aplicar a columna izquierda
         ('GRID', (0, 0), (-1, -1), 1, colors.black),
-        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),  # TOP alineación para mejor texto multilinea
+        ('LEFTPADDING', (0, 0), (-1, -1), 6),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 6),
+        ('TOPPADDING', (0, 0), (-1, -1), 6),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
     ]))
 
     content.append(info_table)
@@ -254,26 +281,41 @@ def activity_pdf_convocatoria(request, pk):
     if grupos.exists():
         content.append(Paragraph("GRUPOS Y HORARIOS", subtitle_style))
 
+        # Crear un estilo para texto de celda que puede expandirse
+        cell_style = ParagraphStyle(
+            'CellStyle',
+            parent=styles['Normal'],
+            fontSize=9,
+            wordWrap='CJK',  # Permite mejor ajuste de líneas
+            alignment=TA_LEFT
+        )
+
         group_data = [['Grupo', 'Fecha/Hora Inicio', 'Fecha/Hora Fin', 'Lugar', 'Descripción']]
         for grupo in grupos:
+            # Usar Paragraph para las celdas que pueden tener mucho texto
+            lugar_text = Paragraph(grupo.lugar or 'No especificado', cell_style)
+            descripcion_text = Paragraph(grupo.descripcion or '-', cell_style)
+
             group_data.append([
                 grupo.nombre_grupo,
-                grupo.fecha_inicio.strftime('%d/%m/%Y %H:%M'),
-                grupo.fecha_fin.strftime('%d/%m/%Y %H:%M'),
-                grupo.lugar or 'No especificado',
-                grupo.descripcion or '-'
+                format_spanish_datetime(timezone.localtime(grupo.fecha_inicio), 'short'),
+                format_spanish_datetime(timezone.localtime(grupo.fecha_fin), 'short'),
+                lugar_text,
+                descripcion_text
             ])
 
         groups_table = Table(group_data, colWidths=[2*cm, 3.5*cm, 3.5*cm, 3*cm, 3*cm])
         groups_table.setStyle(TableStyle([
             ('BACKGROUND', (0, 0), (-1, 0), colors.darkblue),
             ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('ALIGN', (0, 0), (2, -1), 'CENTER'),  # Centrar solo las primeras 3 columnas (Grupo, fechas)
+            ('ALIGN', (3, 1), (-1, -1), 'LEFT'),    # Alinear a la izquierda lugar y descripción
             ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-            ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
-            ('FONTSIZE', (0, 0), (-1, -1), 9),
+            ('FONTNAME', (0, 1), (2, -1), 'Helvetica'),  # Solo para texto plano (no Paragraphs)
+            ('FONTSIZE', (0, 0), (-1, 0), 9),
             ('GRID', (0, 0), (-1, -1), 1, colors.black),
-            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('VALIGN', (0, 0), (-1, -1), 'TOP'),  # Alinear todo al top para mejor texto multilinea
+            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.lightgrey]),  # Alternar colores de filas
         ]))
 
         content.append(groups_table)
@@ -296,7 +338,7 @@ def activity_pdf_convocatoria(request, pk):
     )
 
     content.append(Paragraph(
-        f"Documento generado el {timezone.now().strftime('%d de %B de %Y a las %H:%M')}",
+        f"Documento generado el {format_spanish_datetime(timezone.localtime(timezone.now()), 'long')}",
         footer_style
     ))
 

@@ -1,20 +1,239 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Student View</title>
-</head>
-<body>
-    <h2>Student View</h2>
-    <h3>Your Activities:</h3>
-    <ul>
-        {% for activity in activities %}
-            <li>
-                {{ activity.nombre }} ({{ activity.asignatura.nombre }}) - {{ activity.fecha_inicio }} to {{ activity.fecha_fin }}
-            </li>
-        {% empty %}
-            <li>No activities found for your selected subjects.</li>
-        {% endfor %}
-    </ul>
-    <p><a href="{% url 'teacher_dashboard' %}">Back to Dashboard</a></p>
-</body>
-</html>
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Student View Preview" %}{% endblock %}
+
+{% block extra_head %}
+    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css' rel='stylesheet' />
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.bootstrap5.min.css" rel="stylesheet">
+    <style>
+        @media (min-width: 768px) {
+            .sidebar {
+                position: sticky;
+                top: 1rem;
+                height: calc(100vh - 2rem);
+            }
+        }
+        .preview-banner {
+            background: linear-gradient(135deg, #ffc107 0%, #ff8c00 100%);
+            color: white;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            border-radius: 0.5rem;
+            text-align: center;
+        }
+        .context-info {
+            background-color: #e7f3ff;
+            border: 1px solid #007bff;
+            border-radius: 0.25rem;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <!-- Preview Banner -->
+    <div class="preview-banner">
+        <h3 class="mb-2">
+            <i class="bi bi-eye"></i>
+            {% trans "Student View Preview" %}
+        </h3>
+        <p class="mb-0">
+            {% trans "This is how students would see activities from your subjects" %}
+            {% if show_context %}
+                {% trans "and related courses" %}
+            {% endif %}
+        </p>
+    </div>
+
+    <!-- Context Information -->
+    {% if show_context %}
+    <div class="context-info">
+        <strong><i class="bi bi-info-circle"></i> {% trans "Context View Active" %}:</strong>
+        {% trans "Showing activities from the same degree programs and course levels as your subjects." %}
+    </div>
+    {% endif %}
+
+    <div class="row mt-4">
+        <div class="col-md-3">
+            <div class="sidebar p-3 bg-light rounded">
+                <h4 class="mb-3">{% trans "Preview Info" %}</h4>
+                <div class="alert alert-warning alert-sm">
+                    <small>
+                        <i class="bi bi-exclamation-triangle"></i>
+                        {% trans "This preview shows only active and approved activities, just like students see." %}
+                    </small>
+                </div>
+
+                <hr class="my-4">
+
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4 class="mb-0">{% trans "Simulated Enrolled Subjects" %}</h4>
+                </div>
+
+                {% if enrolled_subjects %}
+                    <div class="table-responsive mb-3" style="max-height: 300px; overflow-y: auto;">
+                        <table class="table table-sm">
+                            <tbody>
+                                {% for subject in enrolled_subjects %}
+                                <tr>
+                                    <td class="align-middle">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" checked disabled>
+                                            <label class="form-check-label">
+                                                {{ subject.nombre }}
+                                            </label>
+                                        </div>
+                                    </td>
+                                    <td class="text-muted small align-middle">{{ subject.titulacion.nombre }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-muted">{% trans "No subjects assigned." %}</p>
+                {% endif %}
+
+                <hr class="my-4">
+
+                <div class="d-grid gap-2">
+                    <a href="{% url 'teacher_dashboard' %}" class="btn btn-primary">
+                        <i class="bi bi-arrow-left"></i> {% trans "Back to Teacher Dashboard" %}
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-9">
+            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="activities-tab" data-bs-toggle="tab" data-bs-target="#activities-view" type="button" role="tab" aria-controls="activities-view" aria-selected="true">
+                        {% trans "Activities" %}
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="calendar-tab" data-bs-toggle="tab" data-bs-target="#calendar-view" type="button" role="tab" aria-controls="calendar-view" aria-selected="false">
+                        {% trans "Calendar" %}
+                    </button>
+                </li>
+            </ul>
+
+            <div class="tab-content" id="myTabContent">
+                <div class="tab-pane fade show active p-3" id="activities-view" role="tabpanel" aria-labelledby="activities-tab">
+                    <h4>{% trans "Upcoming Activities" %}</h4>
+
+                    {% if activities %}
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>{% trans "Activity" %}</th>
+                                        <th>{% trans "Subject(s)" %}</th>
+                                        <th>{% trans "Type" %}</th>
+                                        <th>{% trans "Start Date" %}</th>
+                                        <th>{% trans "End Date" %}</th>
+                                        <th>{% trans "Evaluable" %}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for activity in activities %}
+                                    <tr>
+                                        <td>
+                                            <strong>{{ activity.nombre }}</strong>
+                                            {% if activity.descripcion %}
+                                                <br><small class="text-muted">{{ activity.descripcion|truncatechars:50 }}</small>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% for asignatura in activity.asignaturas.all %}
+                                                <span class="badge bg-primary me-1 mb-1">{{ asignatura.nombre }}</span>
+                                            {% endfor %}
+                                        </td>
+                                        <td>{{ activity.tipo_actividad.nombre }}</td>
+                                        <td>{{ activity.fecha_inicio|date:"D, d M Y, H:i" }}</td>
+                                        <td>{{ activity.fecha_fin|date:"D, d M Y, H:i" }}</td>
+                                        <td>
+                                            {% if activity.evaluable %}
+                                                <span class="badge bg-success">
+                                                    {% trans "Yes" %} ({{ activity.porcentaje_evaluacion }}%)
+                                                </span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">{% trans "No" %}</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle"></i>
+                            {% trans "No activities found for the selected subjects." %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="tab-pane fade p-3" id="calendar-view" role="tabpanel" aria-labelledby="calendar-tab">
+                    <h4>{% trans "Calendar View" %}</h4>
+                    <div id='calendar'></div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'></script>
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/es.js'></script>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const calendarEl = document.getElementById('calendar');
+
+        const calendar = new FullCalendar.Calendar(calendarEl, {
+            locale: 'es',
+            initialView: 'dayGridMonth',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek'
+            },
+            buttonText: {
+                today: '{% trans "Today" %}',
+                month: '{% trans "Month" %}',
+                week: '{% trans "Week" %}',
+                day: '{% trans "Day" %}',
+                list: '{% trans "List" %}'
+            },
+            events: [
+                {% for activity in activities %}
+                {
+                    title: '{{ activity.nombre|escapejs }}',
+                    start: '{{ activity.fecha_inicio|date:"c" }}',
+                    end: '{{ activity.fecha_fin|date:"c" }}',
+                    backgroundColor: '{% if activity.evaluable %}#28a745{% else %}#007bff{% endif %}',
+                    borderColor: '{% if activity.evaluable %}#28a745{% else %}#007bff{% endif %}',
+                    extendedProps: {
+                        description: '{{ activity.descripcion|default:""|escapejs }}',
+                        subjects: '{% for asig in activity.asignaturas.all %}{{ asig.nombre }}{% if not forloop.last %}, {% endif %}{% endfor %}',
+                        type: '{{ activity.tipo_actividad.nombre|escapejs }}',
+                        evaluable: {{ activity.evaluable|yesno:"true,false" }}
+                    }
+                }{% if not forloop.last %},{% endif %}
+                {% endfor %}
+            ],
+            eventClick: function(info) {
+                alert('Activity: ' + info.event.title + '\n' +
+                      'Type: ' + info.event.extendedProps.type + '\n' +
+                      'Subjects: ' + info.event.extendedProps.subjects + '\n' +
+                      'Description: ' + (info.event.extendedProps.description || 'No description'));
+            }
+        });
+
+        calendar.render();
+    });
+    </script>
+{% endblock %}
