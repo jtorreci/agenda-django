@@ -552,6 +552,54 @@ Inconsistencia entre la definición del modelo y el código que accede a él:
 - **Optimización completa UX vista de actividad**
 - **Internacionalización completa dashboard profesor**
 - **Corrección funcionalidad "View as Student"**
+- **Resolución de dependencias de desarrollo**
+
+---
+
+## [2025-09-25] - Resolución de Dependencias de Desarrollo
+
+### 🔧 Corrección de Dependencias Faltantes
+**Estado:** ✅ COMPLETADO
+**Descripción:** Resolución del error de módulo faltante `icalendar` y creación de requirements para desarrollo.
+
+**Problema identificado:**
+- **Error ImportError**: `No module named 'icalendar'` al intentar arrancar el servidor
+- **Causa**: Dependencia requerida para generación de feeds iCal no estaba instalada
+- **Impacto**: Impedía el arranque del servidor de desarrollo
+
+**Soluciones implementadas:**
+
+**1. Instalación de dependencia faltante:**
+- ✅ **Comando ejecutado**: `pip install icalendar==6.3.1`
+- ✅ **Verificación**: Confirmado que funciona para generación de feeds iCal
+- ✅ **Resultado**: Servidor Django arranca correctamente
+
+**2. Verificación de dependencias adicionales:**
+- ✅ **Django 5.2.5**: Correctamente instalado
+- ✅ **reportlab 4.4.3**: Funcional para generación de PDFs
+- ✅ **pytz 2024.2**: Operativo para manejo de timezone
+- ✅ **pillow 11.3.0**: Instalado para procesamiento de imágenes
+- ✅ **Resultado**: Todas las dependencias críticas verificadas
+
+**3. Creación de requirements-dev.txt:**
+- ✅ **Archivo creado**: `requirements-dev.txt` para desarrollo local
+- ✅ **Características**: Evita dependencias de PostgreSQL problemáticas en Windows
+- ✅ **Incluye**: 15 dependencias esenciales para desarrollo
+- ✅ **Documentación**: Instrucciones claras de instalación con comentarios
+
+**4. Actualización de documentación:**
+- ✅ **CLAUDE.md actualizado**: Sección "Development Setup" expandida
+- ✅ **Instrucciones claras**: Diferenciación entre development y production
+- ✅ **Comandos específicos**: `pip install -r requirements-dev.txt` documentado
+
+**Archivos modificados:**
+- ✅ **requirements-dev.txt**: Archivo nuevo con 28 líneas
+- ✅ **CLAUDE.md**: Sección "Development Setup" actualizada (líneas 10-35)
+
+**Validación realizada:**
+- ✅ **Servidor inicia correctamente**: Sin errores de importación
+- ✅ **Funcionalidad iCal operativa**: Feeds se generan sin errores
+- ✅ **Setup reproducible**: requirements-dev.txt probado y funcional
 
 ### 🔧 Funcionalidades Operativas
 - Dashboard de profesor con actividades separadas
@@ -561,17 +609,19 @@ Inconsistencia entre la definición del modelo y el código que accede a él:
 - Generación de PDF de convocatoria sin errores
 
 ### 📊 Estadísticas
-- **Total de bugs corregidos:** 20
+- **Total de bugs corregidos:** 21 (+ 1 error de dependencias)
 - **Nuevas funcionalidades:** 1 (Vista de actividad + PDF)
 - **Mejoras de funcionalidad:** 3 (PDF mejorado + UX vista optimizada + "View as Student" rediseñada)
 - **Internacionalización:** 1 (Dashboard profesor completamente i18n)
-- **Archivos modificados:** 22+
+- **Correcciones de setup:** 1 (Dependencias de desarrollo organizadas)
+- **Archivos modificados:** 24+ (+ requirements-dev.txt + CLAUDE.md actualizado)
 - **Templates actualizados:** 10+ (incluyendo template completamente nuevo)
 - **Funciones nuevas creadas:** 3
 - **Mejoras UX:** 2 (Vista de actividad renovada + "View as Student" profesional)
 - **Strings i18n implementados:** 50+ cadenas traducibles
+- **Archivos de configuración creados:** 1 (requirements-dev.txt)
 
 ---
 
 **Última actualización:** 2025-09-25
-**Estado del proyecto:** Todas las funcionalidades principales operativas sin errores críticos. Timezone completamente consistente. PDF de convocatoria profesional en español. Vista de actividad optimizada. Dashboard profesor completamente internacionalizado. Funcionalidad "View as Student" precisa y profesional.
+**Estado del proyecto:** Todas las funcionalidades principales operativas sin errores críticos. Timezone completamente consistente. PDF de convocatoria profesional en español. Vista de actividad optimizada. Dashboard profesor completamente internacionalizado. Funcionalidad "View as Student" precisa y profesional. Environment de desarrollo completamente configurado con dependencias organizadas.

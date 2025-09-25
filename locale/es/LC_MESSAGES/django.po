@@ -1,14 +1,12 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# Spanish translations for Django Agenda Académica
+# Copyright (C) 2025 Universidad de Extremadura
 # This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#
-#, fuzzy
+# Jesús Torrecilla <jesustorrecilla@unex.es>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-28 11:25+0200\n"
+"POT-Creation-Date: 2025-09-25 20:23+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,258 +16,830 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? "
 "1 : 2;\n"
-#: .\users\templates\users\login.html:5 .\users\templates\users\login.html:8
-#: .\users\templates\users\login.html:12
-msgid "Login"
+#: .\schedule\templates\schedule\activity_confirm_copy.html:4
+msgid "Confirmar Copia de Actividad"
 msgstr ""
 
-#: .\users\templates\users\login.html:14
-msgid "Don't have an account?"
-msgstr "¿No estás registrado?"
+#: .\schedule\templates\schedule\activity_confirm_copy.html:8
+msgid "Actividad Bloqueada"
+msgstr ""
 
-#: .\users\templates\users\login.html:14
-msgid "Register here"
-msgstr "Regístrate aquí"
+#: .\schedule\templates\schedule\activity_confirm_copy.html:15
+msgid "¿Desea continuar y crear una copia editable?"
+msgstr ""
 
-#: .\users\templates\users\registration.html:5
-#: .\users\templates\users\registration.html:8
-#: .\users\templates\users\registration.html:12
-msgid "Register"
-msgstr "Registrar"
+#: .\schedule\templates\schedule\activity_confirm_copy.html:19
+msgid "Sí, crear copia"
+msgstr ""
 
-#: .\users\templates\users\registration.html:14
-msgid "Already have an account?"
-msgstr "¿Ya tienes una cuenta?"
+#: .\schedule\templates\schedule\activity_confirm_copy.html:20
+msgid "Cancelar"
+msgstr ""
 
-#: .\users\templates\users\registration.html:14
-msgid "Login here"
-msgstr "Acceso"
+#: .\schedule\templates\schedule\activity_detail.html:5
+msgid "Activity Details"
+msgstr "Detalles de la Actividad"
 
-#: .\users\views.py:41
-msgid "Welcome to Agenda Academica"
-msgstr "Bienvenido a Agenda Académica"
+#: .\schedule\templates\schedule\activity_detail.html:108
+msgid "General Information"
+msgstr "Información General"
 
-# Activity logging translations
-msgid "Creation"
-msgstr "Creación"
+#: .\schedule\templates\schedule\activity_detail.html:113
+msgid "Start Date & Time"
+msgstr "Fecha y Hora de Inicio"
 
-msgid "Modification"  
-msgstr "Modificación"
+#: .\schedule\templates\schedule\activity_detail.html:123
+msgid "End Date & Time"
+msgstr "Fecha y Hora de Fin"
 
-msgid "Deletion"
-msgstr "Eliminación"
-
-msgid "Reactivation"
-msgstr "Reactivación"
-
-msgid "Version Restore"
-msgstr "Restauración de versión"
-
-# Activity versioning translations
-msgid "Version History"
-msgstr "Historial de versiones"
-
-msgid "Current Version"
-msgstr "Versión actual"
-
-msgid "Previous Versions"
-msgstr "Versiones anteriores"
-
-msgid "Edit Current Version"
-msgstr "Editar versión actual"
-
-msgid "Back to Dashboard"
-msgstr "Volver al panel"
-
-msgid "Back to History"
-msgstr "Volver al historial"
-
-msgid "View Details"
-msgstr "Ver detalles"
-
-msgid "Restore"
-msgstr "Restaurar"
-
-msgid "Restore This Version"
-msgstr "Restaurar esta versión"
-
-msgid "Cancel"
-msgstr "Cancelar"
-
-# Activity details translations
-msgid "Activity Name"
-msgstr "Nombre de la actividad"
-
-msgid "Description"
-msgstr "Descripción"
-
-msgid "Start Date"
-msgstr "Fecha de inicio"
-
-msgid "End Date"
-msgstr "Fecha de fin"
-
-msgid "Type"
-msgstr "Tipo"
-
+#: .\schedule\templates\schedule\activity_detail.html:133
 msgid "Subjects"
 msgstr "Asignaturas"
 
+#: .\schedule\templates\schedule\activity_detail.html:149
+msgid "Groups and Schedules"
+msgstr ""
+
+#: .\schedule\templates\schedule\activity_detail.html:156
+msgid "Group"
+msgstr ""
+
+#: .\schedule\templates\schedule\activity_detail.html:161
+msgid "Start"
+msgstr ""
+
+#: .\schedule\templates\schedule\activity_detail.html:165
+msgid "End"
+msgstr ""
+
+#: .\schedule\templates\schedule\activity_detail.html:169
+msgid "Location"
+msgstr ""
+
+#: .\schedule\templates\schedule\activity_detail.html:173
+msgid "Students"
+msgstr ""
+
+#: .\schedule\templates\schedule\activity_detail.html:180
+#: .\schedule\templates\schedule\activity_detail.html:193
+#: .\schedule\templates\schedule\activity_version_history.html:46
+msgid "Description"
+msgstr ""
+
+#: .\schedule\templates\schedule\activity_detail.html:211
+msgid "Evaluation"
+msgstr "Evaluación"
+
+#: .\schedule\templates\schedule\activity_detail.html:217
+#: .\users\templates\users\teacher_student_view.html:137
 msgid "Evaluable"
-msgstr "Evaluable"
+msgstr ""
 
-msgid "Percentage"
-msgstr "Porcentaje"
+#: .\schedule\templates\schedule\activity_detail.html:220
+msgid "Weight"
+msgstr ""
 
+#: .\schedule\templates\schedule\activity_detail.html:223
+msgid "Recoverable"
+msgstr ""
+
+#: .\schedule\templates\schedule\activity_detail.html:226
+#: .\users\templates\users\teacher_student_view.html:163
+msgid "No"
+msgstr ""
+
+#: .\schedule\templates\schedule\activity_detail.html:230
+#: .\schedule\templates\schedule\activity_detail.html:253
+#: .\schedule\templates\schedule\activity_detail.html:266
+#: .\users\templates\users\teacher_student_view.html:160
+msgid "Yes"
+msgstr ""
+
+#: .\schedule\templates\schedule\activity_detail.html:237
+msgid "Not Evaluable"
+msgstr ""
+
+#: .\schedule\templates\schedule\activity_detail.html:246
 msgid "Status"
 msgstr "Estado"
 
-msgid "Approved"
-msgstr "Aprobada"
-
-msgid "Pending Approval"
-msgstr "Pendiente de aprobación"
-
+#: .\schedule\templates\schedule\activity_detail.html:250
 msgid "Active"
-msgstr "Activa"
+msgstr "Activo"
 
-msgid "Inactive"
-msgstr "Inactiva"
+#: .\schedule\templates\schedule\activity_detail.html:257
+msgid "Deleted"
+msgstr ""
 
-msgid "Yes"
-msgstr "Sí"
+#: .\schedule\templates\schedule\activity_detail.html:263
+msgid "Approved"
+msgstr "Aprobado"
 
-msgid "No"
-msgstr "No"
+#: .\schedule\templates\schedule\activity_detail.html:270
+msgid "Pending"
+msgstr ""
 
-msgid "Modified by"
-msgstr "Modificado por"
+#: .\schedule\templates\schedule\activity_detail.html:282
+msgid "Actions"
+msgstr "Acciones"
 
-msgid "Comment"
-msgstr "Comentario"
+#: .\schedule\templates\schedule\activity_detail.html:290
+msgid "Edit Activity"
+msgstr "Editar Actividad"
 
-# Activity creation/modification log details
-msgid "Activity \"%(name)s\" created for %(count)d subject(s)"
-msgstr "Actividad \"%(name)s\" creada para %(count)d asignatura(s)"
+#: .\schedule\templates\schedule\activity_detail.html:296
+#: .\users\templates\users\teacher_dashboard.html:233
+msgid "Copy Activity"
+msgstr "Copiar Actividad"
 
-msgid "Activity \"%(name)s\" modified"
-msgstr "Actividad \"%(name)s\" modificada"
+#: .\schedule\templates\schedule\activity_detail.html:305
+msgid "Download PDF"
+msgstr "Descargar PDF"
 
-msgid "Activity type \"%(name)s\" created"
-msgstr "Tipo de actividad \"%(name)s\" creado"
+#: .\schedule\templates\schedule\activity_detail.html:312
+#: .\schedule\templates\schedule\activity_version_history.html:18
+#: .\schedule\templates\schedule\activity_version_history.html:22
+#: .\schedule\templates\schedule\activity_version_history.html:26
+#: .\schedule\templates\schedule\ical_management.html:58
+msgid "Back to Dashboard"
+msgstr ""
 
-# Additional translations for versioning system
+#: .\schedule\templates\schedule\activity_version_history.html:4
+#: .\schedule\templates\schedule\activity_version_history.html:11
+msgid "Version History"
+msgstr ""
+
+#: .\schedule\templates\schedule\activity_version_history.html:14
+msgid "Edit Current Version"
+msgstr ""
+
+#: .\schedule\templates\schedule\activity_version_history.html:30
 msgid "Back to Home"
-msgstr "Volver al inicio"
+msgstr ""
 
-msgid "No description"
-msgstr "Sin descripción"
+#: .\schedule\templates\schedule\activity_version_history.html:40
+msgid "Current Version"
+msgstr ""
 
-msgid "Version"
-msgstr "Versión"
+#: .\schedule\templates\schedule\activity_version_history.html:47
+#: .\users\templates\users\teacher_student_view.html:135
+msgid "Start Date"
+msgstr "Fecha de Inicio"
 
-msgid "Modified on"
-msgstr "Modificado el"
+#: .\schedule\templates\schedule\activity_version_history.html:48
+#: .\users\templates\users\teacher_student_view.html:136
+msgid "End Date"
+msgstr "Fecha de Fin"
 
-msgid "Created by"
-msgstr "Creado por"
+#: .\schedule\templates\schedule\activity_version_history.html:51
+#: .\users\templates\users\teacher_student_view.html:134
+msgid "Type"
+msgstr "Tipo"
 
-msgid "Date"
-msgstr "Fecha"
+#: .\schedule\templates\schedule\ical_management.html:4
+msgid "iCal Management"
+msgstr ""
 
-msgid "Restoration Details"
-msgstr "Detalles de restauración"
+#: .\schedule\templates\schedule\ical_management.html:52
+msgid "iCal Feed Management"
+msgstr ""
 
-msgid "Version to restore"
-msgstr "Versión a restaurar"
+#: .\schedule\templates\schedule\ical_management.html:55
+#: .\schedule\templates\schedule\ical_management.html:204
+msgid "Create Automatic Feeds"
+msgstr ""
 
-msgid "Important Information"
-msgstr "Información importante"
+#: .\schedule\templates\schedule\ical_management.html:64
+msgid "Security Warning"
+msgstr ""
 
-msgid "This will restore the activity to"
-msgstr "Esto restaurará la actividad a"
+#: .\schedule\templates\schedule\ical_management.html:65
+msgid ""
+"The iCal URLs are private but shareable. Anyone with the URL can access the "
+"calendar feed. Do not share them publicly unless you want the calendar to be "
+"public."
+msgstr ""
 
-msgid "The current version will be saved as a new version before restoration"
-msgstr "La versión actual se guardará como una nueva versión antes de la restauración"
+#: .\schedule\templates\schedule\ical_management.html:72
+msgid "Complete Titulacion Feeds"
+msgstr ""
 
-msgid "All changes made after"
-msgstr "Todos los cambios realizados después del"
+#: .\schedule\templates\schedule\ical_management.html:83
+#: .\schedule\templates\schedule\ical_management.html:124
+#: .\schedule\templates\schedule\ical_management.html:165
+msgid "subjects"
+msgstr ""
 
-msgid "will be reverted"
-msgstr "serán revertidos"
+#: .\schedule\templates\schedule\ical_management.html:87
+#: .\schedule\templates\schedule\ical_management.html:128
+#: .\schedule\templates\schedule\ical_management.html:169
+msgid "iCal URL:"
+msgstr ""
 
-msgid "This action can be undone by restoring a more recent version"
-msgstr "Esta acción se puede deshacer restaurando una versión más reciente"
+#: .\schedule\templates\schedule\ical_management.html:94
+msgid "Copy URL"
+msgstr ""
 
-msgid "Confirm Version Restoration"
-msgstr "Confirmar restauración de versión"
+#: .\schedule\templates\schedule\ical_management.html:99
+msgid "Download"
+msgstr ""
 
-# Login page translations
-msgid "Please log in to continue"
-msgstr "Por favor, inicia sesión para continuar"
+#: .\schedule\templates\schedule\ical_management.html:113
+msgid "Course-Specific Feeds"
+msgstr ""
 
-msgid "Username"
-msgstr "Nombre de usuario"
+#: .\schedule\templates\schedule\ical_management.html:135
+#: .\schedule\templates\schedule\ical_management.html:176
+msgid "Copy"
+msgstr ""
 
-msgid "Password"
-msgstr "Contraseña"
+#: .\schedule\templates\schedule\ical_management.html:154
+msgid "Custom/Manual Feeds"
+msgstr ""
 
-msgid "Login"
-msgstr "Iniciar sesión"
+#: .\schedule\templates\schedule\ical_management.html:201
+msgid "No iCal feeds found"
+msgstr ""
 
-msgid "Logging in..."
-msgstr "Iniciando sesión..."
+#: .\schedule\templates\schedule\ical_management.html:202
+msgid "Create automatic feeds to get started"
+msgstr ""
 
-msgid "Create New Account"
-msgstr "Crear nueva cuenta"
+#: .\schedule\templates\schedule\ical_management.html:218
+msgid "Success"
+msgstr ""
 
-# Logout page translations
+#: .\schedule\templates\schedule\ical_management.html:225
+msgid "Created feeds:"
+msgstr ""
+
+#: .\schedule\templates\schedule\ical_management.html:229
+msgid "Already existing feeds:"
+msgstr ""
+
+#: .\schedule\templates\schedule\ical_management.html:234
+#: .\users\templates\users\teacher_dashboard.html:234
+msgid "Close"
+msgstr ""
+
+#: .\schedule\templates\schedule\ical_management.html:235
+msgid "Refresh Page"
+msgstr ""
+
+#: .\schedule\templates\schedule\ical_management.html:252
+msgid "Copied!"
+msgstr ""
+
+#: .\schedule\templates\schedule\ical_management.html:263
+msgid "Failed to copy URL"
+msgstr ""
+
+#: .\schedule\templates\schedule\ical_management.html:273
+msgid "Creating feeds..."
+msgstr ""
+
+#: .\schedule\templates\schedule\ical_management.html:288
+msgid "Operation completed!"
+msgstr ""
+
+#: .\schedule\templates\schedule\ical_management.html:289
+msgid "Created:"
+msgstr ""
+
+#: .\schedule\templates\schedule\ical_management.html:289
+msgid "new feeds"
+msgstr ""
+
+#: .\schedule\templates\schedule\ical_management.html:290
+msgid "Already existed:"
+msgstr ""
+
+#: .\schedule\templates\schedule\ical_management.html:290
+msgid "feeds"
+msgstr ""
+
+#: .\schedule\templates\schedule\ical_management.html:323
+msgid "Error creating feeds"
+msgstr ""
+
+#: .\schedule\views.py:84 .\schedule\views.py:990 .\schedule\views.py:1709
+#: .\schedule\views.py:2006 .\users\views.py:864
+msgid "Creation"
+msgstr ""
+
+#: .\schedule\views.py:85
+#, python-format
+msgid "Activity \"%(name)s\" created for %(count)d subject(s)"
+msgstr ""
+
+#: .\schedule\views.py:97 .\schedule\views.py:1030 .\schedule\views.py:1696
+#: .\schedule\views.py:1709 .\schedule\views.py:1992 .\users\views.py:922
+msgid "Modification"
+msgstr ""
+
+#: .\schedule\views.py:98
+#, python-format
+msgid "Activity \"%(name)s\" modified"
+msgstr ""
+
+#: .\schedule\views.py:122 .\schedule\views.py:1077
+msgid "Deletion"
+msgstr ""
+
+#: .\schedule\views.py:575
+msgid "Reactivation"
+msgstr ""
+
+#: .\schedule\views.py:991
+#, python-format
+msgid "Activity type \"%(name)s\" created"
+msgstr ""
+
+#: .\schedule\views.py:1244
+msgid "Version Restore"
+msgstr ""
+
+#: .\schedule\views.py:1457
+msgid "Report Generation"
+msgstr ""
+
+#: .\schedule\views.py:1535
+msgid "iCal Generation"
+msgstr ""
+
+#: .\schedule\views.py:1592
+msgid "iCal Deletion"
+msgstr ""
+
+#: .\schedule\views.py:1697
+msgid "Multi-group activity updated - old version deactivated"
+msgstr ""
+
+#: .\schedule\views.py:1710
+msgid "Multi-group activity created/updated"
+msgstr ""
+
+#: .\templates\logout_success.html:4
 msgid "Logged Out"
-msgstr "Sesión cerrada"
+msgstr ""
 
+#: .\templates\logout_success.html:186
 msgid "Session Ended"
-msgstr "Sesión finalizada"
+msgstr ""
 
+#: .\templates\logout_success.html:188
 msgid "You have been logged out successfully"
-msgstr "Has cerrado sesión correctamente"
+msgstr ""
 
+#: .\templates\logout_success.html:197
 msgid "Thank you for using Agenda Académica"
-msgstr "Gracias por usar Agenda Académica"
+msgstr ""
 
+#: .\templates\logout_success.html:201
 msgid "Your session has been securely closed. All your data is safe."
-msgstr "Tu sesión se ha cerrado de forma segura. Todos tus datos están a salvo."
+msgstr ""
 
+#: .\templates\logout_success.html:207
 msgid "Login Again"
-msgstr "Iniciar sesión de nuevo"
+msgstr ""
 
+#: .\templates\logout_success.html:211
 msgid "Go to Home"
-msgstr "Ir al inicio"
+msgstr ""
 
-# Registration page translations
+#: .\templates\users\registration_success.html:4
+msgid "Registro Exitoso"
+msgstr ""
+
+#: .\templates\users\registration_success.html:15
+msgid "¡Email Reenviado!"
+msgstr ""
+
+#: .\templates\users\registration_success.html:17
+msgid "¡Registro Exitoso!"
+msgstr ""
+
+#: .\templates\users\registration_success.html:24
+msgid "Confirma tu correo electrónico"
+msgstr ""
+
+#: .\templates\users\registration_success.html:26
+msgid "Hemos enviado un enlace de confirmación a:"
+msgstr ""
+
+#: .\templates\users\registration_success.html:31
+msgid ""
+"Por favor, revisa tu bandeja de entrada y la carpeta de spam/correo no "
+"deseado."
+msgstr ""
+
+#: .\templates\users\registration_success.html:37
+msgid "Importante:"
+msgstr ""
+
+#: .\templates\users\registration_success.html:38
+msgid "Debes confirmar tu correo electrónico antes de poder iniciar sesión."
+msgstr ""
+
+#: .\templates\users\registration_success.html:43
+msgid "Ir a Iniciar Sesión"
+msgstr ""
+
+#: .\templates\users\registration_success.html:49
+msgid "¿No recibiste el correo?"
+msgstr ""
+
+#: .\templates\users\registration_success.html:50
+msgid "Reenviar email de confirmación"
+msgstr ""
+
+#: .\templates\users\resend_activation.html:5
+#: .\templates\users\resend_activation.html:14
+msgid "Reenviar Email de Activación"
+msgstr ""
+
+#: .\templates\users\resend_activation.html:18
+msgid "Introduce tu nombre de usuario para reenviar el email de activación:"
+msgstr ""
+
+#: .\templates\users\resend_activation.html:23
+msgid "Nombre de usuario"
+msgstr ""
+
+#: .\templates\users\resend_activation.html:29
+msgid "Tu nombre de usuario"
+msgstr ""
+
+#: .\templates\users\resend_activation.html:34
+msgid "Reenviar Email"
+msgstr ""
+
+#: .\templates\users\resend_activation.html:37
+msgid "Volver al Login"
+msgstr ""
+
+#: .\users\templates\users\account_activation_email.html:3
+#, python-format
+msgid "Hi %(user.username)s,"
+msgstr ""
+
+#: .\users\templates\users\account_activation_email.html:5
+msgid "Please click on the link below to activate your account:"
+msgstr ""
+
+#: .\users\templates\users\login.html:4 .\users\templates\users\login.html:267
+msgid "Login"
+msgstr ""
+
+#: .\users\templates\users\login.html:201
+msgid "Please log in to continue"
+msgstr ""
+
+#: .\users\templates\users\login.html:226
+#: .\users\templates\users\login.html:232
+#: .\users\templates\users\registration.html:271
+#: .\users\templates\users\registration.html:277
+msgid "Username"
+msgstr ""
+
+#: .\users\templates\users\login.html:248
+#: .\users\templates\users\login.html:254
+#: .\users\templates\users\registration.html:322
+#: .\users\templates\users\registration.html:328
+msgid "Password"
+msgstr ""
+
+#: .\users\templates\users\login.html:271
+msgid "Forgot your password?"
+msgstr ""
+
+#: .\users\templates\users\login.html:275
+msgid "Don't have an account?"
+msgstr ""
+
+#: .\users\templates\users\login.html:280
+msgid "Create New Account"
+msgstr ""
+
+#: .\users\templates\users\login.html:296
+msgid "Logging in..."
+msgstr ""
+
+#: .\users\templates\users\registration.html:4
 msgid "Register"
-msgstr "Registrarse"
+msgstr ""
 
+#: .\users\templates\users\registration.html:244
+#: .\users\templates\users\registration.html:369
 msgid "Create Account"
-msgstr "Crear cuenta"
+msgstr ""
 
+#: .\users\templates\users\registration.html:246
 msgid "Join Agenda Académica today"
-msgstr "Únete a Agenda Académica hoy"
+msgstr ""
 
+#: .\users\templates\users\registration.html:297
+#: .\users\templates\users\registration.html:303
 msgid "Email address"
-msgstr "Correo electrónico"
+msgstr ""
 
+#: .\users\templates\users\registration.html:347
+#: .\users\templates\users\registration.html:353
 msgid "Confirm password"
-msgstr "Confirmar contraseña"
+msgstr ""
 
-msgid "Creating account..."
-msgstr "Creando cuenta..."
-
-msgid "Sign In"
-msgstr "Iniciar sesión"
-
+#: .\users\templates\users\registration.html:377
 msgid "Already have an account?"
-msgstr "¿Ya tienes una cuenta?"
+msgstr ""
 
-#: .\users\views.py:42
-msgid "Thank you for registering. Your account has been created."
-msgstr "Gracias por tu registro. Ya tienes una cuenta disponible"
+#: .\users\templates\users\registration.html:381
+msgid "Sign In"
+msgstr ""
+
+#: .\users\templates\users\registration.html:396
+msgid "Creating account..."
+msgstr ""
+
+#: .\users\templates\users\teacher_dashboard.html:4
+#: .\users\templates\users\teacher_dashboard.html:67
+msgid "Teacher Dashboard"
+msgstr ""
+
+#: .\users\templates\users\teacher_dashboard.html:68
+msgid "Welcome, Teacher!"
+msgstr ""
+
+#: .\users\templates\users\teacher_dashboard.html:72
+msgid "No subjects assigned to you. Please"
+msgstr ""
+
+#: .\users\templates\users\teacher_dashboard.html:72
+msgid "select your subjects"
+msgstr ""
+
+#: .\users\templates\users\teacher_dashboard.html:72
+msgid "to begin."
+msgstr ""
+
+#: .\users\templates\users\teacher_dashboard.html:79
+msgid "My Assigned Subjects"
+msgstr "Mis Asignaturas Asignadas"
+
+#: .\users\templates\users\teacher_dashboard.html:80
+msgid "Manage subject selection"
+msgstr ""
+
+#: .\users\templates\users\teacher_dashboard.html:80
+msgid "Manage Selection"
+msgstr ""
+
+#: .\users\templates\users\teacher_dashboard.html:111
+msgid "Create Activity for Selected"
+msgstr "Crear Actividad para Seleccionadas"
+
+#: .\users\templates\users\teacher_dashboard.html:121
+msgid "iCal Feed Configurations"
+msgstr ""
+
+#: .\users\templates\users\teacher_dashboard.html:132
+msgid "Copy Link"
+msgstr ""
+
+#: .\users\templates\users\teacher_dashboard.html:133
+msgid "Delete"
+msgstr ""
+
+#: .\users\templates\users\teacher_dashboard.html:139
+msgid "No iCal feed configurations found."
+msgstr ""
+
+#: .\users\templates\users\teacher_dashboard.html:141
+msgid "Create New iCal Feed"
+msgstr ""
+
+#: .\users\templates\users\teacher_dashboard.html:146
+msgid "View as Student"
+msgstr ""
+
+#: .\users\templates\users\teacher_dashboard.html:153
+#: .\users\templates\users\teacher_student_view.html:113
+msgid "Activities"
+msgstr "Actividades"
+
+#: .\users\templates\users\teacher_dashboard.html:156
+#: .\users\templates\users\teacher_student_view.html:118
+msgid "Calendar"
+msgstr "Calendario"
+
+#: .\users\templates\users\teacher_dashboard.html:163
+msgid "Activities for Selected Subjects"
+msgstr "Actividades para Asignaturas Seleccionadas"
+
+#: .\users\templates\users\teacher_dashboard.html:165
+#: .\users\templates\users\teacher_dashboard.html:509
+msgid "Show Deleted Activities"
+msgstr "Mostrar Actividades Borradas"
+
+#: .\users\templates\users\teacher_dashboard.html:171
+msgid "Select subjects on the left to see their activities."
+msgstr ""
+
+#: .\users\templates\users\teacher_dashboard.html:177
+msgid "Deleted Activities"
+msgstr ""
+
+#: .\users\templates\users\teacher_dashboard.html:180
+msgid "No deleted activities found."
+msgstr ""
+
+#: .\users\templates\users\teacher_dashboard.html:186
+msgid "Calendar for Selected Subjects"
+msgstr "Calendario para Asignaturas Seleccionadas"
+
+#: .\users\templates\users\teacher_dashboard.html:197
+msgid "Logout"
+msgstr ""
+
+#: .\users\templates\users\teacher_dashboard.html:237
+msgid "How do you want to copy the activity"
+msgstr ""
+
+#: .\users\templates\users\teacher_dashboard.html:240
+msgid "As Individual Activity"
+msgstr "Como Actividad Individual"
+
+#: .\users\templates\users\teacher_dashboard.html:243
+msgid "As Multi-Group Activity"
+msgstr "Como Actividad Multi-Grupo"
+
+#: .\users\templates\users\teacher_dashboard.html:248
+msgid "Cancel"
+msgstr ""
+
+#: .\users\templates\users\teacher_dashboard.html:291
+#: .\users\templates\users\teacher_student_view.html:205
+msgid "Today"
+msgstr "Hoy"
+
+#: .\users\templates\users\teacher_dashboard.html:292
+#: .\users\templates\users\teacher_student_view.html:206
+msgid "Month"
+msgstr "Mes"
+
+#: .\users\templates\users\teacher_dashboard.html:293
+#: .\users\templates\users\teacher_student_view.html:207
+msgid "Week"
+msgstr "Semana"
+
+#: .\users\templates\users\teacher_dashboard.html:294
+#: .\users\templates\users\teacher_student_view.html:208
+msgid "Day"
+msgstr ""
+
+#: .\users\templates\users\teacher_dashboard.html:295
+#: .\users\templates\users\teacher_student_view.html:209
+msgid "List"
+msgstr ""
+
+#: .\users\templates\users\teacher_dashboard.html:375
+#: .\users\templates\users\teacher_student_view.html:174
+msgid "No activities found for the selected subjects."
+msgstr ""
+
+#: .\users\templates\users\teacher_dashboard.html:409
+msgid "View details and generate PDF"
+msgstr ""
+
+#: .\users\templates\users\teacher_dashboard.html:412
+msgid "Edit activity"
+msgstr ""
+
+#: .\users\templates\users\teacher_dashboard.html:415
+msgid "Copy activity"
+msgstr ""
+
+#: .\users\templates\users\teacher_dashboard.html:418
+msgid "Delete activity"
+msgstr ""
+
+#: .\users\templates\users\teacher_dashboard.html:470
+msgid "View Details"
+msgstr ""
+
+#: .\users\templates\users\teacher_dashboard.html:503
+msgid "Hide Deleted Activities"
+msgstr "Ocultar Actividades Borradas"
+
+#: .\users\templates\users\teacher_dashboard.html:544
+msgid "Please select at least one subject to create an activity."
+msgstr ""
+
+#: .\users\templates\users\teacher_dashboard.html:553
+msgid "iCal link copied to clipboard!"
+msgstr ""
+
+#: .\users\templates\users\teacher_student_view.html:4
+#: .\users\templates\users\teacher_student_view.html:40
+msgid "Student View Preview"
+msgstr ""
+
+#: .\users\templates\users\teacher_student_view.html:43
+msgid "This is how students would see activities from your subjects"
+msgstr ""
+
+#: .\users\templates\users\teacher_student_view.html:45
+msgid "and related courses"
+msgstr ""
+
+#: .\users\templates\users\teacher_student_view.html:53
+msgid "Context View Active"
+msgstr "Vista de Contexto Activa"
+
+#: .\users\templates\users\teacher_student_view.html:54
+msgid ""
+"Showing activities from the same degree programs and course levels as your "
+"subjects."
+msgstr ""
+
+#: .\users\templates\users\teacher_student_view.html:61
+msgid "Preview Info"
+msgstr ""
+
+#: .\users\templates\users\teacher_student_view.html:65
+msgid ""
+"This preview shows only active and approved activities, just like students "
+"see."
+msgstr ""
+
+#: .\users\templates\users\teacher_student_view.html:72
+msgid "Simulated Enrolled Subjects"
+msgstr "Asignaturas Simuladas Inscritas"
+
+#: .\users\templates\users\teacher_student_view.html:96
+msgid "No subjects assigned."
+msgstr ""
+
+#: .\users\templates\users\teacher_student_view.html:103
+msgid "Back to Teacher Dashboard"
+msgstr ""
+
+#: .\users\templates\users\teacher_student_view.html:125
+msgid "Upcoming Activities"
+msgstr "Próximas Actividades"
+
+#: .\users\templates\users\teacher_student_view.html:132
+msgid "Activity"
+msgstr "Actividad"
+
+#: .\users\templates\users\teacher_student_view.html:133
+msgid "Subject(s)"
+msgstr "Asignatura(s)"
+
+#: .\users\templates\users\teacher_student_view.html:180
+msgid "Calendar View"
+msgstr "Vista de Calendario"
+
+#: .\users\views.py:59
+msgid ""
+"Registration is only allowed for email addresses from UNEX (unex.es or "
+"alumnos.unex.es)."
+msgstr ""
+
+#: .\users\views.py:67
+msgid "Activa tu cuenta - Agenda Académica"
+msgstr ""
+
+#: .\users\views.py:81
+msgid ""
+"Usuario creado, pero hubo un problema enviando el email de confirmación. "
+"Contacta al administrador."
+msgstr ""
+
+#: .\users\views.py:99
+msgid "Your account has been activated successfully. You can now log in."
+msgstr ""
+
+#: .\users\views.py:102
+msgid "The activation link is invalid."
+msgstr ""
+
+#: .\users\views.py:111
+msgid "Esta cuenta ya está activada."
+msgstr ""
+
+#: .\users\views.py:117
+msgid "Reenvío - Activa tu cuenta - Agenda Académica"
+msgstr ""
+
+#: .\users\views.py:132
+msgid "Error enviando el email. Inténtalo más tarde."
+msgstr ""
+
+#: .\users\views.py:135
+msgid "No se encontró ningún usuario con ese nombre."
+msgstr ""
+
+#: .\users\views.py:865
+#, python-format
+msgid "Profile type \"%(name)s\" created"
+msgstr ""
