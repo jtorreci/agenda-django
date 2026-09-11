@@ -11,6 +11,7 @@ COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY --chown=django:django . .
+RUN mkdir -p /app/staticfiles /app/media && chown -R django:django /app/staticfiles /app/media
 USER django
 
 EXPOSE 8000
