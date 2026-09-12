@@ -1,40 +1,51 @@
+name: agenda
+
 services:
   db:
     image: postgres:16-alpine
+    container_name: agenda_db
     restart: unless-stopped
     env_file: .env.garnocex
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB:?Set POSTGRES_DB in .env.garnocex}
-      POSTGRES_USER: ${POSTGRES_USER:?Set POSTGRES_USER in .env.garnocex}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env.garnocex}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
       interval: 10s
       timeout: 5s
       retries: 5
+    volumes:
+      - agenda_postgres_data:/var/lib/postgresql/data
+    networks:
+      - agenda_network
 
-  web:
+  agenda:
     build: .
+    container_name: agenda_app
     restart: unless-stopped
     env_file: .env.garnocex
     environment:
       DJANGO_SETTINGS_MODULE: agenda_academica.settings_production
       DJANGO_DEBUG: "False"
-      DATABASE_URL: postgresql://${POSTGRES_USER:?Set POSTGRES_USER}:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:?Set POSTGRES_DB}
     command: >-
-      sh -c "python manage.py migrate --noinput && python manage.py collectstatic --noinput &&
-      gunicorn agenda_academica.wsgi:application --bind 0.0.0.0:8000 --workers 3
-      --access-logfile - --error-logfile -"
+      sh -c 'export DB_NAME="$${POSTGRES_DB}" DB_USER="$${POSTGRES_USER}" DB_PASSWORD="$${POSTGRES_PASSWORD}" DB_HOST=db DB_PORT=5432; python manage.py migrate --noinput && python manage.py collectstatic --noinput && exec gunicorn agenda_academica.wsgi:application --bind 0.0.0.0:8000 --workers 3 --access-logfile - --error-logfile -'
     depends_on:
       db:
         condition: service_healthy
     ports:
-      - "127.0.0.1:${APP_PORT:-8000}:8000"
+      - "127.0.0.1:8000:8000"
     volumes:
-      - media_data:/app/media
+      - agenda_static_files:/app/staticfiles
+      - agenda_media_files:/app/media
+    networks:
+      - agenda_network
 
 volumes:
-  postgres_data:
-  media_data:
+  agenda_postgres_data:
+    external: true
+  agenda_static_files:
+    external: true
+  agenda_media_files:
+    external: true
+
+networks:
+  agenda_network:
+    external: true
+    name: agenda_agenda_network
