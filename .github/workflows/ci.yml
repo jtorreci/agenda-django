@@ -3,7 +3,7 @@ name: CI
 on:
   pull_request:
   push:
-    branches: [main]
+    branches: [master]
 
 permissions:
   contents: read
@@ -21,3 +21,30 @@ jobs:
       - run: pip install -r requirements.txt
       - run: python manage.py check
       - run: python manage.py test
+
+  deploy:
+    needs: django
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    environment: garnocex-production
+    concurrency:
+      group: agenda-garnocex-production
+      cancel-in-progress: false
+    steps:
+      - name: Deploy through the restricted server endpoint
+        env:
+          DEPLOY_KEY: ${{ secrets.AGENDA_DEPLOY_SSH_KEY }}
+          KNOWN_HOSTS: ${{ secrets.AGENDA_DEPLOY_KNOWN_HOSTS }}
+        run: |
+          set -euo pipefail
+          workdir="$(mktemp -d)"
+          trap 'rm -rf "$workdir"' EXIT
+          umask 077
+          printf '%s\n' "$DEPLOY_KEY" > "$workdir/id_ed25519"
+          printf '%s\n' "$KNOWN_HOSTS" > "$workdir/known_hosts"
+          ssh -i "$workdir/id_ed25519" \
+            -o BatchMode=yes \
+            -o IdentitiesOnly=yes \
+            -o StrictHostKeyChecking=yes \
+            -o UserKnownHostsFile="$workdir/known_hosts" \
+            agenda_deploy@garnocex.unex.es
