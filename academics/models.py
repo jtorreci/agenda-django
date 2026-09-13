@@ -117,3 +117,74 @@ class TeachingAssignment(models.Model):
 
     def __str__(self):
         return f'{self.teacher} · {self.offering}'
+
+
+class CatalogueImport(models.Model):
+    STATE_DRAFT = 'draft'
+    STATE_APPLIED = 'applied'
+    STATE_CHOICES = [
+        (STATE_DRAFT, 'Draft'),
+        (STATE_APPLIED, 'Applied'),
+    ]
+
+    academic_year = models.ForeignKey(AcademicYear, on_delete=models.CASCADE, related_name='catalogue_imports')
+    source_filename = models.CharField(max_length=255, blank=True)
+    created_by = models.ForeignKey(
+        'users.CustomUser', on_delete=models.SET_NULL, null=True, blank=True, related_name='catalogue_imports'
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    state = models.CharField(max_length=10, choices=STATE_CHOICES, default=STATE_DRAFT)
+    applied_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def incomplete_rows(self):
+        return self.rows.filter(Q(curricular_year__isnull=True) | Q(semester__isnull=True))
+
+    def __str__(self):
+        return f'{self.academic_year} · {self.source_filename} ({self.state})'
+
+
+class CatalogueImportRow(models.Model):
+    MATCH_CODE = 'code'
+    MATCH_NAME = 'name'
+    MATCH_NEW = 'new'
+    MATCH_CHOICES = [
+        (MATCH_CODE, 'Matched by code'),
+        (MATCH_NAME, 'Matched by name'),
+        (MATCH_NEW, 'New'),
+    ]
+
+    catalogue_import = models.ForeignKey(CatalogueImport, on_delete=models.CASCADE, related_name='rows')
+    line_number = models.PositiveIntegerField(null=True, blank=True)
+    plan_code = models.CharField(max_length=32)
+    plan_name = models.CharField(max_length=255)
+    subject_code = models.CharField(max_length=32)
+    subject_name = models.CharField(max_length=255)
+    credits = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+    curricular_year = models.PositiveSmallIntegerField(null=True, blank=True)
+    semester = models.PositiveSmallIntegerField(null=True, blank=True)
+    target_titulacion = models.ForeignKey(
+        Titulacion, on_delete=models.SET_NULL, null=True, blank=True, related_name='+'
+    )
+    target_asignatura = models.ForeignKey(
+        Asignatura, on_delete=models.SET_NULL, null=True, blank=True, related_name='+'
+    )
+    match_status = models.CharField(max_length=10, choices=MATCH_CHOICES, default=MATCH_NEW)
+
+    class Meta:
+        ordering = ['plan_code', 'curricular_year', 'semester', 'subject_code']
+        constraints = [
+            models.UniqueConstraint(
+                fields=['catalogue_import', 'plan_code', 'subject_code'],
+                name='academics_unique_catalogue_import_row',
+            )
+        ]
+
+    @property
+    def is_complete(self):
+        return self.curricular_year is not None and self.semester is not None
+
+    def __str__(self):
+        return f'{self.plan_code}/{self.subject_code} {self.subject_name}'
