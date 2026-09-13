@@ -53,3 +53,5 @@ migrations/__pycache__/
 security_audit.md
 .env
 usuarios_prueba_whatsapp.txt
+.env.garnocex
+.env.production
