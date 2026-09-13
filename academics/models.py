@@ -1,5 +1,5 @@
 from django.core.exceptions import ValidationError
-from django.db import models
+from django.db import models, transaction
 from django.db.models import Q
 
 
@@ -38,11 +38,21 @@ class AcademicYear(models.Model):
         )
 
     def activate(self):
-        if self.missing_offering_metadata().exists():
-            raise ValidationError('Every offering needs a curricular year and semester before activation.')
-        self.state = self.STATE_ACTIVE
-        self.full_clean()
-        self.save(update_fields=['state'])
+        """Activate this draft year, archiving the previously active one atomically."""
+        with transaction.atomic():
+            locked = AcademicYear.objects.select_for_update().get(pk=self.pk)
+            if locked.state != self.STATE_DRAFT:
+                raise ValidationError('Only a draft academic year can be activated.')
+            if not self.offerings.exists():
+                raise ValidationError('An academic year needs at least one subject offering before activation.')
+            if self.missing_offering_metadata().exists():
+                raise ValidationError('Every offering needs a curricular year and semester before activation.')
+            AcademicYear.objects.select_for_update().filter(state=self.STATE_ACTIVE).exclude(pk=self.pk).update(
+                state=self.STATE_ARCHIVED
+            )
+            self.state = self.STATE_ACTIVE
+            self.full_clean()
+            self.save(update_fields=['state'])
 
     def __str__(self):
         return self.code

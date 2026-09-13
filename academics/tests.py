@@ -74,6 +74,53 @@ class AcademicYearActivationTests(TestCase):
         self.year.refresh_from_db()
         self.assertEqual(self.year.state, AcademicYear.STATE_ACTIVE)
 
+    def test_activation_archives_previously_active_year(self):
+        previous = AcademicYear.objects.create(
+            code='2025-26',
+            starts_on=date(2025, 9, 1),
+            ends_on=date(2026, 8, 31),
+            state=AcademicYear.STATE_ACTIVE,
+        )
+        SubjectOffering.objects.create(
+            academic_year=self.year, subject=self.subject, curricular_year=1, semester=1
+        )
+
+        self.year.activate()
+
+        previous.refresh_from_db()
+        self.year.refresh_from_db()
+        self.assertEqual(previous.state, AcademicYear.STATE_ARCHIVED)
+        self.assertEqual(self.year.state, AcademicYear.STATE_ACTIVE)
+
+    def test_failed_activation_keeps_previously_active_year(self):
+        previous = AcademicYear.objects.create(
+            code='2025-26',
+            starts_on=date(2025, 9, 1),
+            ends_on=date(2026, 8, 31),
+            state=AcademicYear.STATE_ACTIVE,
+        )
+        SubjectOffering.objects.create(academic_year=self.year, subject=self.subject)
+
+        with self.assertRaises(ValidationError):
+            self.year.activate()
+
+        previous.refresh_from_db()
+        self.assertEqual(previous.state, AcademicYear.STATE_ACTIVE)
+
+    def test_year_without_offerings_cannot_activate(self):
+        with self.assertRaises(ValidationError):
+            self.year.activate()
+
+    def test_archived_year_cannot_be_reactivated(self):
+        SubjectOffering.objects.create(
+            academic_year=self.year, subject=self.subject, curricular_year=1, semester=1
+        )
+        self.year.state = AcademicYear.STATE_ARCHIVED
+        self.year.save(update_fields=['state'])
+
+        with self.assertRaises(ValidationError):
+            self.year.activate()
+
 
 # ---------------------------------------------------------------------------
 # Catalogue import
