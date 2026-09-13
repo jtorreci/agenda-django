@@ -263,6 +263,10 @@
             } else {
                 calendar.refetchEvents();
             }
+            // Force calendar to update its size after tab becomes visible
+            setTimeout(function() {
+                calendar.updateSize();
+            }, 100);
         });
 
         // --- FILTRADO POR ASIGNATURAS ---
