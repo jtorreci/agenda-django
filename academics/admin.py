@@ -1,6 +1,13 @@
 from django.contrib import admin
 
-from .models import Asignatura, CatalogueImport, CatalogueImportRow, PlanCodeAlias, Titulacion
+from .models import (
+    Asignatura,
+    CatalogueImport,
+    CatalogueImportPlanOverride,
+    CatalogueImportRow,
+    PlanCodeAlias,
+    Titulacion,
+)
 
 admin.site.register(Asignatura)
 
@@ -30,11 +37,17 @@ class CatalogueImportRowInline(admin.TabularInline):
     raw_id_fields = ('target_titulacion', 'target_asignatura')
 
 
+class CatalogueImportPlanOverrideInline(admin.TabularInline):
+    model = CatalogueImportPlanOverride
+    extra = 0
+    raw_id_fields = ('titulacion',)
+
+
 @admin.register(CatalogueImport)
 class CatalogueImportAdmin(admin.ModelAdmin):
     list_display = ('academic_year', 'source_filename', 'state', 'created_by', 'created_at', 'applied_at')
     list_filter = ('state', 'academic_year')
-    inlines = [CatalogueImportRowInline]
+    inlines = [CatalogueImportPlanOverrideInline, CatalogueImportRowInline]
 
 
 @admin.register(CatalogueImportRow)

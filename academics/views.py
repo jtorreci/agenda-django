@@ -4,6 +4,7 @@ from django.core.exceptions import ValidationError
 from django.db import IntegrityError, transaction
 from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST
 
@@ -13,9 +14,13 @@ from .catalogue_import import (
     CURRICULAR_YEAR_ALLOWED_TEXT,
     CURRICULAR_YEAR_CHOICES,
     CURRICULAR_YEAR_VALUES,
+    OVERRIDE_AUTO,
+    OVERRIDE_NEW,
+    OVERRIDE_TITULACION,
     SEMESTER_ALLOWED_TEXT,
     SEMESTER_CHOICES,
     SEMESTER_VALUES,
+    CatalogueMatcher,
     apply_import,
     build_draft,
     find_subject_conflicts,
@@ -23,9 +28,10 @@ from .catalogue_import import (
     normalize_name,
     parse_catalogue,
     plan_code_sort_key,
+    set_plan_override,
 )
 from .forms import CatalogueUploadForm
-from .models import AcademicYear, CatalogueImport, CatalogueImportRow
+from .models import AcademicYear, CatalogueImport, CatalogueImportRow, Titulacion
 
 
 def admin_required(view):
@@ -142,11 +148,19 @@ def catalogue_import_detail(request, pk):
         'by_code': sum(row.match_status == CatalogueImportRow.MATCH_CODE for row in all_rows),
         'by_name': sum(row.match_status == CatalogueImportRow.MATCH_NAME for row in all_rows),
         'new': sum(row.match_status == CatalogueImportRow.MATCH_NEW for row in all_rows),
+        'manual': sum(row.match_status == CatalogueImportRow.MATCH_MANUAL for row in all_rows),
+        'manual_plans': len({row.plan_code for row in all_rows if row.plan_match_status == CatalogueImportRow.MATCH_MANUAL}),
         'incomplete': sum(not row.is_complete for row in all_rows),
         'grouped_codes': len({row.plan_code for row in all_rows if row.plan_role == CatalogueImportRow.ROLE_ALIAS}),
     }
     conflicts = find_subject_conflicts(all_rows)
     conflicting = {(conflict.group, conflict.subject_code) for conflict in conflicts}
+
+    is_draft = catalogue_import.state == CatalogueImport.STATE_DRAFT
+    overrides = {override.plan_code: override for override in catalogue_import.plan_overrides.all()}
+    automatic = {}
+    if is_draft and all_rows:
+        automatic = CatalogueMatcher().resolve_plans({row.plan_code: row.plan_name for row in all_rows})
 
     group_names = {}
     for row in all_rows:
@@ -180,13 +194,17 @@ def catalogue_import_detail(request, pk):
                 'role': row.plan_role,
                 'group_name': group_name,
                 'is_mention': parent is not None and normalize_name(parent) == normalize_name(group_name),
+                'override': overrides.get(row.plan_code),
+                'automatic': automatic.get(row.plan_code),
+                'locked': row.plan_code in automatic and automatic[row.plan_code].status == CatalogueImportRow.MATCH_CODE,
                 'rows': [],
             })
         plans[-1]['rows'].append(row)
 
     return render(request, 'academics/catalogue_import_detail.html', {
         'catalogue_import': catalogue_import,
-        'is_draft': catalogue_import.state == CatalogueImport.STATE_DRAFT,
+        'is_draft': is_draft,
+        'titulaciones': Titulacion.objects.order_by('nombre').only('pk', 'nombre', 'codigo_plan') if is_draft else [],
         'summary': summary,
         'conflicts': conflicts,
         'plans': plans,
@@ -201,6 +219,38 @@ def catalogue_import_detail(request, pk):
             and catalogue_import.academic_year.state != AcademicYear.STATE_ARCHIVED
         ),
     })
+
+
+@admin_required
+@require_POST
+def catalogue_import_plan_override(request, pk):
+    catalogue_import = get_object_or_404(CatalogueImport, pk=pk)
+    plan_code = request.POST.get('plan_code', '')
+    choice = request.POST.get('target', '')
+    titulacion = None
+    if choice in ('', OVERRIDE_AUTO):
+        mode = OVERRIDE_AUTO
+    elif choice == OVERRIDE_NEW:
+        mode = OVERRIDE_NEW
+    else:
+        mode = OVERRIDE_TITULACION
+        titulacion = Titulacion.objects.filter(pk=choice).first() if choice.isdigit() else None
+    try:
+        set_plan_override(catalogue_import, plan_code, mode, titulacion)
+    except ValidationError as error:
+        for message in _validation_messages(error):
+            messages.error(request, message)
+    else:
+        if mode == OVERRIDE_AUTO:
+            messages.success(request, f'El plan {plan_code} vuelve a la asociación automática.')
+        elif mode == OVERRIDE_NEW:
+            messages.success(request, f'El plan {plan_code} creará una titulación nueva.')
+        else:
+            messages.success(request, f'El plan {plan_code} se asocia a «{titulacion}».')
+    target = reverse('catalogue_import_detail', args=[pk])
+    if request.POST.get('incomplete') == '1':
+        target += '?incomplete=1'
+    return redirect(f'{target}#plan-{plan_code}')
 
 
 @admin_required

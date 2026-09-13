@@ -164,10 +164,12 @@ class CatalogueImportRow(models.Model):
     MATCH_CODE = 'code'
     MATCH_NAME = 'name'
     MATCH_NEW = 'new'
+    MATCH_MANUAL = 'manual'
     MATCH_CHOICES = [
         (MATCH_CODE, 'Matched by code'),
         (MATCH_NAME, 'Matched by name'),
         (MATCH_NEW, 'New'),
+        (MATCH_MANUAL, 'Manual mapping'),
     ]
 
     catalogue_import = models.ForeignKey(CatalogueImport, on_delete=models.CASCADE, related_name='rows')
@@ -216,3 +218,29 @@ class CatalogueImportRow(models.Model):
 
     def __str__(self):
         return f'{self.plan_code}/{self.subject_code} {self.subject_name}'
+
+
+class CatalogueImportPlanOverride(models.Model):
+    """Admin-chosen mapping of one plan code in a draft import.
+
+    ``titulacion`` set: the plan code lands in that Titulacion.
+    ``titulacion`` null: force a new Titulacion even if the name matches.
+    Deleting the Titulacion deletes the override (back to automatic).
+    """
+
+    catalogue_import = models.ForeignKey(CatalogueImport, on_delete=models.CASCADE, related_name='plan_overrides')
+    plan_code = models.CharField(max_length=32)
+    titulacion = models.ForeignKey(
+        Titulacion, on_delete=models.CASCADE, null=True, blank=True, related_name='+'
+    )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['catalogue_import', 'plan_code'],
+                name='academics_unique_catalogue_plan_override',
+            )
+        ]
+
+    def __str__(self):
+        return f'{self.catalogue_import_id} · {self.plan_code} → {self.titulacion or "new"}'

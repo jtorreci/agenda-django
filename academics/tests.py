@@ -14,12 +14,17 @@ from .catalogue_import import (
     find_subject_conflicts,
     normalize_name,
     parse_catalogue,
+    OVERRIDE_AUTO,
+    OVERRIDE_NEW,
+    OVERRIDE_TITULACION,
     register_plan_code,
+    set_plan_override,
 )
 from .models import (
     AcademicYear,
     Asignatura,
     CatalogueImport,
+    CatalogueImportPlanOverride,
     CatalogueImportRow,
     PlanCodeAlias,
     SubjectOffering,
@@ -555,6 +560,164 @@ class CataloguePlanGroupingTests(TestCase):
         self.assertContains(response, 'aparece en los planes 1623, 1624')
         self.assertFalse(response.context['can_apply'])
         self.assertEqual(response.context['summary']['grouped_codes'], 2)
+
+
+LEGACY_BIM = (
+    'Máster Universitario En Metodología Para La Modelización De La Información De La Construcción '
+    '(building Information Modeling Bim) En El Desarrollo Colaborativo De Proyectos'
+)
+
+
+class CataloguePlanOverrideTests(TestCase):
+    def setUp(self):
+        self.year = make_year()
+        self.legacy = Titulacion.objects.create(nombre=LEGACY_BIM)
+        self.modelling = Asignatura.objects.create(nombre='Modelado BIM', titulacion=self.legacy, curso=1, semestre=2)
+        self.management = Asignatura.objects.create(nombre='Gestión BIM', titulacion=self.legacy, curso=1, semestre=1)
+        rows, errors = parse_catalogue(
+            GROUPING_HEADER
+            + f'1642;{BIM};600001;MODELADO BIM;;\n'
+            + f'1645;{BIM};600002;GESTION BIM;;\n'
+        )
+        self.assertEqual(errors, [])
+        self.draft = build_draft(self.year, rows, 'catalogue.csv', None)
+
+    def row(self, plan_code):
+        return self.draft.rows.select_related('target_titulacion', 'target_asignatura').get(plan_code=plan_code)
+
+    def test_abbreviated_name_is_new_without_override(self):
+        self.assertIsNone(self.row('1642').target_titulacion)
+        self.assertEqual(self.row('1645').plan_role, CatalogueImportRow.ROLE_ALIAS)
+
+    def test_override_maps_to_legacy_titulacion_and_sibling_joins(self):
+        set_plan_override(self.draft, '1642', OVERRIDE_TITULACION, self.legacy)
+
+        primary, sibling = self.row('1642'), self.row('1645')
+        self.assertEqual(
+            (primary.target_titulacion, primary.plan_role, primary.plan_match_status),
+            (self.legacy, CatalogueImportRow.ROLE_PRIMARY, CatalogueImportRow.MATCH_MANUAL),
+        )
+        self.assertEqual((sibling.target_titulacion, sibling.plan_role), (self.legacy, CatalogueImportRow.ROLE_ALIAS))
+        self.assertEqual(primary.plan_group, sibling.plan_group)
+        self.assertEqual(primary.target_asignatura, self.modelling)
+        self.assertEqual(sibling.target_asignatura, self.management)
+        self.assertEqual((primary.curricular_year, primary.semester), (1, 2))
+        self.assertEqual((sibling.curricular_year, sibling.semester), (1, 1))
+        self.assertEqual(primary.match_status, CatalogueImportRow.MATCH_MANUAL)
+
+    def test_apply_with_override_creates_no_duplicate_titulacion(self):
+        set_plan_override(self.draft, '1642', OVERRIDE_TITULACION, self.legacy)
+
+        apply_import(self.draft)
+
+        self.assertEqual(Titulacion.objects.count(), 1)
+        self.legacy.refresh_from_db()
+        self.assertEqual(self.legacy.nombre, LEGACY_BIM)
+        self.assertEqual(self.legacy.codigo_plan, '1642')
+        self.assertEqual(list(self.legacy.plan_code_aliases.values_list('code', flat=True)), ['1645'])
+        self.assertEqual(Asignatura.objects.count(), 2)
+        self.modelling.refresh_from_db()
+        self.assertEqual(self.modelling.codigo_asignatura, '600001')
+
+    def test_mentions_follow_overridden_parent(self):
+        legacy_civil = Titulacion.objects.create(nombre='Grado en Ingeniería Civil (plan antiguo)')
+        rows, _ = parse_catalogue(
+            GROUPING_HEADER
+            + 'P2;GRADO CIVIL ABREV - HIDROLOGÍA;S2;B;2;1\n'
+            + 'P1;GRADO CIVIL ABREV;S1;A;1;1\n'
+        )
+        draft = build_draft(self.year, rows, 'civil.csv', None)
+
+        set_plan_override(draft, 'P1', OVERRIDE_TITULACION, legacy_civil)
+
+        mention = draft.rows.get(plan_code='P2')
+        self.assertEqual((mention.target_titulacion, mention.plan_role), (legacy_civil, CatalogueImportRow.ROLE_ALIAS))
+
+    def test_create_new_forces_new_even_when_name_matches(self):
+        civil = Titulacion.objects.create(nombre=CIVIL)
+        rows, _ = parse_catalogue(GROUPING_HEADER + f'1640;{CIVIL};500900;MATEMÁTICAS I;1;1\n')
+        draft = build_draft(self.year, rows, 'civil.csv', None)
+        self.assertEqual(draft.rows.get().target_titulacion, civil)
+
+        set_plan_override(draft, '1640', OVERRIDE_NEW)
+
+        row = draft.rows.get()
+        self.assertIsNone(row.target_titulacion)
+        self.assertEqual(row.plan_match_status, CatalogueImportRow.MATCH_MANUAL)
+        apply_import(draft)
+        self.assertEqual(Titulacion.objects.filter(nombre=CIVIL).count(), 2)
+        civil.refresh_from_db()
+        self.assertIsNone(civil.codigo_plan)
+
+    def test_removing_override_restores_automatic_mapping(self):
+        set_plan_override(self.draft, '1642', OVERRIDE_TITULACION, self.legacy)
+        set_plan_override(self.draft, '1642', OVERRIDE_AUTO)
+
+        self.assertFalse(CatalogueImportPlanOverride.objects.exists())
+        row = self.row('1642')
+        self.assertIsNone(row.target_titulacion)
+        self.assertEqual(row.plan_match_status, CatalogueImportRow.MATCH_NEW)
+
+    def test_code_matched_plan_cannot_be_overridden(self):
+        coded = Titulacion.objects.create(nombre='Coded', codigo_plan='1700')
+        rows, _ = parse_catalogue(GROUPING_HEADER + '1700;Coded;S1;A;1;1\n')
+        draft = build_draft(self.year, rows, 'coded.csv', None)
+
+        with self.assertRaises(ValidationError):
+            set_plan_override(draft, '1700', OVERRIDE_TITULACION, self.legacy)
+
+        self.assertFalse(CatalogueImportPlanOverride.objects.exists())
+        self.assertEqual(draft.rows.get().target_titulacion, coded)
+
+    def test_override_onto_titulacion_with_other_code_is_alias(self):
+        self.legacy.codigo_plan = '1500'
+        self.legacy.save()
+
+        set_plan_override(self.draft, '1642', OVERRIDE_TITULACION, self.legacy)
+
+        self.assertEqual(self.row('1642').plan_role, CatalogueImportRow.ROLE_ALIAS)
+        apply_import(self.draft)
+        self.legacy.refresh_from_db()
+        self.assertEqual(self.legacy.codigo_plan, '1500')
+        self.assertEqual(sorted(self.legacy.plan_code_aliases.values_list('code', flat=True)), ['1642', '1645'])
+
+    def test_admin_edited_values_survive_override(self):
+        self.draft.rows.filter(plan_code='1642').update(curricular_year=10, semester=3)
+
+        set_plan_override(self.draft, '1642', OVERRIDE_TITULACION, self.legacy)
+
+        row = self.row('1642')
+        self.assertEqual(row.target_asignatura, self.modelling)
+        self.assertEqual((row.curricular_year, row.semester), (10, 3))
+
+    def test_override_endpoint_admin_flow_and_non_admin_denied(self):
+        url = reverse('catalogue_import_plan_override', args=[self.draft.pk])
+        User = get_user_model()
+        teacher = User.objects.create_user(username='teacher', password='x', role='TEACHER')
+        self.client.force_login(teacher)
+        response = self.client.post(url, {'plan_code': '1642', 'target': str(self.legacy.pk)})
+        self.assertEqual(response.status_code, 302)
+        self.assertIn(reverse('login'), response['Location'])
+        self.assertFalse(CatalogueImportPlanOverride.objects.exists())
+
+        admin = User.objects.create_user(username='admin', password='x', role='ADMIN')
+        self.client.force_login(admin)
+        detail_url = reverse('catalogue_import_detail', args=[self.draft.pk])
+        self.assertContains(self.client.get(detail_url), 'Automático (nueva titulación)')
+
+        response = self.client.post(url, {'plan_code': '1642', 'target': str(self.legacy.pk)})
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(CatalogueImportPlanOverride.objects.get().titulacion, self.legacy)
+        response = self.client.get(detail_url)
+        self.assertContains(response, 'Asociación manual')
+        self.assertEqual(response.context['summary']['manual_plans'], 1)
+
+        apply_import(self.draft)
+        response = self.client.post(url, {'plan_code': '1642', 'target': 'new'}, follow=True)
+        self.assertContains(response, 'Solo se pueden modificar importaciones en borrador.')
+        response = self.client.get(detail_url)
+        self.assertNotContains(response, 'name="target"')
+        self.assertContains(response, 'Asociación manual')
 
 
 class CatalogueImportViewTests(TestCase):
