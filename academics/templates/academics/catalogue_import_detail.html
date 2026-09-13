@@ -22,7 +22,8 @@
   <div class="col-6 col-md"><div class="card text-center"><div class="card-body py-2"><div class="fs-4 text-success">{{ summary.by_code }}</div><div class="small text-muted">Por código</div></div></div></div>
   <div class="col-6 col-md"><div class="card text-center"><div class="card-body py-2"><div class="fs-4 text-info">{{ summary.by_name }}</div><div class="small text-muted">Por nombre</div></div></div></div>
   <div class="col-6 col-md"><div class="card text-center"><div class="card-body py-2"><div class="fs-4 text-primary">{{ summary.new }}</div><div class="small text-muted">Nuevas</div></div></div></div>
-  <div class="col-12 col-md"><div class="card text-center"><div class="card-body py-2"><div class="fs-4 {% if summary.incomplete %}text-danger{% endif %}">{{ summary.incomplete }}</div><div class="small text-muted">Incompletas</div></div></div></div>
+  <div class="col-6 col-md"><div class="card text-center"><div class="card-body py-2"><div class="fs-4 {% if summary.incomplete %}text-danger{% endif %}">{{ summary.incomplete }}</div><div class="small text-muted">Incompletas</div></div></div></div>
+  <div class="col-6 col-md"><div class="card text-center"><div class="card-body py-2"><div class="fs-4 text-secondary">{{ summary.grouped_codes }}</div><div class="small text-muted">Códigos agrupados</div></div></div></div>
 </div>
 
 <div class="d-flex flex-wrap gap-2 align-items-center mb-3">
@@ -36,7 +37,7 @@
       <form method="post" action="{% url 'catalogue_import_apply' catalogue_import.pk %}"
             onsubmit="return confirm('¿Aplicar la importación? Se crearán o actualizarán titulaciones, asignaturas y ofertas del curso.');">
         {% csrf_token %}
-        <button type="submit" class="btn btn-success btn-sm" {% if not can_apply %}disabled title="Complete curso y semestre de todas las asignaturas"{% endif %}>
+        <button type="submit" class="btn btn-success btn-sm" {% if not can_apply %}disabled title="Complete curso y semestre y resuelva los conflictos"{% endif %}>
           <i class="bi bi-check2-circle"></i> Aplicar importación
         </button>
       </form>
@@ -56,6 +57,15 @@
   </div>
 </div>
 
+{% if conflicts %}
+  <div class="alert alert-danger small">
+    <p class="mb-1"><strong>Asignaturas repetidas con datos distintos en planes agrupados.</strong> Iguale curso y semestre en todos los planes antes de aplicar.</p>
+    <ul class="mb-0">
+      {% for conflict in conflicts %}<li>{{ conflict }}</li>{% endfor %}
+    </ul>
+  </div>
+{% endif %}
+
 {% if is_draft and summary.incomplete %}
   <div class="alert alert-warning small">
     Hay {{ summary.incomplete }} asignaturas sin curso del plan o semestre. Complételas y guarde los cambios antes de aplicar.
@@ -67,8 +77,11 @@
     <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
       <div>
         <strong>{{ plan.plan_code }}</strong> · {{ plan.plan_name }}
+        {% if plan.role == 'alias' %}
+          <span class="badge bg-secondary">{% if plan.is_mention %}Mención de{% else %}Código adicional de{% endif %} {{ plan.group_name }}</span>
+        {% endif %}
         {% if plan.status == 'code' %}<span class="badge bg-success">Plan por código</span>
-        {% elif plan.status == 'name' %}<span class="badge bg-info text-dark">Plan por nombre: {{ plan.titulacion.nombre }}</span>
+        {% elif plan.status == 'name' %}<span class="badge bg-info text-dark">Plan por nombre: {{ plan.group_name }}</span>
         {% else %}<span class="badge bg-primary">Plan nuevo</span>{% endif %}
       </div>
       <span class="small text-muted">{{ plan.rows|length }} asignaturas</span>
@@ -83,7 +96,7 @@
           </thead>
           <tbody>
             {% for row in plan.rows %}
-              <tr class="{% if not row.is_complete %}table-warning{% endif %}">
+              <tr class="{% if row.has_conflict %}table-danger{% elif not row.is_complete %}table-warning{% endif %}">
                 <td>{{ row.subject_code }}</td>
                 <td>
                   {{ row.subject_name }}

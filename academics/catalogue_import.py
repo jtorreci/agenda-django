@@ -9,6 +9,7 @@ import csv
 import io
 import re
 import unicodedata
+from collections import defaultdict
 from dataclasses import dataclass
 from decimal import Decimal, InvalidOperation
 
@@ -22,6 +23,7 @@ from .models import (
     Asignatura,
     CatalogueImport,
     CatalogueImportRow,
+    PlanCodeAlias,
     SubjectOffering,
     Titulacion,
 )
@@ -245,78 +247,187 @@ def _merge_duplicate(previous, row, errors):
             ))
 
 
+MENTION_SEPARATOR = ' - '
+
+PRIMARY = CatalogueImportRow.ROLE_PRIMARY
+ALIAS = CatalogueImportRow.ROLE_ALIAS
+MATCH_CODE = CatalogueImportRow.MATCH_CODE
+MATCH_NAME = CatalogueImportRow.MATCH_NAME
+MATCH_NEW = CatalogueImportRow.MATCH_NEW
+
+
+def plan_code_sort_key(code):
+    return (0, int(code), code) if code.isdigit() else (1, 0, code)
+
+
+def mention_parent(name):
+    """Return the parent degree name of "<parent> - <mention>", or None."""
+    if MENTION_SEPARATOR not in name:
+        return None
+    parent = name.rsplit(MENTION_SEPARATOR, 1)[0].strip()
+    return parent or None
+
+
+@dataclass
+class PlanResolution:
+    code: str
+    name: str
+    titulacion: Titulacion | None
+    role: str
+    status: str
+    group: str
+    group_name: str
+
+    @property
+    def is_mention(self):
+        parent = mention_parent(self.name)
+        return self.role == ALIAS and parent is not None and normalize_name(parent) == normalize_name(self.group_name)
+
+
 class CatalogueMatcher:
     """Resolves plans and subjects against the current database state.
 
-    A Titulacion (or Asignatura) can be claimed by name only once per run, so
-    two plan codes sharing a name never collapse onto the same record.
+    Plan codes are resolved as a batch so that mentions ("<degree> - <mention>")
+    and secondary codes sharing a degree name are grouped into one Titulacion,
+    regardless of the order in which they appear in the file.
     """
 
     def __init__(self):
-        self._plans = {}
         self._subjects = {}
-        self._claimed_plans = set()
         self._claimed_subjects = set()
-        self._uncoded_plans = None
         self._uncoded_subjects = {}
 
-    def match_plan(self, plan_code, plan_name):
-        if plan_code in self._plans:
-            return self._plans[plan_code]
+    # -- plans -------------------------------------------------------------
 
-        titulacion = Titulacion.objects.filter(codigo_plan=plan_code).first()
-        result = (titulacion, CatalogueImportRow.MATCH_CODE) if titulacion else (None, CatalogueImportRow.MATCH_NEW)
-        if titulacion is None:
-            candidate = self._unique_by_name(self._uncoded_plan_list(), plan_name, lambda t: t.nombre)
-            if candidate is not None and candidate.pk not in self._claimed_plans:
-                self._claimed_plans.add(candidate.pk)
-                result = (candidate, CatalogueImportRow.MATCH_NAME)
+    def resolve_plans(self, plans):
+        """Resolve ``{plan_code: plan_name}`` into ``{plan_code: PlanResolution}``."""
+        codes = sorted(plans, key=plan_code_sort_key)
+        resolved = {}
 
-        self._plans[plan_code] = result
-        return result
+        def existing(code, titulacion, role, status):
+            resolved[code] = PlanResolution(
+                code, plans[code], titulacion, role, status, f't:{titulacion.pk}', titulacion.nombre
+            )
+
+        # (a) Primary code or registered alias code.
+        by_code = {t.codigo_plan: t for t in Titulacion.objects.filter(codigo_plan__in=codes)}
+        by_alias = {
+            alias.code: alias.titulacion
+            for alias in PlanCodeAlias.objects.filter(code__in=codes).select_related('titulacion')
+        }
+        primary_taken = set()
+        for code in codes:
+            if code in by_code:
+                existing(code, by_code[code], PRIMARY, MATCH_CODE)
+                primary_taken.add(by_code[code].pk)
+            elif code in by_alias:
+                existing(code, by_alias[code], ALIAS, MATCH_CODE)
+
+        name_index = defaultdict(list)
+        for titulacion in Titulacion.objects.all():
+            name_index[normalize_name(titulacion.nombre)].append(titulacion)
+
+        def unique_titulacion(name):
+            candidates = name_index.get(normalize_name(name), [])
+            return candidates[0] if len(candidates) == 1 else None
+
+        # (b) Exact name of an existing Titulacion; lowest code takes the primary slot.
+        for code in codes:
+            if code in resolved:
+                continue
+            titulacion = unique_titulacion(plans[code])
+            if titulacion is None:
+                continue
+            if not titulacion.codigo_plan and titulacion.pk not in primary_taken:
+                primary_taken.add(titulacion.pk)
+                existing(code, titulacion, PRIMARY, MATCH_NAME)
+            else:
+                existing(code, titulacion, ALIAS, MATCH_NAME)
+
+        # Remaining codes grouped by exact normalized name within the file.
+        pending = defaultdict(list)
+        for code in codes:
+            if code not in resolved:
+                pending[normalize_name(plans[code])].append(code)
+
+        def resolve_group_as_new(group_codes):
+            primary = group_codes[0]
+            for index, code in enumerate(group_codes):
+                resolved[code] = PlanResolution(
+                    code, plans[code], None, PRIMARY if index == 0 else ALIAS, MATCH_NEW,
+                    f'new:{primary}', plans[primary],
+                )
+
+        def file_plan_named(name):
+            wanted = normalize_name(name)
+            matches = {resolved[code].group for code in resolved if normalize_name(plans[code]) == wanted}
+            if len(matches) != 1:
+                return None
+            group = matches.pop()
+            return next(resolved[code] for code in resolved if resolved[code].group == group)
+
+        mention_groups = []
+        for group_codes in pending.values():
+            if mention_parent(plans[group_codes[0]]) is None:
+                resolve_group_as_new(group_codes)
+            else:
+                mention_groups.append(group_codes)
+
+        # (c) Mentions, shortest names first so nested parents resolve before children.
+        for group_codes in sorted(mention_groups, key=lambda group: len(plans[group[0]])):
+            parent = mention_parent(plans[group_codes[0]])
+            anchor = file_plan_named(parent)
+            if anchor is None and not any(normalize_name(plans[code]) == normalize_name(parent) for code in plans):
+                titulacion = unique_titulacion(parent)
+                if titulacion is not None:
+                    for code in group_codes:
+                        existing(code, titulacion, ALIAS, MATCH_NAME)
+                    continue
+            if anchor is None:
+                # (d) Unresolvable or ambiguous parent: a degree of its own.
+                resolve_group_as_new(group_codes)
+                continue
+            status = MATCH_NEW if anchor.titulacion is None else MATCH_NAME
+            for code in group_codes:
+                resolved[code] = PlanResolution(
+                    code, plans[code], anchor.titulacion, ALIAS, status, anchor.group, anchor.group_name
+                )
+
+        return resolved
+
+    # -- subjects ----------------------------------------------------------
 
     def match_subject(self, titulacion, subject_code, subject_name):
         if titulacion is None:
-            return None, CatalogueImportRow.MATCH_NEW
+            return None, MATCH_NEW
         key = (titulacion.pk, subject_code)
         if key in self._subjects:
             return self._subjects[key]
 
         asignatura = Asignatura.objects.filter(titulacion=titulacion, codigo_asignatura=subject_code).first()
-        result = (asignatura, CatalogueImportRow.MATCH_CODE) if asignatura else (None, CatalogueImportRow.MATCH_NEW)
+        result = (asignatura, MATCH_CODE) if asignatura else (None, MATCH_NEW)
         if asignatura is None:
-            candidate = self._unique_by_name(self._uncoded_subject_list(titulacion), subject_name, lambda a: a.nombre)
+            candidate = self._unique_by_name(self._uncoded_subject_list(titulacion), subject_name)
             if candidate is not None and candidate.pk not in self._claimed_subjects:
                 self._claimed_subjects.add(candidate.pk)
-                result = (candidate, CatalogueImportRow.MATCH_NAME)
+                result = (candidate, MATCH_NAME)
 
         self._subjects[key] = result
         return result
 
-    def match(self, plan_code, plan_name, subject_code, subject_name):
-        """Return (titulacion, asignatura, row match status)."""
-        titulacion, plan_status = self.match_plan(plan_code, plan_name)
-        asignatura, subject_status = self.match_subject(titulacion, subject_code, subject_name)
+    @staticmethod
+    def row_status(plan, subject_status, asignatura):
         if asignatura is None:
-            status = CatalogueImportRow.MATCH_NEW
-        elif CatalogueImportRow.MATCH_NAME in (plan_status, subject_status):
-            status = CatalogueImportRow.MATCH_NAME
-        else:
-            status = CatalogueImportRow.MATCH_CODE
-        return titulacion, asignatura, status
+            return MATCH_NEW
+        if MATCH_NAME in (plan.status, subject_status):
+            return MATCH_NAME
+        return MATCH_CODE
 
     @staticmethod
-    def _unique_by_name(candidates, name, get_name):
+    def _unique_by_name(candidates, name):
         wanted = normalize_name(name)
-        matches = [item for item in candidates if normalize_name(get_name(item)) == wanted]
+        matches = [item for item in candidates if normalize_name(item.nombre) == wanted]
         return matches[0] if len(matches) == 1 else None
-
-    def _uncoded_plan_list(self):
-        if self._uncoded_plans is None:
-            self._uncoded_plans = list(
-                Titulacion.objects.filter(Q(codigo_plan__isnull=True) | Q(codigo_plan=''))
-            )
-        return self._uncoded_plans
 
     def _uncoded_subject_list(self, titulacion):
         if titulacion.pk not in self._uncoded_subjects:
@@ -336,6 +447,63 @@ def is_valid_semester(value):
     return value in SEMESTER_VALUES
 
 
+@dataclass
+class SubjectConflict:
+    group: str
+    subject_code: str
+    plan_codes: list
+    fields: list
+
+    def __str__(self):
+        return (
+            f'La asignatura {self.subject_code} aparece en los planes {", ".join(self.plan_codes)} '
+            f'con distinto {", ".join(self.fields)}.'
+        )
+
+
+CONFLICT_FIELDS = (
+    ('subject_name', 'nombre', lambda row: normalize_name(row.subject_name)),
+    ('curricular_year', 'curso', lambda row: row.curricular_year),
+    ('semester', 'semestre', lambda row: row.semester),
+)
+
+
+def find_subject_conflicts(rows, group_of=lambda row: row.plan_group):
+    """Rows of grouped plan codes sharing a subject code must describe one subject."""
+    by_subject = defaultdict(list)
+    for row in rows:
+        by_subject[(group_of(row), row.subject_code)].append(row)
+    conflicts = []
+    for (group, subject_code), subject_rows in by_subject.items():
+        if len(subject_rows) < 2:
+            continue
+        fields = [label for _, label, value in CONFLICT_FIELDS if len({value(row) for row in subject_rows}) > 1]
+        if fields:
+            plan_codes = sorted({row.plan_code for row in subject_rows}, key=plan_code_sort_key)
+            conflicts.append(SubjectConflict(group, subject_code, plan_codes, fields))
+    return sorted(conflicts, key=lambda c: (c.group, plan_code_sort_key(c.subject_code)))
+
+
+def _fill_from_grouped_duplicates(staged):
+    """Copy curricular year/semester between grouped duplicates when unambiguous."""
+    by_subject = defaultdict(list)
+    for row in staged:
+        by_subject[(row.plan_group, row.subject_code)].append(row)
+    for subject_rows in by_subject.values():
+        if len(subject_rows) < 2:
+            continue
+        for field in ('curricular_year', 'semester'):
+            values = {getattr(row, field) for row in subject_rows} - {None}
+            if len(values) == 1:
+                value = values.pop()
+                for row in subject_rows:
+                    setattr(row, field, value)
+
+
+def _plans_of(rows):
+    return {row.plan_code: row.plan_name for row in rows}
+
+
 @transaction.atomic
 def build_draft(academic_year, rows, filename, user):
     """Store parsed rows as a draft import with matching results."""
@@ -348,11 +516,11 @@ def build_draft(academic_year, rows, filename, user):
         created_by=user if getattr(user, 'is_authenticated', False) else None,
     )
     matcher = CatalogueMatcher()
+    plans = matcher.resolve_plans(_plans_of(rows))
     staged = []
     for row in rows:
-        titulacion, asignatura, status = matcher.match(
-            row.plan_code, row.plan_name, row.subject_code, row.subject_name
-        )
+        plan = plans[row.plan_code]
+        asignatura, subject_status = matcher.match_subject(plan.titulacion, row.subject_code, row.subject_name)
         curricular_year = row.curricular_year
         semester = row.semester
         if asignatura is not None:
@@ -370,12 +538,44 @@ def build_draft(academic_year, rows, filename, user):
             credits=row.credits,
             curricular_year=curricular_year,
             semester=semester,
-            target_titulacion=titulacion,
+            target_titulacion=plan.titulacion,
             target_asignatura=asignatura,
-            match_status=status,
+            match_status=matcher.row_status(plan, subject_status, asignatura),
+            plan_match_status=plan.status,
+            plan_role=plan.role,
+            plan_group=plan.group,
         ))
+    _fill_from_grouped_duplicates(staged)
     CatalogueImportRow.objects.bulk_create(staged)
     return catalogue_import
+
+
+def register_plan_code(titulacion, code, name, role):
+    """Record ``code`` on ``titulacion`` as its primary code or as an alias."""
+    if role == PRIMARY:
+        if titulacion.codigo_plan and titulacion.codigo_plan != code:
+            raise ValidationError(
+                f'La titulación «{titulacion}» ya tiene el código de plan {titulacion.codigo_plan}; '
+                f'no se sustituye por {code}.'
+            )
+        if not titulacion.codigo_plan:
+            alias = PlanCodeAlias.objects.filter(code=code).first()
+            if alias is not None and alias.titulacion_id != titulacion.pk:
+                raise ValidationError(f'El código de plan {code} ya es un alias de «{alias.titulacion}».')
+            titulacion.codigo_plan = code
+            titulacion.save(update_fields=['codigo_plan'])
+        return
+
+    if titulacion.codigo_plan == code:
+        return
+    owner = Titulacion.objects.filter(codigo_plan=code).exclude(pk=titulacion.pk).first()
+    if owner is not None:
+        raise ValidationError(f'El código de plan {code} ya es el código principal de «{owner}».')
+    alias, _ = PlanCodeAlias.objects.get_or_create(code=code, defaults={'titulacion': titulacion, 'name': name})
+    if alias.titulacion_id != titulacion.pk:
+        raise ValidationError(
+            f'El código de plan {code} ya es un alias de «{alias.titulacion}»; no se reasigna a «{titulacion}».'
+        )
 
 
 @transaction.atomic
@@ -392,7 +592,7 @@ def apply_import(catalogue_import):
     if academic_year.state == AcademicYear.STATE_ARCHIVED:
         raise ValidationError('No se puede aplicar una importación a un curso archivado.')
 
-    rows = list(catalogue_import.rows.order_by('plan_code', 'subject_code'))
+    rows = list(catalogue_import.rows.all())
     if not rows:
         raise ValidationError('La importación no contiene asignaturas.')
     incomplete = [row for row in rows if not row.is_complete]
@@ -407,22 +607,27 @@ def apply_import(catalogue_import):
     if invalid:
         raise ValidationError(f'{len(invalid)} asignaturas tienen curso del plan o semestre no válido.')
 
+    # Matches are re-resolved: the database may have changed since the draft.
     matcher = CatalogueMatcher()
-    created_plans = {}
-    for row in rows:
-        titulacion, asignatura, status = matcher.match(
-            row.plan_code, row.plan_name, row.subject_code, row.subject_name
-        )
+    plans = matcher.resolve_plans(_plans_of(rows))
+    conflicts = find_subject_conflicts(rows, group_of=lambda row: plans[row.plan_code].group)
+    if conflicts:
+        raise ValidationError([str(conflict) for conflict in conflicts])
 
+    # Primary codes first so each group's Titulacion exists before its aliases.
+    titulaciones = {}
+    for plan in sorted(plans.values(), key=lambda p: (p.role != PRIMARY, plan_code_sort_key(p.code))):
+        titulacion = plan.titulacion or titulaciones.get(plan.group)
         if titulacion is None:
-            titulacion = created_plans.get(row.plan_code)
-            if titulacion is None:
-                titulacion = Titulacion.objects.create(nombre=row.plan_name, codigo_plan=row.plan_code)
-                created_plans[row.plan_code] = titulacion
-        elif not titulacion.codigo_plan:
-            titulacion.codigo_plan = row.plan_code
-            titulacion.save(update_fields=['codigo_plan'])
+            titulacion = Titulacion.objects.create(nombre=plan.group_name, codigo_plan=plan.code)
+        titulaciones[plan.group] = titulacion
+        register_plan_code(titulacion, plan.code, plan.name, plan.role)
 
+    rows.sort(key=lambda row: (plans[row.plan_code].role != PRIMARY, plan_code_sort_key(row.plan_code), row.subject_code))
+    for row in rows:
+        plan = plans[row.plan_code]
+        titulacion = titulaciones[plan.group]
+        asignatura, subject_status = matcher.match_subject(plan.titulacion, row.subject_code, row.subject_name)
         if asignatura is None:
             asignatura = Asignatura.objects.filter(titulacion=titulacion, codigo_asignatura=row.subject_code).first()
         if asignatura is None:
@@ -452,8 +657,13 @@ def apply_import(catalogue_import):
 
         row.target_titulacion = titulacion
         row.target_asignatura = asignatura
-        row.match_status = status
-        row.save(update_fields=['target_titulacion', 'target_asignatura', 'match_status'])
+        row.match_status = matcher.row_status(plan, subject_status, asignatura)
+        row.plan_match_status = plan.status
+        row.plan_role = plan.role
+        row.plan_group = f't:{titulacion.pk}'
+        row.save(update_fields=[
+            'target_titulacion', 'target_asignatura', 'match_status', 'plan_match_status', 'plan_role', 'plan_group',
+        ])
 
     catalogue_import.state = CatalogueImport.STATE_APPLIED
     catalogue_import.applied_at = timezone.now()

@@ -55,6 +55,20 @@ class Titulacion(models.Model):
     def __str__(self):
         return self.nombre
 
+class PlanCodeAlias(models.Model):
+    """Secondary official plan code (e.g. a mention) grouped into a Titulacion."""
+
+    code = models.CharField(max_length=32, unique=True)
+    titulacion = models.ForeignKey(Titulacion, on_delete=models.CASCADE, related_name='plan_code_aliases')
+    name = models.CharField(max_length=255, blank=True)
+
+    class Meta:
+        ordering = ['code']
+
+    def __str__(self):
+        return f'{self.code} → {self.titulacion}'
+
+
 class Asignatura(models.Model):
     nombre = models.CharField(max_length=255)
     codigo_asignatura = models.CharField(max_length=32, blank=True, null=True)
@@ -171,7 +185,21 @@ class CatalogueImportRow(models.Model):
     target_asignatura = models.ForeignKey(
         Asignatura, on_delete=models.SET_NULL, null=True, blank=True, related_name='+'
     )
+    ROLE_PRIMARY = 'primary'
+    ROLE_ALIAS = 'alias'
+    ROLE_CHOICES = [
+        (ROLE_PRIMARY, 'Primary plan code'),
+        (ROLE_ALIAS, 'Alias plan code'),
+    ]
+
     match_status = models.CharField(max_length=10, choices=MATCH_CHOICES, default=MATCH_NEW)
+    plan_match_status = models.CharField(max_length=10, choices=MATCH_CHOICES, default=MATCH_NEW)
+    plan_role = models.CharField(max_length=10, choices=ROLE_CHOICES, default=ROLE_PRIMARY)
+    plan_group = models.CharField(
+        max_length=64,
+        blank=True,
+        help_text='Rows sharing this key land in the same Titulacion: "t:<pk>" or "new:<primary plan code>".',
+    )
 
     class Meta:
         ordering = ['plan_code', 'curricular_year', 'semester', 'subject_code']

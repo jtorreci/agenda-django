@@ -4,15 +4,24 @@ from decimal import Decimal
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.db import transaction
 from django.test import TestCase
 from django.urls import reverse
 
-from .catalogue_import import apply_import, build_draft, normalize_name, parse_catalogue
+from .catalogue_import import (
+    apply_import,
+    build_draft,
+    find_subject_conflicts,
+    normalize_name,
+    parse_catalogue,
+    register_plan_code,
+)
 from .models import (
     AcademicYear,
     Asignatura,
     CatalogueImport,
     CatalogueImportRow,
+    PlanCodeAlias,
     SubjectOffering,
     TeachingAssignment,
     Titulacion,
@@ -220,19 +229,20 @@ class CatalogueMatchingTests(TestCase):
         self.assertIsNone(row.target_asignatura)
         self.assertEqual(row.match_status, CatalogueImportRow.MATCH_NEW)
 
-    def test_plan_name_can_be_claimed_by_only_one_plan_code(self):
+    def test_second_code_sharing_a_plan_name_is_grouped_as_alias(self):
         plan = Titulacion.objects.create(nombre='Grado en BIM')
 
         draft = self.draft(
             'codPlan;Plan de estudios;codAsignatura;Asignatura\n'
-            'P1;Grado en BIM;S1;A\n'
             'P2;Grado en BIM;S2;B\n'
+            'P1;Grado en BIM;S1;A\n'
         )
 
-        self.assertEqual(draft.rows.get(plan_code='P1').target_titulacion, plan)
+        first = draft.rows.get(plan_code='P1')
         second = draft.rows.get(plan_code='P2')
-        self.assertIsNone(second.target_titulacion)
-        self.assertEqual(second.match_status, CatalogueImportRow.MATCH_NEW)
+        self.assertEqual((first.target_titulacion, first.plan_role), (plan, CatalogueImportRow.ROLE_PRIMARY))
+        self.assertEqual((second.target_titulacion, second.plan_role), (plan, CatalogueImportRow.ROLE_ALIAS))
+        self.assertEqual(first.plan_group, second.plan_group)
 
     def test_ambiguous_plan_name_is_not_matched(self):
         Titulacion.objects.create(nombre='Grado en BIM')
@@ -374,6 +384,177 @@ class CatalogueApplyTests(TestCase):
         self.assertEqual(Titulacion.objects.count(), 1)
         self.assertEqual(Asignatura.objects.count(), 2)
         self.assertEqual(SubjectOffering.objects.filter(academic_year=self.year).count(), 2)
+
+
+CIVIL = 'GRADO EN INGENIERÍA CIVIL'
+BIM = 'MÁSTER U. METODOLOGÍA PARA MODELIZACIÓN INFORMACIÓN CONSTRUCCIÓN (BIM)'
+GROUPING_HEADER = 'codPlan;Plan de estudios;codAsignatura;Asignatura;curso_plan;Semestre\n'
+
+
+class CataloguePlanGroupingTests(TestCase):
+    def setUp(self):
+        self.year = make_year()
+
+    def draft(self, body, year=None):
+        rows, errors = parse_catalogue(GROUPING_HEADER + body)
+        self.assertEqual(errors, [])
+        return build_draft(year or self.year, rows, 'catalogue.csv', None)
+
+    def roles(self, draft):
+        return {
+            row.plan_code: (row.plan_role, row.target_titulacion_id, row.plan_group)
+            for row in draft.rows.all()
+        }
+
+    def civil_body(self, mentions_first):
+        base = f'1640;{CIVIL};500900;MATEMÁTICAS I;1;1\n'
+        mentions = (
+            f'1623;{CIVIL} - CONSTRUCCIONES CIVILES;500922;HIDRÁULICA E HIDROLOGÍA;2;1\n'
+            f'1624;{CIVIL} - HIDROLOGÍA;500922;HIDRÁULICA E HIDROLOGÍA;2;1\n'
+            f'1625;{CIVIL} - TRANSPORTES Y SERVICIOS URBANOS;500950;TRANSPORTES;3;2\n'
+        )
+        return mentions + base if mentions_first else base + mentions
+
+    def assert_civil_grouped(self, civil):
+        self.assertEqual(Titulacion.objects.count(), 1)
+        civil.refresh_from_db()
+        self.assertEqual(civil.codigo_plan, '1640')
+        self.assertEqual(
+            sorted(civil.plan_code_aliases.values_list('code', 'name')),
+            [
+                ('1623', f'{CIVIL} - CONSTRUCCIONES CIVILES'),
+                ('1624', f'{CIVIL} - HIDROLOGÍA'),
+                ('1625', f'{CIVIL} - TRANSPORTES Y SERVICIOS URBANOS'),
+            ],
+        )
+        self.assertEqual(Asignatura.objects.filter(titulacion=civil, codigo_asignatura='500922').count(), 1)
+        self.assertEqual(SubjectOffering.objects.filter(academic_year=self.year).count(), 3)
+
+    def test_civil_mentions_group_into_existing_titulacion(self):
+        for mentions_first in (False, True):
+            with self.subTest(mentions_first=mentions_first):
+                with transaction.atomic():
+                    civil = Titulacion.objects.create(nombre='Grado En Ingeniería Civil')
+                    draft = self.draft(self.civil_body(mentions_first))
+
+                    roles = self.roles(draft)
+                    self.assertEqual(roles['1640'][:2], (CatalogueImportRow.ROLE_PRIMARY, civil.pk))
+                    for code in ('1623', '1624', '1625'):
+                        self.assertEqual(roles[code][:2], (CatalogueImportRow.ROLE_ALIAS, civil.pk))
+                    self.assertEqual(len({role[2] for role in roles.values()}), 1)
+
+                    apply_import(draft)
+                    self.assert_civil_grouped(civil)
+                    transaction.set_rollback(True)
+
+    def test_two_bim_codes_with_same_name_group_into_one_new_titulacion(self):
+        draft = self.draft(
+            f'1645;{BIM};600002;GESTIÓN BIM;1;2\n'
+            f'1642;{BIM};600001;MODELADO BIM;1;1\n'
+        )
+
+        roles = self.roles(draft)
+        self.assertEqual(roles['1642'][0], CatalogueImportRow.ROLE_PRIMARY)
+        self.assertEqual(roles['1645'][0], CatalogueImportRow.ROLE_ALIAS)
+        self.assertEqual(roles['1642'][2], roles['1645'][2])
+
+        apply_import(draft)
+
+        bim = Titulacion.objects.get()
+        self.assertEqual(bim.codigo_plan, '1642')
+        self.assertEqual(list(bim.plan_code_aliases.values_list('code', flat=True)), ['1645'])
+        self.assertEqual(bim.asignatura_set.count(), 2)
+
+    def test_brand_new_degree_groups_its_mentions_within_the_file(self):
+        draft = self.draft(
+            'P9 - X;GRADO NUEVO - MENCIÓN A;S2;B;2;1\n'
+            'P1;GRADO NUEVO;S1;A;1;1\n'
+        )
+
+        roles = self.roles(draft)
+        self.assertEqual(roles['P1'][0], CatalogueImportRow.ROLE_PRIMARY)
+        self.assertEqual(roles['P9 - X'][0], CatalogueImportRow.ROLE_ALIAS)
+        self.assertEqual(roles['P1'][2], roles['P9 - X'][2])
+
+        apply_import(draft)
+
+        degree = Titulacion.objects.get()
+        self.assertEqual((degree.nombre, degree.codigo_plan), ('GRADO NUEVO', 'P1'))
+        self.assertEqual(degree.plan_code_aliases.get().code, 'P9 - X')
+
+    def test_second_import_resolves_alias_codes_without_new_titulacion(self):
+        civil = Titulacion.objects.create(nombre='Grado En Ingeniería Civil')
+        apply_import(self.draft(self.civil_body(mentions_first=False)))
+
+        next_year = make_year('2027-28')
+        second = self.draft(self.civil_body(mentions_first=True), year=next_year)
+
+        self.assertEqual({row.plan_match_status for row in second.rows.all()}, {CatalogueImportRow.MATCH_CODE})
+        self.assertEqual({row.match_status for row in second.rows.all()}, {CatalogueImportRow.MATCH_CODE})
+        apply_import(second)
+
+        self.assertEqual(Titulacion.objects.count(), 1)
+        self.assertEqual(PlanCodeAlias.objects.filter(titulacion=civil).count(), 3)
+        self.assertEqual(Asignatura.objects.count(), 3)
+        self.assertEqual(SubjectOffering.objects.filter(academic_year=next_year).count(), 3)
+
+    def test_conflicting_grouped_duplicate_subject_blocks_apply(self):
+        Titulacion.objects.create(nombre=CIVIL)
+        draft = self.draft(
+            f'1640;{CIVIL};500900;MATEMÁTICAS I;1;1\n'
+            f'1623;{CIVIL} - CONSTRUCCIONES CIVILES;500922;HIDRÁULICA;2;1\n'
+            f'1624;{CIVIL} - HIDROLOGÍA;500922;HIDRÁULICA;3;1\n'
+        )
+
+        conflicts = find_subject_conflicts(draft.rows.all())
+        self.assertEqual(len(conflicts), 1)
+        self.assertEqual((conflicts[0].subject_code, conflicts[0].fields), ('500922', ['curso']))
+        with self.assertRaises(ValidationError):
+            apply_import(draft)
+        self.assertFalse(Asignatura.objects.exists())
+
+        draft.rows.filter(plan_code='1624').update(curricular_year=2)
+        apply_import(draft)
+        self.assertEqual(Asignatura.objects.filter(codigo_asignatura='500922').count(), 1)
+
+    def test_grouped_duplicates_share_known_curricular_metadata(self):
+        Titulacion.objects.create(nombre=CIVIL)
+        draft = self.draft(
+            f'1623;{CIVIL} - CONSTRUCCIONES CIVILES;500932;GEOTECNIA;;\n'
+            f'1624;{CIVIL} - HIDROLOGÍA;500932;GEOTECNIA;2;2\n'
+        )
+
+        self.assertEqual(set(draft.rows.values_list('curricular_year', 'semester')), {(2, 2)})
+
+    def test_alias_belonging_to_another_titulacion_raises(self):
+        civil = Titulacion.objects.create(nombre=CIVIL, codigo_plan='1640')
+        other = Titulacion.objects.create(nombre='Other degree', codigo_plan='9999')
+        PlanCodeAlias.objects.create(code='1623', titulacion=other, name='Other mention')
+
+        with self.assertRaises(ValidationError):
+            register_plan_code(civil, '1623', f'{CIVIL} - CONSTRUCCIONES CIVILES', CatalogueImportRow.ROLE_ALIAS)
+        with self.assertRaises(ValidationError):
+            register_plan_code(civil, '9999', 'Other degree', CatalogueImportRow.ROLE_ALIAS)
+        with self.assertRaises(ValidationError):
+            register_plan_code(civil, '1641', CIVIL, CatalogueImportRow.ROLE_PRIMARY)
+        self.assertEqual(PlanCodeAlias.objects.get(code='1623').titulacion, other)
+
+    def test_preview_shows_mention_badge_and_conflicts(self):
+        admin = get_user_model().objects.create_user(username='admin', password='x', role='ADMIN')
+        self.client.force_login(admin)
+        Titulacion.objects.create(nombre=CIVIL)
+        draft = self.draft(
+            f'1640;{CIVIL};500900;MATEMÁTICAS I;1;1\n'
+            f'1623;{CIVIL} - CONSTRUCCIONES CIVILES;500922;HIDRÁULICA;2;1\n'
+            f'1624;{CIVIL} - HIDROLOGÍA;500922;HIDRÁULICA;3;1\n'
+        )
+
+        response = self.client.get(reverse('catalogue_import_detail', args=[draft.pk]))
+
+        self.assertContains(response, f'Mención de {CIVIL}')
+        self.assertContains(response, 'aparece en los planes 1623, 1624')
+        self.assertFalse(response.context['can_apply'])
+        self.assertEqual(response.context['summary']['grouped_codes'], 2)
 
 
 class CatalogueImportViewTests(TestCase):

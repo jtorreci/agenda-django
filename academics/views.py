@@ -18,7 +18,11 @@ from .catalogue_import import (
     SEMESTER_VALUES,
     apply_import,
     build_draft,
+    find_subject_conflicts,
+    mention_parent,
+    normalize_name,
     parse_catalogue,
+    plan_code_sort_key,
 )
 from .forms import CatalogueUploadForm
 from .models import AcademicYear, CatalogueImport, CatalogueImportRow
@@ -132,32 +136,50 @@ def catalogue_import_detail(request, pk):
         target = request.path + ('?incomplete=1' if request.POST.get('incomplete') == '1' else '')
         return redirect(target)
 
-    all_rows = catalogue_import.rows.all()
-    summary = all_rows.aggregate(
-        total=Count('id'),
-        by_code=Count('id', filter=Q(match_status=CatalogueImportRow.MATCH_CODE)),
-        by_name=Count('id', filter=Q(match_status=CatalogueImportRow.MATCH_NAME)),
-        new=Count('id', filter=Q(match_status=CatalogueImportRow.MATCH_NEW)),
-        incomplete=Count('id', filter=Q(curricular_year__isnull=True) | Q(semester__isnull=True)),
-    )
-    rows = catalogue_import.incomplete_rows() if only_incomplete else all_rows
-    rows = rows.select_related('target_titulacion', 'target_asignatura').order_by('plan_code', 'curricular_year', 'semester', 'subject_code')
+    all_rows = list(catalogue_import.rows.select_related('target_titulacion', 'target_asignatura'))
+    summary = {
+        'total': len(all_rows),
+        'by_code': sum(row.match_status == CatalogueImportRow.MATCH_CODE for row in all_rows),
+        'by_name': sum(row.match_status == CatalogueImportRow.MATCH_NAME for row in all_rows),
+        'new': sum(row.match_status == CatalogueImportRow.MATCH_NEW for row in all_rows),
+        'incomplete': sum(not row.is_complete for row in all_rows),
+        'grouped_codes': len({row.plan_code for row in all_rows if row.plan_role == CatalogueImportRow.ROLE_ALIAS}),
+    }
+    conflicts = find_subject_conflicts(all_rows)
+    conflicting = {(conflict.group, conflict.subject_code) for conflict in conflicts}
+
+    group_names = {}
+    for row in all_rows:
+        if row.target_titulacion is not None:
+            group_names[row.plan_group] = row.target_titulacion.nombre
+        elif row.plan_role == CatalogueImportRow.ROLE_PRIMARY:
+            group_names.setdefault(row.plan_group, row.plan_name)
+
+    rows = [row for row in all_rows if not (only_incomplete and row.is_complete)]
+    rows.sort(key=lambda row: (
+        group_names.get(row.plan_group, ''),
+        row.plan_group,
+        row.plan_role != CatalogueImportRow.ROLE_PRIMARY,
+        plan_code_sort_key(row.plan_code),
+        row.curricular_year or 0,
+        row.semester or 0,
+        row.subject_code,
+    ))
 
     plans = []
     for row in rows:
+        row.has_conflict = (row.plan_group, row.subject_code) in conflicting
         if not plans or plans[-1]['plan_code'] != row.plan_code:
-            titulacion = row.target_titulacion
-            if titulacion is None:
-                plan_status = CatalogueImportRow.MATCH_NEW
-            elif titulacion.codigo_plan == row.plan_code:
-                plan_status = CatalogueImportRow.MATCH_CODE
-            else:
-                plan_status = CatalogueImportRow.MATCH_NAME
+            group_name = group_names.get(row.plan_group, row.plan_name)
+            parent = mention_parent(row.plan_name)
             plans.append({
                 'plan_code': row.plan_code,
                 'plan_name': row.plan_name,
-                'titulacion': titulacion,
-                'status': plan_status,
+                'titulacion': row.target_titulacion,
+                'status': row.plan_match_status,
+                'role': row.plan_role,
+                'group_name': group_name,
+                'is_mention': parent is not None and normalize_name(parent) == normalize_name(group_name),
                 'rows': [],
             })
         plans[-1]['rows'].append(row)
@@ -166,6 +188,7 @@ def catalogue_import_detail(request, pk):
         'catalogue_import': catalogue_import,
         'is_draft': catalogue_import.state == CatalogueImport.STATE_DRAFT,
         'summary': summary,
+        'conflicts': conflicts,
         'plans': plans,
         'only_incomplete': only_incomplete,
         'curricular_year_choices': CURRICULAR_YEAR_CHOICES,
@@ -174,6 +197,7 @@ def catalogue_import_detail(request, pk):
             catalogue_import.state == CatalogueImport.STATE_DRAFT
             and summary['total'] > 0
             and summary['incomplete'] == 0
+            and not conflicts
             and catalogue_import.academic_year.state != AcademicYear.STATE_ARCHIVED
         ),
     })
