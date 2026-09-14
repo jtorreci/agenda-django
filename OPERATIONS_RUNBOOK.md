@@ -33,12 +33,16 @@ encryption. Off-site copies are encrypted before being retained there.
 | Canonical production checkout | `/srv/agenda-django` on Garnocex |
 | Application | `agenda_app` Docker container |
 | Database | `agenda_db` PostgreSQL 16 Docker container and persistent volume |
-| Public routing | nginx → `127.0.0.1:8000` → Gunicorn |
+| Public routing | Host nginx strips `/agenda` → `127.0.0.1:8000` → Gunicorn. Django re-adds the prefix (`FORCE_SCRIPT_NAME=/agenda`) |
+| Proxy network | `agenda_app` also joins Docker network `proxy` as `agenda-app`, ready for the shared Caddy cut-over |
 | Public URL | `https://garnocex.unex.es/agenda/` |
-| Last independently verified release | `09202e2`, public HTTP 200 |
+| Last independently verified release | `208ebcd` (2026-09-14): CI deploy success, public `/agenda/`, login and admin HTTP 200, prefixed links, static CSS 200, cookies `Path=/agenda` |
 
 The application port is intentionally loopback-only. Do not expose port 8000
-to the network; nginx owns public HTTP/HTTPS access.
+to the network; nginx owns public HTTP/HTTPS access until the Caddy cut-over.
+Prefix, proxy and cut-over details: `docs/GARNOCEX_PROXY.md`. Server-wide
+decisions and open issues for everything on Garnocex: PCC node
+`desarrollo.garnocex_infra` (`/mnt/nas/Dropbox/Universidad/Desarrollo/garnocex-infra/README.md`).
 
 ### GitHub Actions deployment flow
 
@@ -146,7 +150,9 @@ Vaultwarden before attempting to decrypt an off-site artifact.
 - Legacy and Docker database business-table counts were compared; the only
   difference was three later failed login attempts.
 - An isolated Docker disaster-recovery environment restored database, static,
-  and media artifacts and passed the critical data parity check.
+  and media artifacts and passed the critical data parity check. It was removed
+  on 2026-09-14 (containers, volumes, network and image) because it held a copy
+  of production data; tear down future drills right after verification.
 - Latest off-site encrypted archive was interactively decrypted and listed
   without materializing plaintext on disk.
 
@@ -156,6 +162,7 @@ Vaultwarden before attempting to decrypt an off-site artifact.
 |---|---|
 | PCC node | `desarrollo.agenda_estudiante` |
 | PCC path | `/mnt/nas/Dropbox/Universidad/Desarrollo/agenda-django` |
+| Garnocex deployment reference | `desarrollo.garnocex_infra` (shared with DIGIBIC and the proxy) |
 | Graphify | A repository graph was generated and used to map the application domain |
 
 PCC uses dot notation for the canonical node ID. Do not create
@@ -177,6 +184,12 @@ external login. It includes:
 5. Native `.ics` upload: choose a current teaching offering, preview parsed
    events, accept/reject/edit, then create audited Agenda activities. Event UID
    prevents duplicate imports.
+
+Status (2026-09-14): items 1 and 2 are implemented on branch
+`feat/academic-years-ical-import` (not yet merged). The importer also groups
+mention and secondary plan codes into their parent degree (`PlanCodeAlias`),
+lets the administrator map a plan to an existing degree by hand, and archives the
+previously active year when a new one is activated.
 
 Plan and subject codes are immutable business keys. Use the composite
 `(plan_code, subject_code)` identity; never match subjects across plans by name.
