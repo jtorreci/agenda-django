@@ -128,6 +128,33 @@ class PrefixedUrlsTests(TestCase):
                 self.assert_page_is_prefixed(path)
                 self.client.logout()
 
+    def test_catalogue_import_pages_are_prefixed(self):
+        from datetime import date
+
+        from academics.catalogue_import import build_draft, parse_catalogue
+        from academics.models import AcademicYear
+
+        year = AcademicYear.objects.create(
+            code="2026-27", starts_on=date(2026, 9, 1), ends_on=date(2027, 8, 31)
+        )
+        rows, errors = parse_catalogue(
+            b"plan_code;plan_name;subject_code;subject_name;curricular_year;semester\n"
+            b"P1;Plan One;S1;Subject One;1;1\n"
+        )
+        self.assertEqual(errors, [])
+        draft = build_draft(year, rows, "catalogue.csv", self.users[CustomUser.ROLE_ADMIN])
+
+        self.client.force_login(self.users[CustomUser.ROLE_ADMIN])
+        self.assert_page_is_prefixed("/catalogue/imports/")
+        self.assert_page_is_prefixed(f"/catalogue/imports/{draft.pk}/")
+        self.assertEqual(
+            reverse("catalogue_import_detail", args=[draft.pk]),
+            f"{PREFIX}/catalogue/imports/{draft.pk}/",
+        )
+
+        response = self.client.post(f"/catalogue/imports/years/{year.pk}/activate/")
+        self.assert_redirects_under_prefix(response)
+
     def test_admin_index_is_prefixed(self):
         self.client.force_login(self.superuser)
         response = self.client.get("/admin/")

@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+
+{% block title %}Importación de catálogo {{ catalogue_import.academic_year.code }}{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+  <div>
+    <h2 class="mb-0">Importación de catálogo · {{ catalogue_import.academic_year.code }}</h2>
+    <div class="text-muted small">
+      {{ catalogue_import.source_filename }} · {{ catalogue_import.created_at|date:"d/m/Y H:i" }}
+      {% if is_draft %}<span class="badge bg-warning text-dark">Borrador</span>
+      {% else %}<span class="badge bg-success">Aplicada {{ catalogue_import.applied_at|date:"d/m/Y H:i" }}</span>{% endif %}
+    </div>
+  </div>
+  <a href="{% url 'catalogue_import_list' %}" class="btn btn-secondary btn-sm">Volver a importaciones</a>
+</div>
+
+{% include 'academics/_messages.html' %}
+
+<div class="row g-2 mb-3">
+  <div class="col-6 col-md"><div class="card text-center"><div class="card-body py-2"><div class="fs-4">{{ summary.total }}</div><div class="small text-muted">Asignaturas</div></div></div></div>
+  <div class="col-6 col-md"><div class="card text-center"><div class="card-body py-2"><div class="fs-4 text-success">{{ summary.by_code }}</div><div class="small text-muted">Por código</div></div></div></div>
+  <div class="col-6 col-md"><div class="card text-center"><div class="card-body py-2"><div class="fs-4 text-info">{{ summary.by_name }}</div><div class="small text-muted">Por nombre</div></div></div></div>
+  <div class="col-6 col-md"><div class="card text-center"><div class="card-body py-2"><div class="fs-4 text-primary">{{ summary.new }}</div><div class="small text-muted">Nuevas</div></div></div></div>
+  <div class="col-6 col-md"><div class="card text-center"><div class="card-body py-2"><div class="fs-4 text-warning">{{ summary.manual }}</div><div class="small text-muted">Manuales ({{ summary.manual_plans }} planes)</div></div></div></div>
+  <div class="col-6 col-md"><div class="card text-center"><div class="card-body py-2"><div class="fs-4 {% if summary.incomplete %}text-danger{% endif %}">{{ summary.incomplete }}</div><div class="small text-muted">Incompletas</div></div></div></div>
+  <div class="col-6 col-md"><div class="card text-center"><div class="card-body py-2"><div class="fs-4 text-secondary">{{ summary.grouped_codes }}</div><div class="small text-muted">Códigos agrupados</div></div></div></div>
+</div>
+
+<div class="d-flex flex-wrap gap-2 align-items-center mb-3">
+  {% if only_incomplete %}
+    <a href="{% url 'catalogue_import_detail' catalogue_import.pk %}" class="btn btn-outline-secondary btn-sm">Mostrar todas</a>
+  {% else %}
+    <a href="?incomplete=1" class="btn btn-outline-secondary btn-sm">Solo incompletas</a>
+  {% endif %}
+  <div class="ms-auto d-flex flex-wrap gap-2">
+    {% if is_draft %}
+      <form method="post" action="{% url 'catalogue_import_apply' catalogue_import.pk %}"
+            onsubmit="return confirm('¿Aplicar la importación? Se crearán o actualizarán titulaciones, asignaturas y ofertas del curso.');">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-success btn-sm" {% if not can_apply %}disabled title="Complete curso y semestre y resuelva los conflictos"{% endif %}>
+          <i class="bi bi-check2-circle"></i> Aplicar importación
+        </button>
+      </form>
+      <form method="post" action="{% url 'catalogue_import_delete' catalogue_import.pk %}"
+            onsubmit="return confirm('¿Eliminar este borrador?');">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-outline-danger btn-sm"><i class="bi bi-trash"></i> Eliminar borrador</button>
+      </form>
+    {% elif catalogue_import.academic_year.state == 'draft' %}
+      <form method="post" action="{% url 'academic_year_activate' catalogue_import.academic_year.pk %}"
+            onsubmit="return confirm('¿Activar el curso {{ catalogue_import.academic_year.code }}? El curso activo actual pasará a archivado.');">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+        <button type="submit" class="btn btn-outline-success btn-sm">Activar curso {{ catalogue_import.academic_year.code }}</button>
+      </form>
+    {% endif %}
+  </div>
+</div>
+
+{% if conflicts %}
+  <div class="alert alert-danger small">
+    <p class="mb-1"><strong>Asignaturas repetidas con datos distintos en planes agrupados.</strong> Iguale curso y semestre en todos los planes antes de aplicar.</p>
+    <ul class="mb-0">
+      {% for conflict in conflicts %}<li>{{ conflict }}</li>{% endfor %}
+    </ul>
+  </div>
+{% endif %}
+
+{% if is_draft and summary.incomplete %}
+  <div class="alert alert-warning small">
+    Hay {{ summary.incomplete }} asignaturas sin curso del plan o semestre. Complételas y guarde los cambios antes de aplicar.
+  </div>
+{% endif %}
+
+{% for plan in plans %}
+  <div class="card mb-3" id="plan-{{ plan.plan_code }}">
+    <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+      <div>
+        <strong>{{ plan.plan_code }}</strong> · {{ plan.plan_name }}
+        {% if plan.role == 'alias' %}
+          <span class="badge bg-secondary">{% if plan.is_mention %}Mención de{% else %}Código adicional de{% endif %} {{ plan.group_name }}</span>
+        {% endif %}
+        {% if plan.status == 'manual' %}<span class="badge bg-warning text-dark">Asociación manual: {% if plan.titulacion %}{{ plan.group_name }}{% else %}nueva titulación{% endif %}</span>
+        {% elif plan.status == 'code' %}<span class="badge bg-success">Plan por código</span>
+        {% elif plan.status == 'name' %}<span class="badge bg-info text-dark">Plan por nombre: {{ plan.group_name }}</span>
+        {% else %}<span class="badge bg-primary">Plan nuevo</span>{% endif %}
+      </div>
+      <span class="small text-muted">{{ plan.rows|length }} asignaturas</span>
+      {% if is_draft %}
+        <form method="post" action="{% url 'catalogue_import_plan_override' catalogue_import.pk %}" class="d-flex flex-wrap gap-2 align-items-center w-100">
+          {% csrf_token %}
+          <input type="hidden" name="plan_code" value="{{ plan.plan_code }}">
+          {% if only_incomplete %}<input type="hidden" name="incomplete" value="1">{% endif %}
+          <label class="small text-muted" for="target-{{ plan.plan_code }}">Asociar a titulación existente</label>
+          <select id="target-{{ plan.plan_code }}" name="target" class="form-select form-select-sm w-auto mw-100" {% if plan.locked %}disabled{% endif %}>
+            <option value="auto"{% if not plan.override %} selected{% endif %}>Automático ({% if plan.automatic.titulacion %}{{ plan.automatic.group_name }}{% else %}nueva titulación{% endif %})</option>
+            <option value="new"{% if plan.override and not plan.override.titulacion_id %} selected{% endif %}>Crear nueva titulación</option>
+            {% for titulacion in titulaciones %}
+              <option value="{{ titulacion.pk }}"{% if plan.override.titulacion_id == titulacion.pk %} selected{% endif %}>{{ titulacion.nombre }}{% if titulacion.codigo_plan %} ({{ titulacion.codigo_plan }}){% endif %}</option>
+            {% endfor %}
+          </select>
+          {% if plan.locked %}
+            <span class="small text-muted">El código ya está registrado; los códigos se cambian en la administración de Django.</span>
+          {% else %}
+            <button type="submit" class="btn btn-outline-primary btn-sm">Asociar</button>
+          {% endif %}
+        </form>
+      {% endif %}
+    </div>
+    <form method="post">
+      {% csrf_token %}
+      {% if only_incomplete %}<input type="hidden" name="incomplete" value="1">{% endif %}
+      <div class="table-responsive">
+        <table class="table table-sm align-middle mb-0">
+          <thead>
+            <tr><th>Código</th><th>Asignatura</th><th>Créditos</th><th>Coincidencia</th><th style="width:9rem">Curso</th><th style="width:11rem">Semestre</th></tr>
+          </thead>
+          <tbody>
+            {% for row in plan.rows %}
+              <tr class="{% if row.has_conflict %}table-danger{% elif not row.is_complete %}table-warning{% endif %}">
+                <td>{{ row.subject_code }}</td>
+                <td>
+                  {{ row.subject_name }}
+                  {% if row.match_status == 'name' and row.target_asignatura and row.target_asignatura.nombre != row.subject_name %}
+                    <div class="small text-muted">Existente: {{ row.target_asignatura.nombre }}</div>
+                  {% endif %}
+                </td>
+                <td>{{ row.credits|default_if_none:"" }}</td>
+                <td>
+                  {% if row.match_status == 'code' %}<span class="badge bg-success">Código</span>
+                  {% elif row.match_status == 'name' %}<span class="badge bg-info text-dark">Nombre</span>
+                  {% else %}<span class="badge bg-primary">Nueva</span>{% endif %}
+                </td>
+                <td>
+                  {% if is_draft %}
+                    <select class="form-select form-select-sm" name="curricular_year_{{ row.pk }}"
+                            aria-label="Curso de {{ row.subject_code }}">
+                      <option value=""{% if row.curricular_year is None %} selected{% endif %}>—</option>
+                      {% for value, label in curricular_year_choices %}
+                        <option value="{{ value }}"{% if row.curricular_year == value %} selected{% endif %}>{{ label }}</option>
+                      {% endfor %}
+                    </select>
+                  {% else %}{% for value, label in curricular_year_choices %}{% if row.curricular_year == value %}{{ label }}{% endif %}{% endfor %}{% endif %}
+                </td>
+                <td>
+                  {% if is_draft %}
+                    <select class="form-select form-select-sm" name="semester_{{ row.pk }}"
+                            aria-label="Semestre de {{ row.subject_code }}">
+                      <option value=""{% if row.semester is None %} selected{% endif %}>—</option>
+                      {% for value, label in semester_choices %}
+                        <option value="{{ value }}"{% if row.semester == value %} selected{% endif %}>{{ label }}</option>
+                      {% endfor %}
+                    </select>
+                  {% else %}{% for value, label in semester_choices %}{% if row.semester == value %}{{ label }}{% endif %}{% endfor %}{% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% if is_draft %}
+        <div class="card-footer text-end">
+          <button type="submit" class="btn btn-primary btn-sm"><i class="bi bi-save"></i> Guardar cambios de {{ plan.plan_code }}</button>
+        </div>
+      {% endif %}
+    </form>
+  </div>
+{% empty %}
+  <p class="text-muted">No hay asignaturas que mostrar.</p>
+{% endfor %}
+{% endblock %}
