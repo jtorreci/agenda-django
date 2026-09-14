@@ -5,8 +5,11 @@ This repository provides a production Compose definition, but no automated deplo
 ## Server preparation
 
 1. Clone the repository into a server-owned directory.
-2. Copy `.env.example` to `.env.garnocex`, then set every blank value. `ALLOWED_HOSTS` is a comma-separated host list and `CSRF_TRUSTED_ORIGINS` contains full HTTPS origins, for example `https://agenda.example.edu`.
-3. Put TLS termination in front of the container and forward `X-Forwarded-Proto: https`. The Compose port binds only to `127.0.0.1`.
+2. Copy `.env.example` to `.env.garnocex`, then set `POSTGRES_PASSWORD` and `DJANGO_SECRET_KEY`. `ALLOWED_HOSTS` (comma-separated hosts) defaults to `garnocex.unex.es` and `CSRF_TRUSTED_ORIGINS` (full HTTPS origins) defaults to `https://garnocex.unex.es`; set them only to override those defaults.
+3. The app is published by the shared garnocex Caddy proxy under `https://garnocex.unex.es/agenda/` (see the proxy's `CONTRACT.md`). Caddy strips the `/agenda` prefix, forwards the original `Host`, and sets `X-Forwarded-Proto`; Django re-adds the prefix through `FORCE_SCRIPT_NAME` (`DJANGO_SCRIPT_NAME`, default `/agenda`), so static files live under `/agenda/static/`, media under `/agenda/media/`, and cookies are scoped to `/agenda`.
+   - Create the shared network once on the host before starting this stack: `docker network create proxy`. The `agenda` service joins it with the alias `agenda-app`.
+   - Caddy serves `/agenda/media/*` directly from the `agenda_media_files` volume, publicly and without Django permission checks. Do not store private uploads there.
+   - The Compose port still binds only to `127.0.0.1:8000` for the transition from host nginx. A proxy that mounts the app at the domain root instead must set `DJANGO_SCRIPT_NAME=/` and forward `Host` and `X-Forwarded-Proto: https`.
 4. Validate configuration without printing secrets:
 
    ```bash

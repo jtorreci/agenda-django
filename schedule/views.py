@@ -1753,7 +1753,7 @@ def copy_activity_individual(request, activity_id):
     # Check if user can access this activity (must be in their subjects)
     user_subjects = request.user.subjects.all()
     if not original_activity.asignaturas.filter(id__in=user_subjects.values_list('id', flat=True)).exists():
-        return HttpResponseRedirect(get_user_dashboard_url(request.user))
+        return redirect(get_user_dashboard_url(request.user))
     
     if request.method == 'POST':
         form = UnifiedActivityForm(request.POST, user=request.user)
@@ -1828,7 +1828,7 @@ def copy_activity_multi_group(request, activity_id):
     # Check if user can access this activity
     user_subjects = request.user.subjects.all()
     if not original_activity.asignaturas.filter(id__in=user_subjects.values_list('id', flat=True)).exists():
-        return HttpResponseRedirect(get_user_dashboard_url(request.user))
+        return redirect(get_user_dashboard_url(request.user))
     
     if request.method == 'POST':
         form = UnifiedActivityForm(request.POST, user=request.user)

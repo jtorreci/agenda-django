@@ -27,7 +27,7 @@
                     <a href="{% url 'login_attempts' %}" class="btn btn-outline-info btn-sm">
                         <i class="bi bi-shield-check"></i> <span class="d-none d-sm-inline">Login Attempts</span><span class="d-inline d-sm-none">Logins</span>
                     </a>
-                    <a href="/admin/" class="btn btn-outline-secondary btn-sm" target="_blank">
+                    <a href="{% url 'admin:index' %}" class="btn btn-outline-secondary btn-sm" target="_blank">
                         <i class="bi bi-gear"></i> <span class="d-none d-sm-inline">Django Admin</span><span class="d-inline d-sm-none">Admin</span>
                     </a>
                     <div class="dropdown">
@@ -850,7 +850,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        fetch(`/ajax/tipoactividad/${currentEditingTipoId}/update/`, {
+        fetch(urlWithId("{% url 'ajax_update_tipo_actividad' 0 %}", currentEditingTipoId), {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -901,7 +901,7 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('deleteTypeName').textContent = tipoName;
             
             // Get activity count and other types
-            fetch(`/ajax/tipoactividad/${tipoId}/activity_count/`)
+            fetch(urlWithId("{% url 'ajax_get_activity_count' 0 %}", tipoId))
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
@@ -992,7 +992,7 @@ document.addEventListener('DOMContentLoaded', function() {
             };
         }
 
-        fetch(`/ajax/tipoactividad/${currentDeletingTipoId}/delete/`, {
+        fetch(urlWithId("{% url 'ajax_delete_tipo_actividad' 0 %}", currentDeletingTipoId), {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
@@ -1372,7 +1372,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        fetch(`/ajax/tipo-perfil/${currentEditingProfileId}/update/`, {
+        fetch(urlWithId("{% url 'ajax_update_tipo_perfil' 0 %}", currentEditingProfileId), {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -1438,7 +1438,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const profileName = btn.getAttribute('data-profile-name');
             
             if (confirm(`¿Estás seguro de que quieres eliminar el tipo de perfil "${profileName}"?`)) {
-                fetch(`/ajax/tipo-perfil/${profileId}/delete/`, {
+                fetch(urlWithId("{% url 'ajax_delete_tipo_perfil' 0 %}", profileId), {
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json',

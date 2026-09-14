@@ -253,8 +253,9 @@ EMAIL_TIMEOUT = 30
 TEACHER_EMAIL_DOMAINS = os.environ.get('TEACHER_EMAIL_DOMAINS', 'unex.es').split(',')
 STUDENT_EMAIL_DOMAINS = os.environ.get('STUDENT_EMAIL_DOMAINS', 'alumnos.unex.es').split(',')
 
-LOGIN_REDIRECT_URL = '/users/dashboard_redirect/'
-LOGIN_URL = '/login/'
+# URL names (not paths) so resolve_url() adds the deployment prefix (FORCE_SCRIPT_NAME).
+LOGIN_REDIRECT_URL = 'dashboard_redirect'
+LOGIN_URL = 'login'
 
 # settings.py
 
