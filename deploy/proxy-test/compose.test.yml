@@ -1,0 +1,67 @@
+# TEST ONLY: local end-to-end check of the agenda behind the shared Caddy routing.
+name: agenda-proxytest
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: agenda-proxytest-db
+    env_file: .env
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - internal
+
+  agenda:
+    build: ../..
+    image: agenda-proxytest-app:local
+    container_name: agenda-proxytest-app
+    env_file: .env
+    environment:
+      DJANGO_SETTINGS_MODULE: agenda_academica.settings_production
+      DJANGO_DEBUG: "False"
+    # Same start command as compose.production.yml.
+    command: >-
+      sh -c 'export DB_NAME="$${POSTGRES_DB}" DB_USER="$${POSTGRES_USER}" DB_PASSWORD="$${POSTGRES_PASSWORD}" DB_HOST=db DB_PORT=5432; python manage.py migrate --noinput && python manage.py collectstatic --noinput && exec gunicorn agenda_academica.wsgi:application --bind 0.0.0.0:8000 --workers 3 --access-logfile - --error-logfile -'
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:18000:8000"
+    volumes:
+      - static:/app/staticfiles
+      - media:/app/media
+    networks:
+      internal:
+      proxy:
+        aliases:
+          - agenda-app
+
+  caddy:
+    image: caddy:2.10-alpine
+    container_name: agenda-proxytest-caddy
+    ports:
+      - "127.0.0.1:18443:18443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - media:/srv/agenda/media:ro
+    networks:
+      - proxy
+
+volumes:
+  pgdata:
+    name: agenda-proxytest-pgdata
+  static:
+    name: agenda-proxytest-static
+  media:
+    name: agenda-proxytest-media
+
+networks:
+  internal:
+    name: agenda-proxytest-internal
+  proxy:
+    name: agenda-proxytest-proxy
