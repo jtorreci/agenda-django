@@ -10,6 +10,10 @@ and the starting point for any other app that joins the proxy later.
 > (server: `/opt/proxy`). Those files are shared: change their site-level parts only
 > after agreement with every affected app owner. Agenda edits only its own blocks.
 
+> **Server-wide reference:** decisions, routes and open issues for everything deployed on
+> Garnocex live in the PCC node `desarrollo.garnocex_infra`
+> (`/mnt/nas/Dropbox/Universidad/Desarrollo/garnocex-infra/README.md`).
+
 ## Quick path
 
 1. On Garnocex, once: `docker network create proxy`. Without it the agenda deploy fails,
