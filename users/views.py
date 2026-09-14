@@ -68,6 +68,7 @@ def register(request):
                 message = render_to_string('users/account_activation_email.html', {
                     'user': user,
                     'domain': current_site.domain,
+                    'protocol': request.scheme,
                     'uid': urlsafe_base64_encode(force_bytes(user.pk)),
                     'token': default_token_generator.make_token(user),
                 })
@@ -118,6 +119,7 @@ def resend_activation(request):
                 message = render_to_string('users/account_activation_email.html', {
                     'user': user,
                     'domain': current_site.domain,
+                    'protocol': request.scheme,
                     'uid': urlsafe_base64_encode(force_bytes(user.pk)),
                     'token': default_token_generator.make_token(user),
                 })

@@ -35,7 +35,11 @@ services:
       - agenda_static_files:/app/staticfiles
       - agenda_media_files:/app/media
     networks:
-      - agenda_network
+      agenda_network:
+      # Shared garnocex Caddy proxy (see its CONTRACT.md): routes /agenda/* here.
+      proxy:
+        aliases:
+          - agenda-app
 
 volumes:
   agenda_postgres_data:
@@ -49,3 +53,6 @@ networks:
   agenda_network:
     external: true
     name: agenda_agenda_network
+  # Created once on the host (docker network create proxy); owned by the proxy stack.
+  proxy:
+    external: true

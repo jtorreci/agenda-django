@@ -364,7 +364,7 @@
             headerToolbar: { left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek,timeGridDay' },
             events: function(fetchInfo, successCallback, failureCallback) {
                 const params = new URLSearchParams(new FormData(document.getElementById('filter-form')));
-                fetch(`/all_activities/?${params.toString()}`)
+                fetch(`{% url 'all_activities' %}?${params.toString()}`)
                     .then(response => response.json()).then(data => successCallback(data)).catch(error => failureCallback(error));
             },
             eventClick: function(info) {
@@ -402,7 +402,7 @@
         
         // Create activity to titulaciones mapping
         const activityTitulaciones = {};
-        {% for activity in activities %}
+        {% for activity in active_activities %}
             activityTitulaciones[{{ activity.id }}] = [
                 {% for asignatura in activity.asignaturas.all %}
                     {{ asignatura.titulacion.id }}{% if not forloop.last %},{% endif %}
@@ -464,7 +464,7 @@
                     // Disable checkbox during request
                     this.disabled = true;
                     
-                    fetch(`/activity/toggle_approval_from_dashboard/${activityId}/`, {
+                    fetch(urlWithId("{% url 'toggle_activity_approval_from_dashboard' 0 %}", activityId), {
                         method: 'POST',
                         headers: { 
                             'X-CSRFToken': '{{ csrf_token }}', 
@@ -505,7 +505,7 @@
             const params = new URLSearchParams();
             selectedTitulaciones.forEach(id => params.append('titulacion_ids', id));
             selectedCursos.forEach(id => params.append('curso_ids', id));
-            fetch(`/ajax/get_filtered_asignaturas/?${params.toString()}`)
+            fetch(`{% url 'get_filtered_asignaturas' %}?${params.toString()}`)
                 .then(response => response.json())
                 .then(data => {
                     const tsAsignatura = asignaturaSelect.tomselect;

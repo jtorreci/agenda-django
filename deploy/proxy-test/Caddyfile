@@ -1,0 +1,26 @@
+# TEST ONLY (agenda-proxytest). Site body copied verbatim from the shared
+# garnocex-proxy Caddyfile, minus the digibic blocks; site address and TLS changed.
+https://localhost:18443 {
+	tls internal
+
+	encode zstd gzip
+
+	# ---- shared ---------------------------------------------------------
+	redir / /agenda/ 302
+
+	# ---- owner: agenda --------------------------------------------------
+	# Django runs with FORCE_SCRIPT_NAME=/agenda: the prefix IS stripped.
+	redir /agenda /agenda/
+	handle_path /agenda/media/* {
+		root * /srv/agenda/media
+		file_server
+	}
+	handle_path /agenda/* {
+		reverse_proxy agenda-app:8000
+	}
+
+	# ---- shared ---------------------------------------------------------
+	handle {
+		respond "Not Found" 404
+	}
+}
