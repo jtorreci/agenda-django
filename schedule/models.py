@@ -1,5 +1,6 @@
 from django.db import models
-from academics.models import Asignatura
+from django.db.models import Q
+from academics.models import AcademicYear, Asignatura
 from users.models import CustomUser
 import uuid
 
@@ -50,6 +51,10 @@ class ActividadQuerySet(models.QuerySet):
         """Compatibilidad con campo legacy activa"""
         return self.exclude(estado='archivada').filter(activa=True)
 
+    def in_active_year(self):
+        """Activities of the active academic year (empty when no year is active)."""
+        return self.filter(academic_year__state=AcademicYear.STATE_ACTIVE)
+
 class ActividadManager(models.Manager):
     """Manager personalizado con métodos de filtrado por estado"""
 
@@ -64,6 +69,9 @@ class ActividadManager(models.Manager):
 
     def archivadas(self):
         return self.get_queryset().archivadas()
+
+    def in_active_year(self):
+        return self.get_queryset().in_active_year()
 
 class Actividad(models.Model):
     # Estados de actividad
@@ -80,6 +88,15 @@ class Actividad(models.Model):
     nombre = models.CharField(max_length=255)
     asignaturas = models.ManyToManyField(Asignatura)
     tipo_actividad = models.ForeignKey(TipoActividad, on_delete=models.CASCADE)
+    # Every activity belongs to exactly one academic year. Only activities of the
+    # active year are editable; new activities always get the active year.
+    academic_year = models.ForeignKey(
+        AcademicYear, on_delete=models.PROTECT, related_name='activities'
+    )
+    # Source activity when this one was imported from a previous academic year.
+    copied_from = models.ForeignKey(
+        'self', on_delete=models.SET_NULL, null=True, blank=True, related_name='copies'
+    )
 
     # Campo estado principal
     estado = models.CharField(
@@ -104,6 +121,20 @@ class Actividad(models.Model):
 
     # Manager personalizado
     objects = ActividadManager()
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['copied_from', 'academic_year'],
+                condition=Q(copied_from__isnull=False),
+                name='schedule_unique_activity_import_per_year',
+            )
+        ]
+
+    @property
+    def is_read_only(self):
+        """Activities outside the active academic year cannot be modified."""
+        return self.academic_year.state != AcademicYear.STATE_ACTIVE
     
     @property
     def grupos_count(self):
@@ -116,6 +147,10 @@ class Actividad(models.Model):
         return self.grupos.first()
 
     def save(self, *args, **kwargs):
+        # New activities always belong to the active academic year.
+        if self.academic_year_id is None:
+            self.academic_year = AcademicYear.require_active()
+
         # Apply automatic approval logic only when creating a new activity or when approval status hasn't been manually set
         if not self.pk or not hasattr(self, '_approval_manually_set'):
             self.aprobada = self._get_default_approval_status()

@@ -1,6 +1,6 @@
 from django import forms
 from .models import Actividad, ActividadGrupo, VistaCalendario, TipoActividad
-from academics.models import Asignatura
+from academics.models import AcademicYear, Asignatura, offered_subjects
 import json
 import uuid
 from django.db import transaction
@@ -43,6 +43,20 @@ class LocalDateTimeWidget(forms.DateTimeInput):
     def format_key(self):
         return self.format or '%Y-%m-%dT%H:%M'
 
+def subjects_for_new_activities(user):
+    """The user's subjects that are offered in the active academic year."""
+    return offered_subjects(AcademicYear.get_active(), user.subjects.all())
+
+
+def check_active_year(form):
+    """Add a form error when there is no active year to create activities in."""
+    if AcademicYear.get_active() is None:
+        form.add_error(
+            None,
+            'No hay ningún curso académico activo, así que no se pueden crear ni editar actividades.',
+        )
+
+
 class ActividadForm(forms.ModelForm):
     asignaturas = forms.ModelMultipleChoiceField(
         queryset=Asignatura.objects.none(), # Set initial queryset to none
@@ -55,8 +69,13 @@ class ActividadForm(forms.ModelForm):
         user = kwargs.pop('user', None)
         read_only = kwargs.pop('read_only', False) # New parameter
         # Set queryset before calling super().__init__
+        self._check_active_year = not read_only
         if user and user.role in ['TEACHER', 'COORDINATOR', 'ADMIN']:
-            self.base_fields['asignaturas'].queryset = user.subjects.all()
+            # Read-only views show the activity as it is; editing and creating
+            # only offer subjects offered in the active academic year.
+            self.base_fields['asignaturas'].queryset = (
+                user.subjects.all() if read_only else subjects_for_new_activities(user)
+            )
         super().__init__(*args, **kwargs)
 
         # Configure datetime input formats for datetime-local
@@ -72,6 +91,12 @@ class ActividadForm(forms.ModelForm):
                     field.widget.attrs['readonly'] = True
                     field.widget.attrs['disabled'] = True # Disable for checkboxes/selects
                 field.required = False # Make fields not required in read-only mode
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if self._check_active_year:
+            check_active_year(self)
+        return cleaned_data
 
     def clean_fecha_inicio(self):
         """
@@ -170,10 +195,15 @@ class MultiGroupActivityForm(forms.Form):
         super().__init__(*args, **kwargs)
         
         if user and user.role in ['TEACHER', 'COORDINATOR', 'ADMIN']:
-            self.fields['asignaturas'].queryset = user.subjects.all()
+            self.fields['asignaturas'].queryset = subjects_for_new_activities(user)
         
         if initial_groups:
             self.fields['grupos_data'].initial = json.dumps(initial_groups)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        check_active_year(self)
+        return cleaned_data
 
     def clean_grupos_data(self):
         grupos_data = self.cleaned_data.get('grupos_data', '[]')
@@ -295,10 +325,15 @@ class UnifiedActivityForm(forms.Form):
         super().__init__(*args, **kwargs)
 
         if user and user.role in ['TEACHER', 'COORDINATOR', 'ADMIN']:
-            self.fields['asignaturas'].queryset = user.subjects.all()
+            self.fields['asignaturas'].queryset = subjects_for_new_activities(user)
 
         if initial_groups:
             self.fields['grupos_data'].initial = json.dumps(initial_groups)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        check_active_year(self)
+        return cleaned_data
 
     def clean_grupos_data(self):
         grupos_data = self.cleaned_data.get('grupos_data', '[]')

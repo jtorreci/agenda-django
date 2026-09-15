@@ -1,0 +1,15 @@
+{% comment %}
+Multi-select of browsable academic years. Include inside a GET <form>.
+Expects: academic_years, selected_academic_year_ids, active_academic_year.
+{% endcomment %}
+<div class="mb-3">
+    <label for="academic_year" class="form-label">Curso académico:</label>
+    <select name="academic_year" id="academic_year" multiple class="form-select form-select-sm">
+        {% for year in academic_years %}
+            <option value="{{ year.pk }}" {% if year.pk in selected_academic_year_ids %}selected{% endif %}>{{ year.code }}{% if year.is_active %} (activo){% endif %}</option>
+        {% endfor %}
+    </select>
+    {% if not active_academic_year %}
+        <div class="form-text text-danger">No hay ningún curso académico activo.</div>
+    {% endif %}
+</div>

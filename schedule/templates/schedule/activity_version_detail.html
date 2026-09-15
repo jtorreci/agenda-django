@@ -9,9 +9,11 @@
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2><i class="bi bi-archive"></i> Version {{ version.version_numero }} Details</h2>
                 <div>
+                    {% if not activity.is_read_only %}
                     <a href="{% url 'activity_restore_version' activity.pk version.pk %}" class="btn btn-warning">
                         <i class="bi bi-arrow-clockwise"></i> Restore This Version
                     </a>
+                    {% endif %}
                     <a href="{% url 'activity_version_history' activity.pk %}" class="btn btn-secondary">
                         <i class="bi bi-arrow-left"></i> Back to History
                     </a>

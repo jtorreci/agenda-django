@@ -6,12 +6,25 @@
 <body>
     <h2>Activity List</h2>
     <p><a href="{% url 'activity_new' %}">Create New Activity</a></p>
+    <form method="get" action="{% url 'activity_list' %}">
+        <label for="academic_year">Curso académico:</label>
+        <select name="academic_year" id="academic_year" multiple>
+            {% for year in academic_years %}
+                <option value="{{ year.pk }}" {% if year.pk in selected_academic_year_ids %}selected{% endif %}>{{ year.code }}{% if year.is_active %} (activo){% endif %}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Filtrar</button>
+    </form>
     <ul>
         {% for activity in activities %}
             <li>
-                {{ activity.nombre }} ({% for asignatura in activity.asignaturas.all %}{{ asignatura.nombre }}{% if not forloop.last %}, {% endif %}{% endfor %}) - {{ activity.fecha_inicio }} to {{ activity.fecha_fin }}
+                {{ activity.nombre }} ({% for asignatura in activity.asignaturas.all %}{{ asignatura.nombre }}{% if not forloop.last %}, {% endif %}{% endfor %}) - {{ activity.fecha_inicio }} to {{ activity.fecha_fin }} [{{ activity.academic_year.code }}]
+                {% if activity.is_read_only %}
+                <em>Solo lectura</em>
+                {% else %}
                 <a href="{% url 'activity_check_edit' activity.pk %}">Edit</a>
                 <a href="{% url 'activity_delete' activity.pk %}">Delete</a>
+                {% endif %}
             </li>
         {% empty %}
             <li>No activities found.</li>
