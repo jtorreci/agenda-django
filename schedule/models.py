@@ -126,7 +126,9 @@ class Actividad(models.Model):
         constraints = [
             models.UniqueConstraint(
                 fields=['copied_from', 'academic_year'],
-                condition=Q(copied_from__isnull=False),
+                # Only non-deleted copies are unique: a deleted copy frees the
+                # source for a new import (see schedule.year_import.live_copies).
+                condition=Q(copied_from__isnull=False, estado='visible'),
                 name='schedule_unique_activity_import_per_year',
             )
         ]

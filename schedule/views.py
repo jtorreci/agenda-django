@@ -125,7 +125,9 @@ def activity_delete(request, pk):
     if denied:
         return denied
     if request.method == 'POST':
-        activity.activa = False
+        # save() derives the legacy 'activa' flag from 'estado', so deleting must
+        # change 'estado'; setting only activa=False was silently undone.
+        activity.estado = Actividad.ESTADO_BORRADA
         activity.save()
         LogActividad.objects.create(
             actividad=activity,
@@ -616,7 +618,21 @@ def reactivate_activity(request, pk):
     if denied:
         return denied
     if request.method == 'POST':
-        activity.activa = True
+        if (
+            activity.copied_from_id
+            and not activity.es_visible()
+            and Actividad.objects.visible().filter(
+                copied_from_id=activity.copied_from_id, academic_year=activity.academic_year
+            ).exists()
+        ):
+            messages.error(
+                request,
+                f'No se puede restaurar "{activity.nombre}": la actividad de origen ya se volvió '
+                'a traer a este curso.',
+            )
+            return redirect('coordinator_dashboard')
+        # save() derives 'activa' from 'estado', so restoring must change 'estado'.
+        activity.estado = Actividad.ESTADO_VISIBLE
         activity.save()
         LogActividad.objects.create(
             actividad=activity,

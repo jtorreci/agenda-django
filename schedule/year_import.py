@@ -32,14 +32,22 @@ def user_can_import(user, activity):
     return activity.asignaturas.filter(id__in=user.subjects.values('id')).exists()
 
 
+def live_copies(target_year):
+    """Imported copies in ``target_year`` that count as "already imported".
+
+    Deleted copies (any non-visible ``estado``: borrada or archivada) do not count,
+    so the source can be imported again. This matches the partial unique
+    constraint ``schedule_unique_activity_import_per_year``.
+    """
+    return Actividad.objects.visible().filter(academic_year=target_year, copied_from__isnull=False)
+
+
 def imported_source_ids(activities, target_year):
-    """Ids of ``activities`` that already have a copy in ``target_year``."""
+    """Ids of ``activities`` that already have a non-deleted copy in ``target_year``."""
     if target_year is None:
         return set()
     return set(
-        Actividad.objects.filter(
-            academic_year=target_year, copied_from__in=activities
-        ).values_list('copied_from_id', flat=True)
+        live_copies(target_year).filter(copied_from__in=activities).values_list('copied_from_id', flat=True)
     )
 
 
@@ -47,7 +55,8 @@ def import_activity(source, user):
     """Copy ``source`` into the active academic year and return the new activity.
 
     The copy keeps every field and group, shifts dates by 52 weeks, keeps only the
-    subjects offered in the active year, is not approved and records its source.
+    subjects offered in the active year, gets the same automatic approval as any
+    new activity (``Actividad._get_default_approval_status``) and records its source.
     Raises :class:`ImportRefused` when the import is not possible.
     """
     target = AcademicYear.get_active()
@@ -57,7 +66,7 @@ def import_activity(source, user):
         raise ImportRefused(f'La actividad "{source.nombre}" ya pertenece al curso actual.')
     if not source.es_visible():
         raise ImportRefused(f'La actividad "{source.nombre}" no está visible y no se puede traer.')
-    if Actividad.objects.filter(copied_from=source, academic_year=target).exists():
+    if live_copies(target).filter(copied_from=source).exists():
         raise ImportRefused(f'La actividad "{source.nombre}" ya se trajo al curso {target.code}.')
 
     subjects = list(offered_subjects(target, source.asignaturas.all()))
@@ -82,11 +91,8 @@ def import_activity(source, user):
                 porcentaje_evaluacion=source.porcentaje_evaluacion,
                 no_recuperable=source.no_recuperable,
             )
+            # save() applies the automatic approval rule used for every new activity.
             copy.save()
-            # save() applies the automatic approval rule to new activities; an
-            # imported activity must always be reviewed again, so force it off.
-            Actividad.objects.filter(pk=copy.pk).update(aprobada=False)
-            copy.aprobada = False
             copy.asignaturas.set(subjects)
 
             for grupo in source.grupos.all():

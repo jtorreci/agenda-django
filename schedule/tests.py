@@ -2,7 +2,7 @@ import json
 import uuid
 from datetime import date, datetime, timedelta
 
-from django.db import connection
+from django.db import IntegrityError, connection, transaction
 from django.db.migrations.executor import MigrationExecutor
 from django.test import TestCase, TransactionTestCase
 from django.urls import reverse
@@ -27,7 +27,7 @@ class MigrationBackfillTests(TransactionTestCase):
         ('academics', '0006_catalogue_plan_override'),
     ]
     after = [
-        ('schedule', '0014_actividad_academic_year_not_null'),
+        ('schedule', '0015_import_uniqueness_ignores_deleted_copies'),
         ('academics', '0006_catalogue_plan_override'),
     ]
 
@@ -305,7 +305,6 @@ class ImportActivityTests(YearFixtureMixin, TestCase):
             self.past, 'Lab', self.offered, self.unoffered,
             groups=[('A', local(2025, 10, 7, 9, 30)), ('B', local(2025, 10, 9, 16))],
         )
-        self.assertTrue(source.aprobada)  # not evaluable: auto-approved on creation
         self.login(self.teacher)
 
         response = self.client.post(self.import_url(source))
@@ -315,7 +314,7 @@ class ImportActivityTests(YearFixtureMixin, TestCase):
         self.assertEqual(copy.academic_year, self.active)
         self.assertEqual(copy.nombre, 'Lab')
         self.assertEqual(copy.descripcion, 'desc')
-        self.assertFalse(copy.aprobada)
+        self.assertTrue(copy.aprobada)  # not evaluable: same automatic approval as a new activity
         self.assertEqual(list(copy.asignaturas.all()), [self.offered])
         self.assertEqual(copy.fecha_inicio - source.fecha_inicio, timedelta(weeks=52))
         local_start = timezone.localtime(copy.fecha_inicio)
@@ -331,6 +330,67 @@ class ImportActivityTests(YearFixtureMixin, TestCase):
         source.refresh_from_db()
         self.assertEqual(source.academic_year, self.past)
         self.assertEqual(source.grupos.count(), 2)
+
+    def test_import_applies_normal_approval_rule(self):
+        evaluable = self.make_activity(
+            self.past, 'Graded', self.offered, evaluable=True, porcentaje_evaluacion=30
+        )
+        Actividad.objects.filter(pk=evaluable.pk).update(aprobada=True)  # approved last year
+        minor = self.make_activity(
+            self.past, 'Minor graded', self.offered, evaluable=True, porcentaje_evaluacion=5
+        )
+        self.login(self.teacher)
+        self.client.post(self.import_url(evaluable))
+        self.client.post(self.import_url(minor))
+        self.assertFalse(Actividad.objects.get(copied_from=evaluable).aprobada)
+        self.assertTrue(Actividad.objects.get(copied_from=minor).aprobada)
+
+    def test_deleted_copy_allows_import_again(self):
+        self.login(self.teacher)
+        self.client.post(self.import_url(self.past_activity))
+        first = Actividad.objects.get(copied_from=self.past_activity)
+
+        response = self.client.post(reverse('activity_delete', args=[first.pk]))
+        self.assertEqual(response.status_code, 302)
+        first.refresh_from_db()
+        self.assertEqual(first.estado, Actividad.ESTADO_BORRADA)
+        self.assertFalse(first.activa)
+
+        rows = self.client.get(
+            reverse('get_filtered_activities'), {'subject_ids': self.offered.pk, 'academic_year': self.past.pk}
+        ).json()
+        self.assertTrue(rows[0]['extendedProps']['can_import'])
+        self.assertFalse(rows[0]['extendedProps']['already_imported'])
+        detail = self.client.get(reverse('activity_detail_view', args=[self.past_activity.pk]))
+        self.assertContains(detail, self.import_url(self.past_activity))
+        self.assertNotContains(detail, 'Ya traída')
+
+        self.client.post(self.import_url(self.past_activity))
+        copies = Actividad.objects.filter(copied_from=self.past_activity, academic_year=self.active)
+        self.assertEqual(sorted(copies.values_list('estado', flat=True)), ['borrada', 'visible'])
+
+        response = self.client.post(self.import_url(self.past_activity), follow=True)
+        self.assertContains(response, 'ya se trajo')
+        self.assertEqual(copies.count(), 2)
+
+        # Restoring the deleted copy would create two live copies: refused.
+        self.login(self.coordinator)
+        self.client.post(reverse('reactivate_activity', args=[first.pk]))
+        first.refresh_from_db()
+        self.assertEqual(first.estado, Actividad.ESTADO_BORRADA)
+
+    def test_database_refuses_two_live_copies(self):
+        self.login(self.teacher)
+        self.client.post(self.import_url(self.past_activity))
+        duplicate = Actividad(
+            nombre='Dup', tipo_actividad=self.tipo, academic_year=self.active, copied_from=self.past_activity,
+            fecha_inicio=local(2026, 10, 6, 9), fecha_fin=local(2026, 10, 6, 10),
+        )
+        with self.assertRaises(IntegrityError), transaction.atomic():
+            duplicate.save()
+        duplicate.estado = Actividad.ESTADO_BORRADA
+        duplicate.pk = None
+        duplicate.save()  # a deleted copy does not conflict
 
     def test_import_keeps_local_time_across_daylight_saving_change(self):
         # 2026-10-26 is winter time; 52 weeks later (2027-10-25) is still summer time.
@@ -405,7 +465,7 @@ class ImportActivityTests(YearFixtureMixin, TestCase):
         self.assertEqual(Actividad.objects.filter(copied_from=second).count(), 1)
         self.assertEqual(Actividad.objects.filter(copied_from=self.past_activity).count(), 1)
         self.assertFalse(Actividad.objects.filter(copied_from__in=[deleted, unrelated, self.active_activity]).exists())
-        self.assertFalse(Actividad.objects.get(copied_from=second).aprobada)
+        self.assertTrue(Actividad.objects.get(copied_from=second).aprobada)
         self.assertContains(response, '1 actividad(es) de')
         self.assertContains(response, 'ya se habían traído')
 
