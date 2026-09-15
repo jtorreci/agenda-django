@@ -96,7 +96,12 @@
             {{ activity.nombre }}
         </h1>
         <p class="mb-0 lead">{{ activity.tipo_actividad.nombre }}</p>
+        <p class="mb-0 mt-2"><span class="badge bg-light text-dark">Curso {{ activity.academic_year.code }}</span></p>
     </div>
+    {% include 'academics/_messages.html' %}
+    {% if activity.is_read_only %}
+        <div class="alert alert-secondary"><i class="bi bi-lock"></i> Esta actividad pertenece a un curso anterior y es de solo lectura.</div>
+    {% endif %}
 
     <div class="row">
         <!-- Main Information -->
@@ -283,7 +288,7 @@
                 </h5>
 
                 <div class="d-flex justify-content-center gap-2">
-                    {% if activity.activa %}
+                    {% if activity.activa and not activity.is_read_only %}
                         <a href="{% url 'activity_check_edit' activity.pk %}"
                            class="btn btn-outline-primary btn-sm"
                            data-bs-toggle="tooltip"
@@ -296,6 +301,17 @@
                            title="{% trans 'Copy Activity' %}">
                             <i class="bi bi-files"></i>
                         </a>
+                    {% endif %}
+
+                    {% if can_import %}
+                        <form method="post" action="{% url 'import_activity_to_current_year' activity.pk %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-success btn-sm" title="Traer al curso actual">
+                                <i class="bi bi-box-arrow-in-down"></i> Traer al curso actual
+                            </button>
+                        </form>
+                    {% elif already_imported %}
+                        <span class="badge bg-secondary align-self-center">Ya traída</span>
                     {% endif %}
 
                     <a href="{% url 'activity_pdf_convocatoria' activity.pk %}"

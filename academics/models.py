@@ -3,6 +3,15 @@ from django.db import models, transaction
 from django.db.models import Q
 
 
+class NoActiveAcademicYear(Exception):
+    """Raised when an operation needs the active academic year and none exists."""
+
+    default_message = 'No hay ningún curso académico activo. Contacta con la administración.'
+
+    def __init__(self, message=None):
+        super().__init__(message or self.default_message)
+
+
 class AcademicYear(models.Model):
     STATE_DRAFT = 'draft'
     STATE_ACTIVE = 'active'
@@ -27,6 +36,27 @@ class AcademicYear(models.Model):
                 name='academics_single_active_year',
             )
         ]
+
+    @classmethod
+    def get_active(cls):
+        """Return the active academic year, or None when no year is active."""
+        return cls.objects.filter(state=cls.STATE_ACTIVE).first()
+
+    @classmethod
+    def require_active(cls):
+        active = cls.get_active()
+        if active is None:
+            raise NoActiveAcademicYear()
+        return active
+
+    @classmethod
+    def selectable(cls):
+        """Years users may browse: every non-draft year, newest first."""
+        return cls.objects.exclude(state=cls.STATE_DRAFT).order_by('-starts_on')
+
+    @property
+    def is_active(self):
+        return self.state == self.STATE_ACTIVE
 
     def clean(self):
         if self.ends_on <= self.starts_on:
@@ -97,6 +127,21 @@ class Asignatura(models.Model):
                 name='academics_unique_subject_code_per_plan',
             )
         ]
+
+
+def offered_subjects(academic_year, subjects=None):
+    """Subjects with an 'offered' SubjectOffering in ``academic_year``.
+
+    ``subjects`` optionally narrows the base queryset (e.g. a user's subjects).
+    Returns an empty queryset when ``academic_year`` is None.
+    """
+    base = Asignatura.objects.all() if subjects is None else subjects
+    if academic_year is None:
+        return base.none()
+    offered_ids = SubjectOffering.objects.filter(
+        academic_year=academic_year, state=SubjectOffering.STATE_OFFERED
+    ).values('subject_id')
+    return base.filter(id__in=offered_ids)
 
 
 class SubjectOffering(models.Model):

@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block title %}Actividad de solo lectura{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="alert alert-warning" role="alert">
+        <h4 class="alert-heading"><i class="bi bi-lock"></i> Actividad de solo lectura</h4>
+        <p class="mb-0">{{ message }}</p>
+    </div>
+    <a href="{% url 'activity_detail_view' activity.pk %}" class="btn btn-outline-primary">Ver actividad</a>
+    <a href="{% url 'dashboard_redirect' %}" class="btn btn-secondary">Volver al panel</a>
+</div>
+{% endblock %}

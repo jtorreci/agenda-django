@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from .forms import StudentSubjectForm, NotificationForm, CustomUserCreationForm # Import CustomUserCreationForm
 from schedule.models import Actividad, VistaCalendario, TipoActividad, LogActividad
 from schedule.forms import VistaCalendarioForm
+from schedule.year_scope import read_only_response, year_selection_context
 from academics.models import Titulacion, Asignatura
 from django.core.mail import send_mail
 from django.utils.translation import gettext as _
@@ -154,7 +155,11 @@ def teacher_dashboard(request):
     selected_semestres = request.GET.getlist('semestre')
     selected_tipos_actividad = request.GET.getlist('tipo_actividad')
 
-    activities = Actividad.objects.filter(asignaturas__in=teacher_subjects)
+    year_context = year_selection_context(request)
+    activities = Actividad.objects.filter(
+        asignaturas__in=teacher_subjects,
+        academic_year__in=year_context['selected_academic_years'],
+    )
 
     if selected_titulaciones:
         activities = activities.filter(asignaturas__titulacion__id__in=selected_titulaciones)
@@ -183,6 +188,7 @@ def teacher_dashboard(request):
         'selected_tipos_actividad': selected_tipos_actividad,
         'teacher_subjects': teacher_subjects,
         'calendar_views': calendar_views,
+        **year_context,
     })
 
 @login_required
@@ -201,8 +207,8 @@ def student_dashboard(request):
     selected_semestres = request.GET.getlist('semestre')
     selected_tipos_actividad = request.GET.getlist('tipo_actividad')
 
-    # Only show active and approved activities
-    activities = Actividad.objects.filter(
+    # Only show active and approved activities of the active academic year
+    activities = Actividad.objects.in_active_year().filter(
         asignaturas__in=user_subjects,
         activa=True,
         aprobada=True
@@ -333,8 +339,8 @@ def student_calendar_events(request):
         enrolled_subjects = enrolled_subjects.filter(id__in=selected_asignaturas)
 
     # 3. Filtrar las actividades de esas asignaturas (sin duplicados)
-    # Solo mostrar actividades activas y aprobadas
-    activities = Actividad.objects.filter(
+    # Solo mostrar actividades activas y aprobadas del curso académico activo
+    activities = Actividad.objects.in_active_year().filter(
         asignaturas__in=enrolled_subjects,
         activa=True,
         aprobada=True
@@ -419,8 +425,9 @@ def coordinator_dashboard(request):
     min_percentage = request.GET.get('min_percentage')
     approval_status = request.GET.get('approval_status') # 'approved', 'unapproved', 'all'
 
-    # Initial queryset: all activities
-    activities = Actividad.objects.all()
+    # Initial queryset: activities of the selected academic years (default: active year)
+    year_context = year_selection_context(request)
+    activities = Actividad.objects.filter(academic_year__in=year_context['selected_academic_years'])
 
     # Apply filters from the form
     if selected_titulaciones:
@@ -480,6 +487,7 @@ def coordinator_dashboard(request):
         'approval_status': approval_status,
         'user_coordinated_titulaciones_ids': [t.id for t in user_coordinated_titulaciones], # Pass IDs for frontend check
         'show_no_titulaciones_message': show_no_titulaciones_message,
+        **year_context,
     })
 
 @login_required
@@ -594,6 +602,9 @@ def admin_dashboard(request):
     total_titulaciones = Titulacion.objects.count()
     total_asignaturas = Asignatura.objects.count()
     active_activities = Actividad.objects.filter(activa=True).count()
+    from academics.models import AcademicYear
+    active_academic_year = AcademicYear.get_active()
+    active_year_activities = Actividad.objects.in_active_year().count()
     
     titulaciones = Titulacion.objects.all().order_by('nombre')
     all_users = CustomUser.objects.all().order_by('username')
@@ -614,6 +625,8 @@ def admin_dashboard(request):
         'total_titulaciones': total_titulaciones,
         'total_asignaturas': total_asignaturas,
         'active_activities': active_activities,
+        'active_academic_year': active_academic_year,
+        'active_year_activities': active_year_activities,
         'titulaciones': titulaciones,
         'all_titulaciones': titulaciones,  # For PDF report dropdown
         'all_users': all_users,
@@ -695,7 +708,7 @@ def teacher_student_view(request):
     show_context = request.GET.get('show_context', 'false') == 'true'
 
     # Only show active and approved activities (like real student dashboard)
-    activities_query = Actividad.objects.filter(
+    activities_query = Actividad.objects.in_active_year().filter(
         activa=True,
         aprobada=True
     ).order_by('fecha_inicio')
@@ -999,6 +1012,10 @@ def archivar_actividad_ajax(request):
             actividad = Actividad.objects.get(id=actividad_id)
         except Actividad.DoesNotExist:
             return JsonResponse({'success': False, 'error': 'Actividad no encontrada'})
+
+        denied = read_only_response(request, actividad, as_json=True)
+        if denied:
+            return denied
 
         # Verificar que la actividad esté en estado 'borrada'
         if not actividad.es_borrada():

@@ -155,6 +155,59 @@ class PrefixedUrlsTests(TestCase):
         response = self.client.post(f"/catalogue/imports/years/{year.pk}/activate/")
         self.assert_redirects_under_prefix(response)
 
+    def test_academic_year_pages_are_prefixed(self):
+        from datetime import date, datetime
+
+        from django.utils import timezone
+
+        from academics.models import AcademicYear, Asignatura, SubjectOffering, Titulacion
+        from schedule.models import Actividad, ActividadGrupo, TipoActividad
+
+        past = AcademicYear.objects.create(
+            code="2025-26", starts_on=date(2025, 9, 1), ends_on=date(2026, 8, 31), state="archived"
+        )
+        active = AcademicYear.objects.create(
+            code="2026-27", starts_on=date(2026, 9, 1), ends_on=date(2027, 8, 31), state="active"
+        )
+        plan = Titulacion.objects.create(nombre="Plan", codigo_plan="P1")
+        subject = Asignatura.objects.create(nombre="S", codigo_asignatura="S1", titulacion=plan, curso=1, semestre=1)
+        SubjectOffering.objects.create(academic_year=active, subject=subject, curricular_year=1, semester=1)
+        start = timezone.make_aware(datetime(2025, 10, 7, 9))
+        activity = Actividad.objects.create(
+            nombre="Past", tipo_actividad=TipoActividad.objects.create(nombre="T"), academic_year=past,
+            fecha_inicio=start, fecha_fin=start, estado="visible",
+        )
+        activity.asignaturas.set([subject])
+        ActividadGrupo.objects.create(actividad=activity, nombre_grupo="A", fecha_inicio=start, fecha_fin=start)
+        teacher = self.users[CustomUser.ROLE_TEACHER]
+        teacher.subjects.set([subject])
+
+        years = f"?academic_year={past.pk}&academic_year={active.pk}"
+        self.client.force_login(teacher)
+        self.assert_page_is_prefixed(f"/users/teacher_dashboard/{years}")
+        self.assert_page_is_prefixed(f"/activity/view/{activity.pk}/")
+        self.assert_page_is_prefixed(f"/activity/{activity.pk}/versions/")
+        self.assert_page_is_prefixed("/activity/unified/new/")
+
+        read_only = self.client.get(f"/activity/unified/edit/{activity.pk}/")
+        self.assertEqual(read_only.status_code, 403)
+        self.assertEqual(unprefixed_urls(read_only.content.decode()), [])
+
+        response = self.client.post(f"/activity/{activity.pk}/import-to-current-year/")
+        self.assert_redirects_under_prefix(response)
+        response = self.client.post(f"/activity/import-subject/{subject.pk}/", {"academic_year": past.pk})
+        self.assert_redirects_under_prefix(response)
+        self.assertEqual(
+            reverse("import_activity_to_current_year", args=[activity.pk]),
+            f"{PREFIX}/activity/{activity.pk}/import-to-current-year/",
+        )
+
+        self.client.force_login(self.users[CustomUser.ROLE_COORDINATOR])
+        self.assert_page_is_prefixed(f"/users/coordinator_dashboard/{years}")
+        self.client.force_login(self.users[CustomUser.ROLE_ADMIN])
+        self.assert_page_is_prefixed("/users/admin_dashboard/")
+        self.assert_page_is_prefixed(f"/activity/list/{years}")
+
     def test_admin_index_is_prefixed(self):
         self.client.force_login(self.superuser)
         response = self.client.get("/admin/")

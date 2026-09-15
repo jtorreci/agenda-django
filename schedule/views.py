@@ -1,4 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
@@ -10,7 +12,9 @@ from .models import Actividad, ActividadGrupo, VistaCalendario, LogActividad, Ti
 from icalendar import Calendar, Event
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from agenda_academica.models import AgendaSettings
-from academics.models import Asignatura, Titulacion
+from academics.models import AcademicYear, Asignatura, Titulacion, offered_subjects
+from .year_scope import parse_year_selection, read_only_response
+from .year_import import ImportRefused, import_activity, imported_source_ids, user_can_import
 from django.core import serializers
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
@@ -52,6 +56,10 @@ def activity_form(request, pk=None, read_only=False): # Added read_only paramete
         # IDOR check
         if not request.user.is_staff and not activity.asignaturas.filter(id__in=request.user.subjects.all()).exists():
             return redirect(get_user_dashboard_url(request.user))
+        if not read_only:
+            denied = read_only_response(request, activity)
+            if denied:
+                return denied
         initial_subjects = activity.asignaturas.all()
     else:
         subject_ids_str = request.GET.get('subjects')
@@ -113,8 +121,13 @@ def activity_delete(request, pk):
     # IDOR check
     if not request.user.is_staff and not activity.asignaturas.filter(id__in=request.user.subjects.all()).exists():
         return redirect(get_user_dashboard_url(request.user))
+    denied = read_only_response(request, activity)
+    if denied:
+        return denied
     if request.method == 'POST':
-        activity.activa = False
+        # save() derives the legacy 'activa' flag from 'estado', so deleting must
+        # change 'estado'; setting only activa=False was silently undone.
+        activity.estado = Actividad.ESTADO_BORRADA
         activity.save()
         LogActividad.objects.create(
             actividad=activity,
@@ -139,10 +152,17 @@ def activity_detail_view(request, pk):
     # Get activity groups if available
     grupos = activity.grupos.all().order_by('orden')
 
+    active_year = AcademicYear.get_active()
+    already_imported = activity.pk in imported_source_ids([activity], active_year)
     context = {
         'activity': activity,
         'grupos': grupos,
         'is_multi_group': grupos.count() > 1,
+        'already_imported': already_imported,
+        'can_import': bool(
+            activity.is_read_only and active_year and activity.es_visible()
+            and not already_imported and user_can_import(request.user, activity)
+        ),
     }
 
     return render(request, 'schedule/activity_detail.html', context)
@@ -379,7 +399,16 @@ def get_filtered_activities(request):
     else:
         activities_filter['activa'] = True   # Show only active activities (default)
 
-    activities = Actividad.objects.filter(**activities_filter).distinct().order_by('fecha_inicio')
+    _, selected_years = parse_year_selection(request)
+    activities_filter['academic_year__in'] = selected_years
+    activities = (
+        Actividad.objects.filter(**activities_filter)
+        .select_related('academic_year', 'tipo_actividad')
+        .distinct()
+        .order_by('fecha_inicio')
+    )
+    active_year = AcademicYear.get_active()
+    already_imported = imported_source_ids(activities, active_year)
 
     # Manually serialize the data to include related fields
     from django.utils import timezone
@@ -393,6 +422,16 @@ def get_filtered_activities(request):
     teacher_subject_ids = set(request.user.subjects.all().values_list('id', flat=True))
 
     for activity in activities:
+        is_read_only = activity.is_read_only
+        year_props = {
+            'academic_year': activity.academic_year.code,
+            'is_read_only': is_read_only,
+            'already_imported': activity.id in already_imported,
+            'can_import': bool(
+                is_read_only and active_year and activity.es_visible()
+                and activity.id not in already_imported
+            ),
+        }
         # Get groups for this activity (new system) or use legacy fields
         grupos = activity.grupos.all().order_by('orden')
         
@@ -443,6 +482,7 @@ def get_filtered_activities(request):
                         'evaluable': activity.evaluable,
                         'percentage': activity.porcentaje_evaluacion,
                         'is_own': is_own,
+                        **year_props,
                         'is_multi_group': True,
                         'grupos_count': grupos.count(),
                         'grupos_info': grupos_info
@@ -474,6 +514,7 @@ def get_filtered_activities(request):
                             'evaluable': activity.evaluable,
                             'percentage': activity.porcentaje_evaluacion,
                             'is_own': is_own,
+                            **year_props,
                             'grupo_nombre': grupo.nombre_grupo,
                             'is_multi_group': True,
                             'is_calendar_event': True  # Mark as calendar-only event
@@ -511,6 +552,7 @@ def get_filtered_activities(request):
                         'evaluable': activity.evaluable,
                         'percentage': activity.porcentaje_evaluacion,
                         'is_own': is_own,
+                        **year_props,
                         'is_multi_group': False
                     }
                 })
@@ -544,6 +586,7 @@ def get_filtered_activities(request):
                     'evaluable': activity.evaluable,
                     'percentage': activity.porcentaje_evaluacion,
                     'is_own': is_own,
+                    **year_props,
                     'is_multi_group': False
                 }
             })
@@ -553,8 +596,13 @@ def get_filtered_activities(request):
 @login_required
 @user_passes_test(is_teacher)
 def activity_list(request):
-    activities = Actividad.objects.all()
-    return render(request, 'schedule/activity_list.html', {'activities': activities})
+    academic_years, selected_years = parse_year_selection(request)
+    activities = Actividad.objects.filter(academic_year__in=selected_years).select_related('academic_year')
+    return render(request, 'schedule/activity_list.html', {
+        'activities': activities,
+        'academic_years': academic_years,
+        'selected_academic_year_ids': [year.pk for year in selected_years],
+    })
 
 @login_required
 @user_passes_test(is_coordinator_or_admin)
@@ -566,8 +614,25 @@ def activity_logs(request):
 @user_passes_test(is_coordinator_or_admin)
 def reactivate_activity(request, pk):
     activity = get_object_or_404(Actividad, pk=pk)
+    denied = read_only_response(request, activity)
+    if denied:
+        return denied
     if request.method == 'POST':
-        activity.activa = True
+        if (
+            activity.copied_from_id
+            and not activity.es_visible()
+            and Actividad.objects.visible().filter(
+                copied_from_id=activity.copied_from_id, academic_year=activity.academic_year
+            ).exists()
+        ):
+            messages.error(
+                request,
+                f'No se puede restaurar "{activity.nombre}": la actividad de origen ya se volvió '
+                'a traer a este curso.',
+            )
+            return redirect('coordinator_dashboard')
+        # save() derives 'activa' from 'estado', so restoring must change 'estado'.
+        activity.estado = Actividad.ESTADO_VISIBLE
         activity.save()
         LogActividad.objects.create(
             actividad=activity,
@@ -582,6 +647,9 @@ def reactivate_activity(request, pk):
 @user_passes_test(is_coordinator_or_admin)
 def toggle_activity_approval(request, pk):
     activity = get_object_or_404(Actividad, pk=pk)
+    denied = read_only_response(request, activity)
+    if denied:
+        return denied
     if request.method == 'POST':
         new_status = not activity.aprobada
         activity.set_approval_manually(new_status, modified_by=request.user)
@@ -630,7 +698,8 @@ def ical_feed(request, token):
     cal.add('prodid', '-//My Calendar App//mxm.dk//')
     cal.add('version', '2.0')
 
-    activities = Actividad.objects.all()
+    # Feeds are published calendars: only the active academic year is exported.
+    activities = Actividad.objects.in_active_year()
 
     if calendar_view.asignaturas.exists():
         activities = activities.filter(asignaturas__in=calendar_view.asignaturas.all())
@@ -653,6 +722,9 @@ def ical_feed(request, token):
 @user_passes_test(is_coordinator)
 def delete_misassigned_activity(request, pk):
     activity = get_object_or_404(Actividad, pk=pk)
+    denied = read_only_response(request, activity)
+    if denied:
+        return denied
     if request.method == 'POST':
         activity.delete()
         return redirect('coordinator_dashboard')
@@ -664,6 +736,9 @@ def delete_misassigned_activity(request, pk):
 def toggle_activity_approval_from_dashboard(request, pk):
     try:
         activity = Actividad.objects.get(pk=pk)
+        denied = read_only_response(request, activity, as_json=True)
+        if denied:
+            return denied
         data = json.loads(request.body)
         new_status = data.get('aprobada')
 
@@ -716,7 +791,7 @@ def get_filtered_asignaturas(request):
 def get_cursos(request):
     titulacion_id = request.GET.get('titulacion_id')
     
-    cursos_qs = Asignatura.objects.filter(titulacion_id=titulacion_id).order_by('curso').values_list('curso', flat=True).distinct()
+    cursos_qs = offered_subjects(AcademicYear.get_active()).filter(titulacion_id=titulacion_id).order_by('curso').values_list('curso', flat=True).distinct()
     
     # Exclude TFE for non-coordinators
     if not is_coordinator(request.user):
@@ -749,7 +824,7 @@ def get_semestres(request):
     }
     curso = curso_map_inv.get(curso_str, curso_str)
 
-    semestres = Asignatura.objects.filter(titulacion_id=titulacion_id, curso=curso).order_by('semestre').values_list('semestre', flat=True).distinct()
+    semestres = offered_subjects(AcademicYear.get_active()).filter(titulacion_id=titulacion_id, curso=curso).order_by('semestre').values_list('semestre', flat=True).distinct()
     
     semestre_map = {1: "Primer Semestre", 2: "Segundo Semestre", 3: "Optativa"}
     semestres_display = [semestre_map.get(s, s) for s in semestres]
@@ -774,7 +849,8 @@ def get_asignaturas(request):
     semestre_map_inv = {"Primer Semestre": 1, "Segundo Semestre": 2, "Optativa": 3}
     semestre = semestre_map_inv.get(semestre_str, semestre_str)
 
-    asignaturas = Asignatura.objects.filter(
+    # Cascading selectors feed activity forms: only subjects offered in the active year.
+    asignaturas = offered_subjects(AcademicYear.get_active()).filter(
         titulacion_id=titulacion_id, 
         curso=curso, 
         semestre=semestre
@@ -790,7 +866,8 @@ def get_asignaturas(request):
 def all_activities(request):
     print(f"Received GET parameters: {request.GET}") # Debug print
 
-    activities = Actividad.objects.all()
+    _, selected_years = parse_year_selection(request)
+    activities = Actividad.objects.filter(academic_year__in=selected_years)
     
     titulaciones = request.GET.getlist('titulacion')
     cursos = request.GET.getlist('curso')
@@ -1199,6 +1276,10 @@ def activity_restore_version(request, pk, version_id):
     
     if not has_permission and request.user.role not in ['ADMIN', 'COORDINATOR']:
         return HttpResponseRedirect(reverse_lazy(get_user_dashboard_url(request.user)))
+
+    denied = read_only_response(request, activity)
+    if denied:
+        return denied
     
     if request.method == 'POST':
         # Set version metadata before restoring
@@ -1341,7 +1422,7 @@ def generate_agenda_report(request, titulacion_id=None):
             elements.append(Spacer(1, 20))
         
         # Get activities for this titulacion (only active ones)
-        activities = Actividad.objects.filter(
+        activities = Actividad.objects.in_active_year().filter(
             asignaturas__titulacion=titulacion,
             activa=True
         ).select_related('tipo_actividad').prefetch_related('asignaturas').distinct().order_by('fecha_inicio')
@@ -1610,6 +1691,10 @@ def check_and_edit_activity(request, pk):
     if not request.user.is_staff and not activity.asignaturas.filter(id__in=request.user.subjects.all()).exists():
         return redirect(get_user_dashboard_url(request.user))
 
+    denied = read_only_response(request, activity)
+    if denied:
+        return denied
+
     try:
         lock_date = AgendaSettings.load().closing_date
         creation_log = LogActividad.objects.filter(actividad=activity, tipo_log='Creation').order_by('timestamp').first()
@@ -1626,6 +1711,8 @@ def check_and_edit_activity(request, pk):
                 new_activity = activity
                 new_activity.pk = None # This is the key to creating a new object
                 new_activity.id = None
+                # The copy is not an import: it must not claim the import source.
+                new_activity.copied_from = None
 
                 # 2. Modify the name as requested
                 new_activity.nombre = f"{activity.nombre} [Modificación de actividad inicial]"
@@ -1668,6 +1755,9 @@ def multi_group_activity_form(request, grupo_id=None):
     
     if grupo_id:
         existing_activities = Actividad.objects.filter(grupo_id=grupo_id, activa=True)
+        read_only_activity = next((a for a in existing_activities if a.is_read_only), None)
+        if read_only_activity:
+            return read_only_response(request, read_only_activity)
         if existing_activities.exists():
             first_activity = existing_activities.first()
             initial_groups = []
@@ -1917,6 +2007,10 @@ def unified_activity_form(request, pk=None):
         # IDOR check
         if not request.user.is_staff and not activity.asignaturas.filter(id__in=request.user.subjects.all()).exists():
             return redirect(get_user_dashboard_url(request.user))
+
+        denied = read_only_response(request, activity)
+        if denied:
+            return denied
             
         # Cargar grupos existentes
         grupos = activity.grupos.all().order_by('orden')
@@ -2036,3 +2130,80 @@ def unified_activity_form(request, pk=None):
         'activity': activity,
         'is_edit': bool(pk)
     })
+
+# ==================== IMPORT FROM PREVIOUS ACADEMIC YEARS ====================
+
+def _safe_next_url(request, fallback):
+    next_url = request.POST.get('next')
+    if next_url and url_has_allowed_host_and_scheme(
+        next_url, allowed_hosts={request.get_host()}, require_https=request.is_secure()
+    ):
+        return next_url
+    return fallback
+
+
+@login_required
+@user_passes_test(is_teacher)
+@require_POST
+def import_activity_to_current_year(request, pk):
+    """Copy one past-year activity into the active academic year ("Traer al curso actual")."""
+    source = get_object_or_404(Actividad.objects.select_related('academic_year'), pk=pk)
+    if not user_can_import(request.user, source):
+        return HttpResponse('No tienes permiso para traer esta actividad.', status=403)
+    try:
+        copy = import_activity(source, request.user)
+    except ImportRefused as refused:
+        messages.error(request, str(refused))
+    else:
+        messages.success(
+            request,
+            f'Actividad "{copy.nombre}" traída al curso {copy.academic_year.code}. '
+            'Queda pendiente de aprobación.',
+        )
+    return redirect(_safe_next_url(request, get_user_dashboard_url(request.user)))
+
+
+@login_required
+@user_passes_test(is_teacher)
+@require_POST
+def import_subject_activities(request, subject_id):
+    """Import every visible past-year activity of a subject from the selected years."""
+    subject = get_object_or_404(Asignatura, pk=subject_id)
+    if not request.user.subjects.filter(pk=subject.pk).exists():
+        return HttpResponse('No impartes esta asignatura.', status=403)
+
+    selected_ids = [raw for raw in request.POST.getlist('academic_year') if raw.isdigit()]
+    past_years = AcademicYear.selectable().exclude(state=AcademicYear.STATE_ACTIVE).filter(pk__in=selected_ids)
+    sources = (
+        Actividad.objects.visible()
+        .filter(asignaturas=subject, academic_year__in=past_years)
+        .select_related('academic_year')
+        .distinct()
+        .order_by('fecha_inicio')
+    )
+
+    already_imported = imported_source_ids(sources, AcademicYear.get_active())
+    imported, skipped, refusals = 0, 0, []
+    for source in sources:
+        if source.pk in already_imported:
+            skipped += 1
+            continue
+        try:
+            import_activity(source, request.user)
+            imported += 1
+        except ImportRefused as refused:
+            refusals.append(str(refused))
+
+    if imported:
+        messages.success(
+            request,
+            f'{imported} actividad(es) de "{subject.nombre}" traída(s) al curso actual, '
+            'pendientes de aprobación.',
+        )
+    if skipped:
+        messages.info(request, f'{skipped} actividad(es) de "{subject.nombre}" ya se habían traído.')
+    if not (imported or skipped or refusals):
+        messages.info(request, f'No hay actividades de cursos anteriores de "{subject.nombre}" que traer.')
+    for refusal in refusals:
+        messages.warning(request, refusal)
+    return redirect(_safe_next_url(request, get_user_dashboard_url(request.user)))
