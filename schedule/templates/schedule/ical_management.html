@@ -238,7 +238,7 @@
 </div>
 {% endblock %}
 
-{% block extra_scripts %}
+{% block extra_js %}
 <script>
 function copyToClipboard(button) {
     const url = button.getAttribute('data-url');
@@ -296,7 +296,8 @@ function createAutomaticFeeds() {
                 createdList.innerHTML = '';
                 data.created_feeds.forEach(feed => {
                     const li = document.createElement('li');
-                    li.innerHTML = `<i class="bi bi-plus-circle text-success"></i> ${feed}`;
+                    li.innerHTML = '<i class="bi bi-plus-circle text-success"></i> ';
+                    li.appendChild(document.createTextNode(feed));
                     createdList.appendChild(li);
                 });
             }
@@ -308,7 +309,8 @@ function createAutomaticFeeds() {
                 existingList.innerHTML = '';
                 data.existing_feeds.forEach(feed => {
                     const li = document.createElement('li');
-                    li.innerHTML = `<i class="bi bi-info-circle text-info"></i> ${feed}`;
+                    li.innerHTML = '<i class="bi bi-info-circle text-info"></i> ';
+                    li.appendChild(document.createTextNode(feed));
                     existingList.appendChild(li);
                 });
             }

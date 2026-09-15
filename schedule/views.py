@@ -1542,6 +1542,7 @@ def generate_agenda_report(request, titulacion_id=None):
 
 @login_required
 @user_passes_test(is_coordinator_or_admin)
+@require_POST
 def create_automatic_icals(request):
     """Create automatic iCal feeds for all courses and titulaciones"""
     created_feeds = []

@@ -29,6 +29,24 @@
             overflow-y: auto;
         }
     </style>
+<style>
+/* Ensure datetime-local inputs have adequate width and visibility */
+input[type="datetime-local"].group-start,
+input[type="datetime-local"].group-end {
+    min-width: 180px !important;
+    width: 100% !important;
+    font-size: 0.9rem;
+}
+
+/* Ensure responsive behavior on smaller screens */
+@media (max-width: 768px) {
+    input[type="datetime-local"].group-start,
+    input[type="datetime-local"].group-end {
+        min-width: 160px !important;
+        font-size: 0.85rem;
+    }
+}
+</style>
 {% endblock %}
 
 {% block content %}
@@ -142,27 +160,6 @@
         </div>
     </div>
 </div>
-{% endblock %}
-
-{% block extra_css %}
-<style>
-/* Ensure datetime-local inputs have adequate width and visibility */
-input[type="datetime-local"].group-start,
-input[type="datetime-local"].group-end {
-    min-width: 180px !important;
-    width: 100% !important;
-    font-size: 0.9rem;
-}
-
-/* Ensure responsive behavior on smaller screens */
-@media (max-width: 768px) {
-    input[type="datetime-local"].group-start,
-    input[type="datetime-local"].group-end {
-        min-width: 160px !important;
-        font-size: 0.85rem;
-    }
-}
-</style>
 {% endblock %}
 
 {% block extra_js %}
