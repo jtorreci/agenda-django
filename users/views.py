@@ -174,6 +174,15 @@ def teacher_dashboard(request):
 
     calendar_views = VistaCalendario.objects.filter(usuario=request.user)
 
+    # Client-side subject selection and context toggle, mirrored in the URL so a
+    # full reload (filter submit, bulk import, back navigation) restores them.
+    teacher_subject_ids = set(teacher_subjects.values_list('id', flat=True))
+    requested_subject_ids = [
+        int(raw) for raw in request.GET.get('subjects', '').split(',') if raw.strip().isdigit()
+    ]
+    restored_subject_ids = [pk for pk in dict.fromkeys(requested_subject_ids) if pk in teacher_subject_ids]
+    restored_show_context = request.GET.get('context') == '1'
+
     return render(request, 'users/teacher_dashboard.html', {
         'titulaciones': titulaciones,
         'asignaturas': teacher_subjects,
@@ -188,6 +197,9 @@ def teacher_dashboard(request):
         'selected_tipos_actividad': selected_tipos_actividad,
         'teacher_subjects': teacher_subjects,
         'calendar_views': calendar_views,
+        'restored_subject_ids': restored_subject_ids,
+        'restored_subjects_param': ','.join(str(pk) for pk in restored_subject_ids),
+        'restored_show_context': restored_show_context,
         **year_context,
     })
 

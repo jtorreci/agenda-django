@@ -185,6 +185,7 @@ class PrefixedUrlsTests(TestCase):
         years = f"?academic_year={past.pk}&academic_year={active.pk}"
         self.client.force_login(teacher)
         self.assert_page_is_prefixed(f"/users/teacher_dashboard/{years}")
+        self.assert_page_is_prefixed(f"/users/teacher_dashboard/{years}&subjects={subject.pk}&context=1")
         self.assert_page_is_prefixed(f"/activity/view/{activity.pk}/")
         self.assert_page_is_prefixed(f"/activity/{activity.pk}/versions/")
         self.assert_page_is_prefixed("/activity/unified/new/")
@@ -193,6 +194,11 @@ class PrefixedUrlsTests(TestCase):
         self.assertEqual(read_only.status_code, 403)
         self.assertEqual(unprefixed_urls(read_only.content.decode()), [])
 
+        response = self.client.post(
+            f"/activity/{activity.pk}/import-to-current-year/", HTTP_ACCEPT="application/json"
+        )
+        self.assertEqual(response.json()["status"], "imported")
+        Actividad.objects.filter(copied_from=activity).update(estado="borrada")
         response = self.client.post(f"/activity/{activity.pk}/import-to-current-year/")
         self.assert_redirects_under_prefix(response)
         response = self.client.post(f"/activity/import-subject/{subject.pk}/", {"academic_year": past.pk})
