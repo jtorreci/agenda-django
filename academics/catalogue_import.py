@@ -632,7 +632,7 @@ def set_plan_override(catalogue_import, plan_code, mode, titulacion=None):
     if mode not in (OVERRIDE_AUTO, OVERRIDE_NEW, OVERRIDE_TITULACION):
         raise ValidationError('Opción de asociación no válida.')
     if mode == OVERRIDE_TITULACION and titulacion is None:
-        raise ValidationError('Elija una titulación.')
+        raise ValidationError('Elige una titulación.')
 
     automatic = CatalogueMatcher().resolve_plans(plans)
     if automatic[plan_code].status == MATCH_CODE:

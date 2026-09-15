@@ -38,7 +38,7 @@
       <form method="post" action="{% url 'catalogue_import_apply' catalogue_import.pk %}"
             onsubmit="return confirm('¿Aplicar la importación? Se crearán o actualizarán titulaciones, asignaturas y ofertas del curso académico.');">
         {% csrf_token %}
-        <button type="submit" class="btn btn-success btn-sm" {% if not can_apply %}disabled title="Complete curso y semestre y resuelva los conflictos"{% endif %}>
+        <button type="submit" class="btn btn-success btn-sm" {% if not can_apply %}disabled title="Completa curso y semestre y resuelve los conflictos"{% endif %}>
           <i class="bi bi-check2-circle"></i> Aplicar importación
         </button>
       </form>

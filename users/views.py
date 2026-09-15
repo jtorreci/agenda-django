@@ -984,7 +984,7 @@ def ajax_delete_tipo_perfil(request, pk):
         if asignaciones_count > 0:
             return JsonResponse({
                 'success': False, 
-                'error': f'Este tipo de perfil tiene {asignaciones_count} asignación(es) activa(s). Debe reasignar o desactivar estas asignaciones primero.'
+                'error': f'Este tipo de perfil tiene {asignaciones_count} asignación(es) activa(s). Reasigna o desactiva estas asignaciones primero.'
             })
         
         tipo_name = tipo_perfil.nombre
