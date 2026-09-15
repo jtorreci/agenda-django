@@ -1,35 +1,34 @@
 {% extends 'base.html' %}
-{% load i18n %}
 
-{% block title %}{% trans "Version History" %} - {{ activity.nombre }}{% endblock %}
+{% block title %}Historial de versiones - {{ activity.nombre }}{% endblock %}
 
 {% block content %}
 <div class="container mt-4">
     <div class="row">
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2><i class="bi bi-clock-history"></i> {% trans "Version History" %}</h2>
+                <h2><i class="bi bi-clock-history"></i> Historial de versiones</h2>
                 <div>
                     {% if not activity.is_read_only %}
                     <a href="{% url 'activity_check_edit' activity.pk %}" class="btn btn-primary">
-                        <i class="bi bi-pencil"></i> {% trans "Edit Current Version" %}
+                        <i class="bi bi-pencil"></i> Editar versión actual
                     </a>
                     {% endif %}
                     {% if user.role == 'TEACHER' %}
                         <a href="{% url 'teacher_dashboard' %}" class="btn btn-secondary">
-                            <i class="bi bi-arrow-left"></i> {% trans "Back to Dashboard" %}
+                            <i class="bi bi-arrow-left"></i> Volver al panel
                         </a>
                     {% elif user.role == 'COORDINATOR' %}
                         <a href="{% url 'coordinator_dashboard' %}" class="btn btn-secondary">
-                            <i class="bi bi-arrow-left"></i> {% trans "Back to Dashboard" %}
+                            <i class="bi bi-arrow-left"></i> Volver al panel
                         </a>
                     {% elif user.role == 'ADMIN' %}
                         <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">
-                            <i class="bi bi-arrow-left"></i> {% trans "Back to Dashboard" %}
+                            <i class="bi bi-arrow-left"></i> Volver al panel
                         </a>
                     {% else %}
                         <a href="{% url 'home' %}" class="btn btn-secondary">
-                            <i class="bi bi-arrow-left"></i> {% trans "Back to Home" %}
+                            <i class="bi bi-arrow-left"></i> Volver al inicio
                         </a>
                     {% endif %}
                 </div>
@@ -39,19 +38,19 @@
             <div class="card mb-4 border-success">
                 <div class="card-header bg-success text-white">
                     <h5 class="mb-0">
-                        <i class="bi bi-star-fill"></i> {% trans "Current Version" %} - {{ activity.nombre }}
+                        <i class="bi bi-star-fill"></i> Versión actual - {{ activity.nombre }}
                     </h5>
                 </div>
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-6">
-                            <p><strong>{% trans "Description" %}:</strong> {{ activity.descripcion|default:"No description" }}</p>
-                            <p><strong>{% trans "Start Date" %}:</strong> {{ activity.fecha_inicio|date:"M d, Y H:i" }}</p>
-                            <p><strong>{% trans "End Date" %}:</strong> {{ activity.fecha_fin|date:"M d, Y H:i" }}</p>
+                            <p><strong>Descripción:</strong> {{ activity.descripcion|default:"Sin descripción" }}</p>
+                            <p><strong>Fecha de inicio:</strong> {{ activity.fecha_inicio|date:"d M Y, H:i" }}</p>
+                            <p><strong>Fecha de fin:</strong> {{ activity.fecha_fin|date:"d M Y, H:i" }}</p>
                         </div>
                         <div class="col-md-6">
-                            <p><strong>{% trans "Type" %}:</strong> {{ activity.tipo_actividad.nombre }}</p>
-                            <p><strong>Subjects:</strong> 
+                            <p><strong>Tipo:</strong> {{ activity.tipo_actividad.nombre }}</p>
+                            <p><strong>Asignaturas:</strong> 
                                 {% for asignatura in activity.asignaturas.all %}
                                     <span class="badge bg-primary">{{ asignatura.nombre }}</span>{% if not forloop.last %} {% endif %}
                                 {% endfor %}
@@ -59,22 +58,22 @@
                             <p>
                                 <strong>Evaluable:</strong> 
                                 {% if activity.evaluable %}
-                                    <span class="badge bg-warning">Yes ({{ activity.porcentaje_evaluacion }}%)</span>
+                                    <span class="badge bg-warning">Sí ({{ activity.porcentaje_evaluacion }}%)</span>
                                 {% else %}
                                     <span class="badge bg-secondary">No</span>
                                 {% endif %}
                             </p>
                             <p>
-                                <strong>Status:</strong>
+                                <strong>Estado:</strong>
                                 {% if activity.aprobada %}
-                                    <span class="badge bg-success">Approved</span>
+                                    <span class="badge bg-success">Aprobada</span>
                                 {% else %}
-                                    <span class="badge bg-danger">Pending Approval</span>
+                                    <span class="badge bg-danger">Pendiente de aprobación</span>
                                 {% endif %}
                                 {% if activity.activa %}
-                                    <span class="badge bg-info">Active</span>
+                                    <span class="badge bg-info">Activa</span>
                                 {% else %}
-                                    <span class="badge bg-dark">Inactive</span>
+                                    <span class="badge bg-dark">Inactiva</span>
                                 {% endif %}
                             </p>
                         </div>
@@ -84,33 +83,33 @@
 
             <!-- Version History -->
             {% if versions %}
-                <h4>Previous Versions ({{ versions.count }})</h4>
+                <h4>Versiones anteriores ({{ versions.count }})</h4>
                 <div class="row">
                     {% for version in versions %}
                     <div class="col-md-6 mb-3">
                         <div class="card">
                             <div class="card-header d-flex justify-content-between align-items-center">
                                 <h6 class="mb-0">
-                                    <i class="bi bi-archive"></i> Version {{ version.version_numero }}
+                                    <i class="bi bi-archive"></i> Versión {{ version.version_numero }}
                                 </h6>
-                                <small class="text-muted">{{ version.fecha_modificacion|date:"M d, Y H:i" }}</small>
+                                <small class="text-muted">{{ version.fecha_modificacion|date:"d M Y, H:i" }}</small>
                             </div>
                             <div class="card-body">
-                                <p><strong>Name:</strong> {{ version.nombre }}</p>
-                                <p><strong>Modified by:</strong> {{ version.modificada_por.username }}</p>
+                                <p><strong>Nombre:</strong> {{ version.nombre }}</p>
+                                <p><strong>Modificada por:</strong> {{ version.modificada_por.username }}</p>
                                 {% if version.comentario_version %}
-                                    <p><strong>Comment:</strong> <em>{{ version.comentario_version }}</em></p>
+                                    <p><strong>Comentario:</strong> <em>{{ version.comentario_version }}</em></p>
                                 {% endif %}
-                                <p><strong>Subjects:</strong> {{ version.get_asignaturas_names }}</p>
-                                <p><strong>Type:</strong> {{ version.tipo_actividad_snapshot.nombre|default:"N/A" }}</p>
+                                <p><strong>Asignaturas:</strong> {{ version.get_asignaturas_names }}</p>
+                                <p><strong>Tipo:</strong> {{ version.tipo_actividad_snapshot.nombre|default:"N/D" }}</p>
                                 
                                 <div class="btn-group btn-group-sm" role="group">
                                     <a href="{% url 'activity_version_detail' activity.pk version.pk %}" class="btn btn-outline-info">
-                                        <i class="bi bi-eye"></i> View Details
+                                        <i class="bi bi-eye"></i> Ver detalles
                                     </a>
                                     {% if not activity.is_read_only %}
                                     <a href="{% url 'activity_restore_version' activity.pk version.pk %}" class="btn btn-outline-warning">
-                                        <i class="bi bi-arrow-clockwise"></i> Restore
+                                        <i class="bi bi-arrow-clockwise"></i> Restaurar
                                     </a>
                                     {% endif %}
                                 </div>
@@ -121,7 +120,7 @@
                 </div>
             {% else %}
                 <div class="alert alert-info">
-                    <i class="bi bi-info-circle"></i> No previous versions found. This activity has not been modified since creation.
+                    <i class="bi bi-info-circle"></i> No hay versiones anteriores. Esta actividad no se ha modificado desde su creación.
                 </div>
             {% endif %}
         </div>

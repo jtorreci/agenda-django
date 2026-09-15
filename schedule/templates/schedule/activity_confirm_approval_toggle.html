@@ -1,15 +1,17 @@
 {% extends 'base.html' %}
 
+{% block title %}Confirmar cambio de aprobación{% endblock %}
+
 {% block content %}
 <div class="container mt-4">
-    <h2>Confirm Activity Approval Toggle</h2>
-    <p>Are you sure you want to toggle the approval status for activity: <strong>{{ activity.nombre }}</strong>?</p>
-    <p>Current status: <strong>{% if activity.aprobada %}Approved{% else %}Not Approved{% endif %}</strong></p>
+    <h2>Confirmar cambio de aprobación de la actividad</h2>
+    <p>¿Seguro que quieres cambiar el estado de aprobación de la actividad <strong>{{ activity.nombre }}</strong>?</p>
+    <p>Estado actual: <strong>{% if activity.aprobada %}Aprobada{% else %}No aprobada{% endif %}</strong></p>
     
     <form method="post">
         {% csrf_token %}
-        <button type="submit" class="btn btn-primary">Confirm Toggle</button>
-        <a href="{% url 'activity_logs' %}" class="btn btn-secondary">Cancel</a>
+        <button type="submit" class="btn btn-primary">Confirmar cambio</button>
+        <a href="{% url 'activity_logs' %}" class="btn btn-secondary">Cancelar</a>
     </form>
 </div>
 {% endblock %}

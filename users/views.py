@@ -6,7 +6,6 @@ from schedule.forms import VistaCalendarioForm
 from schedule.year_scope import read_only_response, year_selection_context
 from academics.models import Titulacion, Asignatura
 from django.core.mail import send_mail
-from django.utils.translation import gettext as _
 from .models import CustomUser
 from django.contrib import messages
 from django.http import JsonResponse
@@ -57,7 +56,7 @@ def register(request):
             elif email_domain in settings.STUDENT_EMAIL_DOMAINS:
                 user.role = CustomUser.ROLE_STUDENT
             else:
-                messages.error(request, _('Registration is only allowed for email addresses from UNEX (unex.es or alumnos.unex.es).'))
+                messages.error(request, 'Solo se permite el registro con direcciones de correo de la UEx (unex.es o alumnos.unex.es).')
                 return render(request, 'users/registration.html', {'form': form})
 
             user.save()
@@ -65,7 +64,7 @@ def register(request):
             # Send confirmation email
             try:
                 current_site = get_current_site(request)
-                mail_subject = _('Activa tu cuenta - Agenda Académica')
+                mail_subject = 'Activa tu cuenta - Agenda Académica'
                 message = render_to_string('users/account_activation_email.html', {
                     'user': user,
                     'domain': current_site.domain,
@@ -80,7 +79,7 @@ def register(request):
                 import logging
                 logger = logging.getLogger(__name__)
                 logger.error(f"Error sending activation email: {e}")
-                messages.warning(request, _('Usuario creado, pero hubo un problema enviando el email de confirmación. Contacta al administrador.'))
+                messages.warning(request, 'Usuario creado, pero hubo un problema al enviar el correo de confirmación. Contacta con el administrador.')
             
             # Render success page instead of redirect
             return render(request, 'users/registration_success.html', {'email': user.email})
@@ -98,10 +97,10 @@ def activate(request, uidb64, token):
     if user is not None and default_token_generator.check_token(user, token):
         user.is_active = True
         user.save()
-        messages.success(request, _('Your account has been activated successfully. You can now log in.'))
+        messages.success(request, 'Tu cuenta se ha activado correctamente. Ya puedes iniciar sesión.')
         return redirect('login')
     else:
-        messages.error(request, _('The activation link is invalid.'))
+        messages.error(request, 'El enlace de activación no es válido.')
         return redirect('login')
 
 def resend_activation(request):
@@ -110,13 +109,13 @@ def resend_activation(request):
         try:
             user = CustomUser.objects.get(username=username)
             if user.is_active:
-                messages.info(request, _('Esta cuenta ya está activada.'))
+                messages.info(request, 'Esta cuenta ya está activada.')
                 return redirect('login')
             
             # Send activation email again
             try:
                 current_site = get_current_site(request)
-                mail_subject = _('Reenvío - Activa tu cuenta - Agenda Académica')
+                mail_subject = 'Reenvío - Activa tu cuenta - Agenda Académica'
                 message = render_to_string('users/account_activation_email.html', {
                     'user': user,
                     'domain': current_site.domain,
@@ -132,10 +131,10 @@ def resend_activation(request):
                     'resent': True
                 })
             except Exception as e:
-                messages.error(request, _('Error enviando el email. Inténtalo más tarde.'))
+                messages.error(request, 'Error al enviar el correo. Inténtalo más tarde.')
                 
         except CustomUser.DoesNotExist:
-            messages.error(request, _('No se encontró ningún usuario con ese nombre.'))
+            messages.error(request, 'No se encontró ningún usuario con ese nombre.')
     
     return render(request, 'users/resend_activation.html')
 
@@ -655,7 +654,7 @@ def dashboard_redirect(request):
     if request.user.role == CustomUser.ROLE_ADMIN:
         return redirect('admin_dashboard')
     elif request.user.role == CustomUser.ROLE_COORDINATOR:
-        return render(request, 'users/dashboard_selection.html', {'dashboards': {'Coordinator': 'coordinator_dashboard', 'Teacher': 'teacher_dashboard'}})
+        return render(request, 'users/dashboard_selection.html', {'dashboards': {'Panel de coordinación': 'coordinator_dashboard', 'Panel de profesor/a': 'teacher_dashboard'}})
     elif request.user.role == CustomUser.ROLE_TEACHER:
         return redirect('teacher_dashboard')
     elif request.user.role == CustomUser.ROLE_STUDENT:
@@ -791,10 +790,10 @@ def ajax_update_coordinator(request):
                 
                 # Log the coordinator assignment
                 if current_coordinator:
-                    details = f'Coordinator for "{titulacion.nombre}" changed from {current_coordinator.username} to {new_coordinator.username}'
+                    details = f'Coordinación de "{titulacion.nombre}" cambiada de {current_coordinator.username} a {new_coordinator.username}'
                     action = 'Modificación'
                 else:
-                    details = f'Coordinator {new_coordinator.username} assigned to "{titulacion.nombre}"'
+                    details = f'{new_coordinator.username} asignado/a como coordinador/a de "{titulacion.nombre}"'
                     action = 'Asignación'
                     
                 LogActividad.objects.create(
@@ -818,7 +817,7 @@ def ajax_update_coordinator(request):
                     object_id=titulacion.id,
                     usuario=request.user,
                     tipo_log='Eliminación',
-                    details=f'Coordinator {current_coordinator.username} removed from "{titulacion.nombre}"'
+                    details=f'{current_coordinator.username} retirado/a como coordinador/a de "{titulacion.nombre}"'
                 )
                 
             titulacion.coordinador = None
@@ -888,8 +887,8 @@ def ajax_create_tipo_perfil(request):
             object_name=tipo_perfil.nombre,
             object_id=tipo_perfil.id,
             usuario=request.user,
-            tipo_log=_('Creation'),
-            details=_('Profile type "%(name)s" created') % {'name': tipo_perfil.nombre}
+            tipo_log='Creation',
+            details=f'Tipo de perfil "{tipo_perfil.nombre}" creado'
         )
         
         return JsonResponse({
@@ -946,8 +945,8 @@ def ajax_update_tipo_perfil(request, pk):
             object_name=tipo_perfil.nombre,
             object_id=tipo_perfil.id,
             usuario=request.user,
-            tipo_log=_('Modification'),
-            details=f'Profile type updated from "{old_name}" to "{tipo_perfil.nombre}"'
+            tipo_log='Modification',
+            details=f'Tipo de perfil actualizado de "{old_name}" a "{tipo_perfil.nombre}"'
         )
         
         return JsonResponse({
@@ -985,7 +984,7 @@ def ajax_delete_tipo_perfil(request, pk):
         if asignaciones_count > 0:
             return JsonResponse({
                 'success': False, 
-                'error': f'Este tipo de perfil tiene {asignaciones_count} asignación(es) activa(s). Debe reasignar o desactivar estas asignaciones primero.'
+                'error': f'Este tipo de perfil tiene {asignaciones_count} asignación(es) activa(s). Reasigna o desactiva estas asignaciones primero.'
             })
         
         tipo_name = tipo_perfil.nombre
@@ -998,7 +997,7 @@ def ajax_delete_tipo_perfil(request, pk):
             object_id=pk,
             usuario=request.user,
             tipo_log='Eliminación',
-            details=f'Profile type "{tipo_name}" deleted'
+            details=f'Tipo de perfil "{tipo_name}" eliminado'
         )
         
         return JsonResponse({'success': True})

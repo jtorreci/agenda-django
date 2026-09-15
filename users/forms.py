@@ -30,8 +30,8 @@ class CustomUserCreationForm(UserCreationForm):
         return user
 
 class NotificationForm(forms.Form):
-    subject = forms.CharField(max_length=100)
-    message = forms.CharField(widget=forms.Textarea)
+    subject = forms.CharField(max_length=100, label='Asunto')
+    message = forms.CharField(widget=forms.Textarea, label='Mensaje')
 
 class StudentSubjectForm(forms.ModelForm):
     subjects = forms.ModelMultipleChoiceField(

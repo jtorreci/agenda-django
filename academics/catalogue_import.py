@@ -541,7 +541,7 @@ def _plans_of(rows):
 def build_draft(academic_year, rows, filename, user):
     """Store parsed rows as a draft import with matching results."""
     if academic_year.state == AcademicYear.STATE_ARCHIVED:
-        raise ValidationError('No se puede importar un catálogo en un curso archivado.')
+        raise ValidationError('No se puede importar un catálogo en un curso académico archivado.')
 
     catalogue_import = CatalogueImport.objects.create(
         academic_year=academic_year,
@@ -632,7 +632,7 @@ def set_plan_override(catalogue_import, plan_code, mode, titulacion=None):
     if mode not in (OVERRIDE_AUTO, OVERRIDE_NEW, OVERRIDE_TITULACION):
         raise ValidationError('Opción de asociación no válida.')
     if mode == OVERRIDE_TITULACION and titulacion is None:
-        raise ValidationError('Elija una titulación.')
+        raise ValidationError('Elige una titulación.')
 
     automatic = CatalogueMatcher().resolve_plans(plans)
     if automatic[plan_code].status == MATCH_CODE:
@@ -706,7 +706,7 @@ def apply_import(catalogue_import):
         raise ValidationError('La importación ya se ha aplicado.')
     academic_year = catalogue_import.academic_year
     if academic_year.state == AcademicYear.STATE_ARCHIVED:
-        raise ValidationError('No se puede aplicar una importación a un curso archivado.')
+        raise ValidationError('No se puede aplicar una importación a un curso académico archivado.')
 
     rows = list(catalogue_import.rows.all())
     if not rows:

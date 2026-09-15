@@ -13,13 +13,13 @@ class CatalogueUploadForm(forms.Form):
         queryset=AcademicYear.objects.exclude(state=AcademicYear.STATE_ARCHIVED),
         required=False,
         label='Curso académico existente',
-        empty_label='— Crear un curso nuevo —',
+        empty_label='— Crear un curso académico nuevo —',
         widget=forms.Select(attrs={'class': 'form-select'}),
     )
     new_year_code = forms.CharField(
         required=False,
         max_length=9,
-        label='Código del curso nuevo',
+        label='Código del curso académico nuevo',
         widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': '2026-27'}),
     )
     new_year_starts_on = forms.DateField(
@@ -43,7 +43,7 @@ class CatalogueUploadForm(forms.Form):
             return code
         match = YEAR_CODE_PATTERN.match(code)
         if not match or (int(match.group(1)) + 1) % 100 != int(match.group(2)):
-            raise forms.ValidationError('Use el formato AAAA-AA con años consecutivos, por ejemplo 2026-27.')
+            raise forms.ValidationError('Usa el formato AAAA-AA con años consecutivos, por ejemplo 2026-27.')
         if AcademicYear.objects.filter(code=code).exists():
             raise forms.ValidationError('Ya existe un curso académico con ese código.')
         return code
@@ -61,10 +61,10 @@ class CatalogueUploadForm(forms.Form):
         starts_on = cleaned.get('new_year_starts_on')
         ends_on = cleaned.get('new_year_ends_on')
         if year and (code or starts_on or ends_on):
-            raise forms.ValidationError('Elija un curso existente o cree uno nuevo, no ambas cosas.')
+            raise forms.ValidationError('Elige un curso académico existente o crea uno nuevo, no ambas cosas.')
         if not year and 'new_year_code' not in self.errors:
             if not (code and starts_on and ends_on):
-                raise forms.ValidationError('Elija un curso existente o indique código, inicio y fin del curso nuevo.')
+                raise forms.ValidationError('Elige un curso académico existente o indica código, inicio y fin del curso académico nuevo.')
             if ends_on <= starts_on:
-                self.add_error('new_year_ends_on', 'El curso debe terminar después de empezar.')
+                self.add_error('new_year_ends_on', 'El curso académico debe terminar después de empezar.')
         return cleaned

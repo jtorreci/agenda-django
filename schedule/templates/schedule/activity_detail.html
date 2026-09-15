@@ -1,8 +1,7 @@
 {% extends 'base.html' %}
-{% load i18n %}
 {% load widget_tweaks %}
 
-{% block title %}{% trans "Activity Details" %} - {{ activity.nombre }}{% endblock %}
+{% block title %}Detalles de la actividad - {{ activity.nombre }}{% endblock %}
 
 {% block extra_head %}
 <style>
@@ -96,11 +95,11 @@
             {{ activity.nombre }}
         </h1>
         <p class="mb-0 lead">{{ activity.tipo_actividad.nombre }}</p>
-        <p class="mb-0 mt-2"><span class="badge bg-light text-dark">Curso {{ activity.academic_year.code }}</span></p>
+        <p class="mb-0 mt-2"><span class="badge bg-light text-dark">Curso académico {{ activity.academic_year.code }}</span></p>
     </div>
     {% include 'academics/_messages.html' %}
     {% if activity.is_read_only %}
-        <div class="alert alert-secondary"><i class="bi bi-lock"></i> Esta actividad pertenece a un curso anterior y es de solo lectura.</div>
+        <div class="alert alert-secondary"><i class="bi bi-lock"></i> Esta actividad pertenece a un curso académico anterior y es de solo lectura.</div>
     {% endif %}
 
     <div class="row">
@@ -110,12 +109,12 @@
             <div class="info-card">
                 <h4 class="mb-3">
                     <i class="bi bi-info-circle text-primary"></i>
-                    {% trans "General Information" %}
+                    Información general
                 </h4>
 
                 <div class="row">
                     <div class="col-md-6">
-                        <div class="info-label">{% trans "Start Date & Time" %}</div>
+                        <div class="info-label">Fecha y hora de inicio</div>
                         <div class="info-value">
                             <i class="bi bi-calendar"></i>
                             {{ activity.fecha_inicio|date:"l, d F Y" }}<br>
@@ -125,7 +124,7 @@
                     </div>
 
                     <div class="col-md-6">
-                        <div class="info-label">{% trans "End Date & Time" %}</div>
+                        <div class="info-label">Fecha y hora de fin</div>
                         <div class="info-value">
                             <i class="bi bi-calendar"></i>
                             {{ activity.fecha_fin|date:"l, d F Y" }}<br>
@@ -135,7 +134,7 @@
                     </div>
                 </div>
 
-                <div class="info-label">{% trans "Subjects" %}</div>
+                <div class="info-label">Asignaturas</div>
                 <div class="subjects-list">
                     {% for asignatura in activity.asignaturas.all %}
                         <span class="badge bg-primary me-2 mb-2">
@@ -151,38 +150,38 @@
             <div class="info-card">
                 <h4 class="mb-3">
                     <i class="bi bi-people text-success"></i>
-                    {% trans "Groups and Schedules" %}
+                    Grupos y horarios
                 </h4>
 
                 {% for grupo in grupos %}
                 <div class="group-card">
                     <div class="group-title">
                         <i class="bi bi-person-circle"></i>
-                        {% trans "Group" %}: {{ grupo.nombre_grupo }}
+                        Grupo: {{ grupo.nombre_grupo }}
                     </div>
 
                     <div class="row">
                         <div class="col-md-3">
-                            <strong>{% trans "Start" %}:</strong><br>
+                            <strong>Inicio:</strong><br>
                             {{ grupo.fecha_inicio|date:"d/m/Y H:i" }}
                         </div>
                         <div class="col-md-3">
-                            <strong>{% trans "End" %}:</strong><br>
+                            <strong>Fin:</strong><br>
                             {{ grupo.fecha_fin|date:"d/m/Y H:i" }}
                         </div>
                         <div class="col-md-3">
-                            <strong>{% trans "Location" %}:</strong><br>
+                            <strong>Lugar:</strong><br>
                             {{ grupo.lugar|default:"No especificado" }}
                         </div>
                         <div class="col-md-3">
-                            <strong>{% trans "Students" %}:</strong><br>
+                            <strong>Estudiantes:</strong><br>
                             {{ grupo.estudiantes_asignados|default:"Por asignar" }}
                         </div>
                     </div>
 
                     {% if grupo.descripcion %}
                     <div class="mt-2">
-                        <strong>{% trans "Description" %}:</strong> {{ grupo.descripcion }}
+                        <strong>Descripción:</strong> {{ grupo.descripcion }}
                     </div>
                     {% endif %}
                 </div>
@@ -195,7 +194,7 @@
             <div class="info-card">
                 <h4 class="mb-3">
                     <i class="bi bi-file-text text-warning"></i>
-                    {% trans "Description" %}
+                    Descripción
                 </h4>
                 <div class="description-box">
                     {{ activity.descripcion|linebreaks }}
@@ -213,33 +212,33 @@
                     <div class="col-6">
                         <h6 class="mb-3">
                             <i class="bi bi-award text-info"></i>
-                            {% trans "Evaluation" %}
+                            Evaluación
                         </h6>
 
                         {% if activity.evaluable %}
                             <span class="badge badge-evaluation fs-6 mb-2 d-block">
                                 <i class="bi bi-check-circle"></i>
-                                {% trans "Evaluable" %}
+                                Evaluable
                             </span>
                             <div class="info-value small">
-                                <strong>{% trans "Weight" %}:</strong> {{ activity.porcentaje_evaluacion }}%
+                                <strong>Peso:</strong> {{ activity.porcentaje_evaluacion }}%
                             </div>
                             <div class="info-value small">
-                                <strong>{% trans "Recoverable" %}:</strong>
+                                <strong>Recuperable:</strong>
                                 {% if activity.no_recuperable %}
                                     <span class="text-danger">
-                                        <i class="bi bi-x-circle"></i> {% trans "No" %}
+                                        <i class="bi bi-x-circle"></i> No
                                     </span>
                                 {% else %}
                                     <span class="text-success">
-                                        <i class="bi bi-check-circle"></i> {% trans "Yes" %}
+                                        <i class="bi bi-check-circle"></i> Sí
                                     </span>
                                 {% endif %}
                             </div>
                         {% else %}
                             <span class="badge badge-no-evaluation fs-6">
                                 <i class="bi bi-x-circle"></i>
-                                {% trans "Not Evaluable" %}
+                                No evaluable
                             </span>
                         {% endif %}
                     </div>
@@ -248,31 +247,31 @@
                     <div class="col-6">
                         <h6 class="mb-3">
                             <i class="bi bi-gear text-secondary"></i>
-                            {% trans "Status" %}
+                            Estado
                         </h6>
 
                         <div class="info-value small">
-                            <strong>{% trans "Active" %}:</strong><br>
+                            <strong>Activa:</strong><br>
                             {% if activity.activa %}
                                 <span class="text-success">
-                                    <i class="bi bi-check-circle"></i> {% trans "Yes" %}
+                                    <i class="bi bi-check-circle"></i> Sí
                                 </span>
                             {% else %}
                                 <span class="text-danger">
-                                    <i class="bi bi-x-circle"></i> {% trans "Deleted" %}
+                                    <i class="bi bi-x-circle"></i> Eliminada
                                 </span>
                             {% endif %}
                         </div>
 
                         <div class="info-value small">
-                            <strong>{% trans "Approved" %}:</strong><br>
+                            <strong>Aprobada:</strong><br>
                             {% if activity.aprobada %}
                                 <span class="text-success">
-                                    <i class="bi bi-check-circle"></i> {% trans "Yes" %}
+                                    <i class="bi bi-check-circle"></i> Sí
                                 </span>
                             {% else %}
                                 <span class="text-warning">
-                                    <i class="bi bi-clock"></i> {% trans "Pending" %}
+                                    <i class="bi bi-clock"></i> Pendiente
                                 </span>
                             {% endif %}
                         </div>
@@ -284,7 +283,7 @@
             <div class="info-card">
                 <h5 class="mb-3">
                     <i class="bi bi-tools text-primary"></i>
-                    {% trans "Actions" %}
+                    Acciones
                 </h5>
 
                 <div class="d-flex justify-content-center gap-2">
@@ -292,13 +291,13 @@
                         <a href="{% url 'activity_check_edit' activity.pk %}"
                            class="btn btn-outline-primary btn-sm"
                            data-bs-toggle="tooltip"
-                           title="{% trans 'Edit Activity' %}">
+                           title="Editar actividad">
                             <i class="bi bi-pencil"></i>
                         </a>
                         <a href="{% url 'copy_activity_individual' activity.pk %}"
                            class="btn btn-outline-secondary btn-sm"
                            data-bs-toggle="tooltip"
-                           title="{% trans 'Copy Activity' %}">
+                           title="Copiar actividad">
                             <i class="bi bi-files"></i>
                         </a>
                     {% endif %}
@@ -306,8 +305,8 @@
                     {% if can_import %}
                         <form method="post" action="{% url 'import_activity_to_current_year' activity.pk %}" class="d-inline">
                             {% csrf_token %}
-                            <button type="submit" class="btn btn-outline-success btn-sm" title="Traer al curso actual">
-                                <i class="bi bi-box-arrow-in-down"></i> Traer al curso actual
+                            <button type="submit" class="btn btn-outline-success btn-sm" title="Traer al curso académico actual">
+                                <i class="bi bi-box-arrow-in-down"></i> Traer al curso académico actual
                             </button>
                         </form>
                     {% elif already_imported %}
@@ -318,14 +317,14 @@
                        class="btn btn-danger btn-sm"
                        target="_blank"
                        data-bs-toggle="tooltip"
-                       title="{% trans 'Download PDF' %}">
+                       title="Descargar PDF">
                         <i class="bi bi-download"></i>
                     </a>
 
                     <a href="javascript:window.history.back();"
                        class="btn btn-outline-dark btn-sm"
                        data-bs-toggle="tooltip"
-                       title="{% trans 'Back to Dashboard' %}">
+                       title="Volver al panel">
                         <i class="bi bi-arrow-left"></i>
                     </a>
                 </div>

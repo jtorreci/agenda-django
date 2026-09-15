@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-    <title>Activity List</title>
+    <title>Lista de actividades</title>
 </head>
 <body>
-    <h2>Activity List</h2>
-    <p><a href="{% url 'activity_new' %}">Create New Activity</a></p>
+    <h2>Lista de actividades</h2>
+    <p><a href="{% url 'activity_new' %}">Crear nueva actividad</a></p>
     <form method="get" action="{% url 'activity_list' %}">
         <label for="academic_year">Curso académico:</label>
         <select name="academic_year" id="academic_year" multiple>
@@ -18,18 +18,18 @@
     <ul>
         {% for activity in activities %}
             <li>
-                {{ activity.nombre }} ({% for asignatura in activity.asignaturas.all %}{{ asignatura.nombre }}{% if not forloop.last %}, {% endif %}{% endfor %}) - {{ activity.fecha_inicio }} to {{ activity.fecha_fin }} [{{ activity.academic_year.code }}]
+                {{ activity.nombre }} ({% for asignatura in activity.asignaturas.all %}{{ asignatura.nombre }}{% if not forloop.last %}, {% endif %}{% endfor %}) - {{ activity.fecha_inicio }} a {{ activity.fecha_fin }} [{{ activity.academic_year.code }}]
                 {% if activity.is_read_only %}
                 <em>Solo lectura</em>
                 {% else %}
-                <a href="{% url 'activity_check_edit' activity.pk %}">Edit</a>
-                <a href="{% url 'activity_delete' activity.pk %}">Delete</a>
+                <a href="{% url 'activity_check_edit' activity.pk %}">Editar</a>
+                <a href="{% url 'activity_delete' activity.pk %}">Eliminar</a>
                 {% endif %}
             </li>
         {% empty %}
-            <li>No activities found.</li>
+            <li>No se han encontrado actividades.</li>
         {% endfor %}
     </ul>
-    <p><a href="{% url 'teacher_dashboard' %}">Back to Dashboard</a></p>
+    <p><a href="{% url 'teacher_dashboard' %}">Volver al panel</a></p>
 </body>
 </html>

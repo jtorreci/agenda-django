@@ -2,7 +2,11 @@ from django.db import models
 from django.utils import timezone
 
 class AgendaSettings(models.Model):
-    closing_date = models.DateField()
+    closing_date = models.DateField('fecha de cierre')
+
+    class Meta:
+        verbose_name = 'configuración de la agenda'
+        verbose_name_plural = 'configuración de la agenda'
 
     def save(self, *args, **kwargs):
         self.pk = 1

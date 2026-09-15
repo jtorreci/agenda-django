@@ -43,7 +43,7 @@ def ajax_update_agenda_settings(request):
         try:
             closing_date = datetime.strptime(closing_date_str, '%Y-%m-%d').date()
         except ValueError:
-            return JsonResponse({'success': False, 'error': 'Formato de fecha inválido. Use YYYY-MM-DD'})
+            return JsonResponse({'success': False, 'error': 'Formato de fecha no válido. Usa AAAA-MM-DD'})
         
         # Load and update settings
         settings = AgendaSettings.load()

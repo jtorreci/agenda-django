@@ -1,7 +1,6 @@
 {% extends 'base.html' %}
-{% load i18n %}
 
-{% block title %}{% trans "Register" %} - Agenda Académica{% endblock %}
+{% block title %}Registrarse - Agenda Académica{% endblock %}
 
 {% block extra_head %}
 <style>
@@ -241,9 +240,9 @@
         <div class="register-header">
             <h2>
                 <i class="bi bi-person-plus me-2"></i>
-                {% trans "Create Account" %}
+                Crear cuenta
             </h2>
-            <p>{% trans "Join Agenda Académica today" %}</p>
+            <p>Únete hoy a Agenda Académica</p>
         </div>
         
         <div class="register-body">
@@ -268,13 +267,13 @@
                         id="id_username" 
                         name="username"
                         value="{{ form.username.value|default_if_none:'' }}"
-                        placeholder="{% trans 'Username' %}"
+                        placeholder="Nombre de usuario"
                         required
                         autocomplete="username"
                     >
                     <label for="id_username">
                         <i class="bi bi-person me-2"></i>
-                        {% trans "Username" %}
+                        Nombre de usuario
                     </label>
                     {% if form.username.help_text %}
                         <div class="form-text">{{ form.username.help_text }}</div>
@@ -294,13 +293,13 @@
                         id="id_email" 
                         name="email"
                         value="{{ form.email.value|default_if_none:'' }}"
-                        placeholder="{% trans 'Email address' %}"
+                        placeholder="Correo electrónico"
                         required
                         autocomplete="email"
                     >
                     <label for="id_email">
                         <i class="bi bi-envelope me-2"></i>
-                        {% trans "Email address" %}
+                        Correo electrónico
                     </label>
                     {% if form.email.help_text %}
                         <div class="form-text">{{ form.email.help_text }}</div>
@@ -319,13 +318,13 @@
                         class="form-control{% if form.password1.errors %} is-invalid{% endif %}" 
                         id="id_password1" 
                         name="password1"
-                        placeholder="{% trans 'Password' %}"
+                        placeholder="Contraseña"
                         required
                         autocomplete="new-password"
                     >
                     <label for="id_password1">
                         <i class="bi bi-lock me-2"></i>
-                        {% trans "Password" %}
+                        Contraseña
                     </label>
                     {% if form.password1.help_text %}
                         <div class="form-text">{{ form.password1.help_text }}</div>
@@ -344,13 +343,13 @@
                         class="form-control{% if form.password2.errors %} is-invalid{% endif %}" 
                         id="id_password2" 
                         name="password2"
-                        placeholder="{% trans 'Confirm password' %}"
+                        placeholder="Confirmar contraseña"
                         required
                         autocomplete="new-password"
                     >
                     <label for="id_password2">
                         <i class="bi bi-lock-fill me-2"></i>
-                        {% trans "Confirm password" %}
+                        Confirmar contraseña
                     </label>
                     {% if form.password2.help_text %}
                         <div class="form-text">{{ form.password2.help_text }}</div>
@@ -366,7 +365,7 @@
                 <div class="d-grid gap-3 mt-4">
                     <button type="submit" class="btn btn-primary btn-register" id="registerBtn">
                         <i class="bi bi-person-plus me-2"></i>
-                        {% trans "Create Account" %}
+                        Crear cuenta
                     </button>
                 </div>
             </form>
@@ -374,11 +373,11 @@
             <!-- Login link section -->
             <div class="login-link-section">
                 <div class="login-link-text">
-                    {% trans "Already have an account?" %}
+                    ¿Ya tienes una cuenta?
                 </div>
                 <a href="{% url 'login' %}" class="btn-login-link">
                     <i class="bi bi-box-arrow-in-right me-2"></i>
-                    {% trans "Sign In" %}
+                    Iniciar sesión
                 </a>
             </div>
         </div>
@@ -393,7 +392,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     form.addEventListener('submit', function() {
         registerBtn.disabled = true;
-        registerBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>{% trans "Creating account..." %}';
+        registerBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Creando cuenta...';
     });
     
     // Reset button state if form submission fails and page reloads

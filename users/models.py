@@ -19,13 +19,13 @@ class TipoPerfil(models.Model):
     activo = models.BooleanField(default=True)
     orden = models.PositiveIntegerField(default=0, help_text="Orden de aparición en interfaces")
     
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField('fecha de creación', auto_now_add=True)
+    updated_at = models.DateTimeField('fecha de actualización', auto_now=True)
     
     class Meta:
         ordering = ['orden', 'nombre']
-        verbose_name = 'Tipo de Perfil'
-        verbose_name_plural = 'Tipos de Perfil'
+        verbose_name = 'tipo de perfil'
+        verbose_name_plural = 'tipos de perfil'
     
     def __str__(self):
         return self.nombre
@@ -49,8 +49,8 @@ class AsignacionPerfil(models.Model):
     class Meta:
         unique_together = ('usuario', 'tipo_perfil')
         ordering = ['-fecha_asignacion']
-        verbose_name = 'Asignación de Perfil'
-        verbose_name_plural = 'Asignaciones de Perfil'
+        verbose_name = 'asignación de perfil'
+        verbose_name_plural = 'asignaciones de perfil'
     
     def __str__(self):
         return f'{self.usuario.username} - {self.tipo_perfil.nombre}'
@@ -63,19 +63,24 @@ class CustomUser(AbstractUser):
     ROLE_ADMIN = 'ADMIN'
 
     ROLE_CHOICES = (
-        (ROLE_STUDENT, 'Student'),
-        (ROLE_TEACHER, 'Teacher'),
-        (ROLE_COORDINATOR, 'Coordinator'),
-        (ROLE_ADMIN, 'Admin'),
+        (ROLE_STUDENT, 'Estudiante'),
+        (ROLE_TEACHER, 'Profesor/a'),
+        (ROLE_COORDINATOR, 'Coordinador/a'),
+        (ROLE_ADMIN, 'Administrador/a'),
     )
     # SISTEMA LEGACY - Mantener por compatibilidad
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='STUDENT')
-    subjects = models.ManyToManyField(Asignatura, blank=True)
-    coordinated_titulaciones = models.ManyToManyField(Titulacion, blank=True)
+    role = models.CharField('rol', max_length=20, choices=ROLE_CHOICES, default='STUDENT')
+    subjects = models.ManyToManyField(Asignatura, blank=True, verbose_name='asignaturas')
+    coordinated_titulaciones = models.ManyToManyField(Titulacion, blank=True, verbose_name='titulaciones coordinadas')
     
     # NUEVO SISTEMA - Perfiles dinámicos
     tipos_perfil = models.ManyToManyField(TipoPerfil, through=AsignacionPerfil, 
-                                         through_fields=('usuario', 'tipo_perfil'), blank=True)
+                                         through_fields=('usuario', 'tipo_perfil'), blank=True,
+                                         verbose_name='tipos de perfil')
+
+    class Meta(AbstractUser.Meta):
+        verbose_name = 'usuario'
+        verbose_name_plural = 'usuarios'
     
     def tiene_perfil(self, codigo_perfil):
         """Verifica si el usuario tiene un perfil específico (nuevo sistema)"""
@@ -163,10 +168,14 @@ class CustomUser(AbstractUser):
         return self.perfiles_activos().values('nombre', 'color', 'icono')
 
 class LoginAttempt(models.Model):
-    username = models.CharField(max_length=150)
-    ip_address = models.GenericIPAddressField()
-    timestamp = models.DateTimeField(auto_now_add=True)
-    success = models.BooleanField()
+    username = models.CharField('nombre de usuario', max_length=150)
+    ip_address = models.GenericIPAddressField('dirección IP')
+    timestamp = models.DateTimeField('fecha y hora', auto_now_add=True)
+    success = models.BooleanField('correcto')
+
+    class Meta:
+        verbose_name = 'intento de inicio de sesión'
+        verbose_name_plural = 'intentos de inicio de sesión'
 
     def __str__(self):
-        return f'{self.username} - {self.timestamp} - {"Success" if self.success else "Failed"}'
+        return f'{self.username} - {self.timestamp} - {"Correcto" if self.success else "Fallido"}'

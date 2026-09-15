@@ -74,19 +74,19 @@ def import_activity(source, user):
     if target is None:
         raise ImportRefused('No hay ningún curso académico activo al que traer la actividad.')
     if source.academic_year_id == target.pk:
-        raise ImportRefused(f'La actividad "{source.nombre}" ya pertenece al curso actual.')
+        raise ImportRefused(f'La actividad "{source.nombre}" ya pertenece al curso académico actual.')
     if not source.es_visible():
         raise ImportRefused(f'La actividad "{source.nombre}" no está visible y no se puede traer.')
     if live_copies(target).filter(copied_from=source).exists():
         raise ImportRefused(
-            f'La actividad "{source.nombre}" ya se trajo al curso {target.code}.',
+            f'La actividad "{source.nombre}" ya se trajo al curso académico {target.code}.',
             ImportRefused.ALREADY_IMPORTED,
         )
 
     subjects = list(offered_subjects(target, source.asignaturas.all()))
     if not subjects:
         raise ImportRefused(
-            f'Ninguna asignatura de "{source.nombre}" se oferta en el curso {target.code}; '
+            f'Ninguna asignatura de "{source.nombre}" se oferta en el curso académico {target.code}; '
             'no se puede traer la actividad.'
         )
 
@@ -128,14 +128,14 @@ def import_activity(source, user):
                 usuario=user,
                 tipo_log='Creation',
                 details=(
-                    f'Actividad traída al curso {target.code} desde la actividad {source.pk} '
-                    f'del curso {source.academic_year.code}'
+                    f'Actividad traída al curso académico {target.code} desde la actividad {source.pk} '
+                    f'del curso académico {source.academic_year.code}'
                 ),
             )
     except IntegrityError:
         # A concurrent request imported the same source first.
         raise ImportRefused(
-            f'La actividad "{source.nombre}" ya se trajo al curso {target.code}.',
+            f'La actividad "{source.nombre}" ya se trajo al curso académico {target.code}.',
             ImportRefused.ALREADY_IMPORTED,
         )
     return copy

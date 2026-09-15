@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block title %}Acceso denegado - Agenda Académica{% endblock %}
+
+{% block content %}
+<div class="text-center py-5">
+    <h1 class="display-5">Acceso denegado</h1>
+    <p class="lead">No tienes permiso para acceder a esta página.</p>
+    <a href="{% url 'home' %}" class="btn btn-primary">Ir al inicio</a>
+</div>
+{% endblock %}

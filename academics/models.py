@@ -17,17 +17,19 @@ class AcademicYear(models.Model):
     STATE_ACTIVE = 'active'
     STATE_ARCHIVED = 'archived'
     STATE_CHOICES = [
-        (STATE_DRAFT, 'Draft'),
-        (STATE_ACTIVE, 'Active'),
-        (STATE_ARCHIVED, 'Archived'),
+        (STATE_DRAFT, 'Borrador'),
+        (STATE_ACTIVE, 'Activo'),
+        (STATE_ARCHIVED, 'Archivado'),
     ]
 
-    code = models.CharField(max_length=9, unique=True, help_text='Example: 2026-27')
-    starts_on = models.DateField()
-    ends_on = models.DateField()
-    state = models.CharField(max_length=10, choices=STATE_CHOICES, default=STATE_DRAFT)
+    code = models.CharField('código', max_length=9, unique=True, help_text='Ejemplo: 2026-27')
+    starts_on = models.DateField('fecha de inicio')
+    ends_on = models.DateField('fecha de fin')
+    state = models.CharField('estado', max_length=10, choices=STATE_CHOICES, default=STATE_DRAFT)
 
     class Meta:
+        verbose_name = 'curso académico'
+        verbose_name_plural = 'cursos académicos'
         ordering = ['-starts_on']
         constraints = [
             models.UniqueConstraint(
@@ -60,7 +62,7 @@ class AcademicYear(models.Model):
 
     def clean(self):
         if self.ends_on <= self.starts_on:
-            raise ValidationError({'ends_on': 'The academic year must end after it starts.'})
+            raise ValidationError({'ends_on': 'El curso académico debe terminar después de empezar.'})
 
     def missing_offering_metadata(self):
         return self.offerings.filter(
@@ -72,11 +74,11 @@ class AcademicYear(models.Model):
         with transaction.atomic():
             locked = AcademicYear.objects.select_for_update().get(pk=self.pk)
             if locked.state != self.STATE_DRAFT:
-                raise ValidationError('Only a draft academic year can be activated.')
+                raise ValidationError('Solo se puede activar un curso académico en borrador.')
             if not self.offerings.exists():
-                raise ValidationError('An academic year needs at least one subject offering before activation.')
+                raise ValidationError('Un curso académico necesita al menos una asignatura ofertada antes de activarse.')
             if self.missing_offering_metadata().exists():
-                raise ValidationError('Every offering needs a curricular year and semester before activation.')
+                raise ValidationError('Todas las asignaturas ofertadas necesitan curso y semestre antes de activar el curso académico.')
             AcademicYear.objects.select_for_update().filter(state=self.STATE_ACTIVE).exclude(pk=self.pk).update(
                 state=self.STATE_ARCHIVED
             )
@@ -89,8 +91,12 @@ class AcademicYear(models.Model):
 
 class Titulacion(models.Model):
     nombre = models.CharField(max_length=255)
-    codigo_plan = models.CharField(max_length=32, blank=True, null=True, unique=True)
+    codigo_plan = models.CharField('código del plan', max_length=32, blank=True, null=True, unique=True)
     coordinador = models.ForeignKey('users.CustomUser', on_delete=models.SET_NULL, null=True, blank=True, related_name='coordinated_titulaciones_as_coordinator')
+
+    class Meta:
+        verbose_name = 'titulación'
+        verbose_name_plural = 'titulaciones'
 
     def __str__(self):
         return self.nombre
@@ -98,11 +104,13 @@ class Titulacion(models.Model):
 class PlanCodeAlias(models.Model):
     """Secondary official plan code (e.g. a mention) grouped into a Titulacion."""
 
-    code = models.CharField(max_length=32, unique=True)
-    titulacion = models.ForeignKey(Titulacion, on_delete=models.CASCADE, related_name='plan_code_aliases')
-    name = models.CharField(max_length=255, blank=True)
+    code = models.CharField('código', max_length=32, unique=True)
+    titulacion = models.ForeignKey(Titulacion, on_delete=models.CASCADE, related_name='plan_code_aliases', verbose_name='titulación')
+    name = models.CharField('nombre', max_length=255, blank=True)
 
     class Meta:
+        verbose_name = 'código de plan adicional'
+        verbose_name_plural = 'códigos de plan adicionales'
         ordering = ['code']
 
     def __str__(self):
@@ -111,16 +119,18 @@ class PlanCodeAlias(models.Model):
 
 class Asignatura(models.Model):
     nombre = models.CharField(max_length=255)
-    codigo_asignatura = models.CharField(max_length=32, blank=True, null=True)
-    titulacion = models.ForeignKey(Titulacion, on_delete=models.CASCADE)
+    codigo_asignatura = models.CharField('código de asignatura', max_length=32, blank=True, null=True)
+    titulacion = models.ForeignKey(Titulacion, on_delete=models.CASCADE, verbose_name='titulación')
     curso = models.IntegerField()
     semestre = models.IntegerField()
-    coordinator = models.ForeignKey('users.CustomUser', on_delete=models.SET_NULL, null=True, blank=True, related_name='coordinated_subjects') # New field
+    coordinator = models.ForeignKey('users.CustomUser', on_delete=models.SET_NULL, null=True, blank=True, related_name='coordinated_subjects', verbose_name='coordinador/a') # New field
 
     def __str__(self):
         return self.nombre
 
     class Meta:
+        verbose_name = 'asignatura'
+        verbose_name_plural = 'asignaturas'
         constraints = [
             models.UniqueConstraint(
                 fields=['titulacion', 'codigo_asignatura'],
@@ -148,17 +158,19 @@ class SubjectOffering(models.Model):
     STATE_OFFERED = 'offered'
     STATE_WITHDRAWN = 'withdrawn'
     STATE_CHOICES = [
-        (STATE_OFFERED, 'Offered'),
-        (STATE_WITHDRAWN, 'Withdrawn'),
+        (STATE_OFFERED, 'Ofertada'),
+        (STATE_WITHDRAWN, 'Retirada'),
     ]
 
-    academic_year = models.ForeignKey(AcademicYear, on_delete=models.CASCADE, related_name='offerings')
-    subject = models.ForeignKey(Asignatura, on_delete=models.PROTECT, related_name='offerings')
-    curricular_year = models.PositiveSmallIntegerField(null=True, blank=True)
-    semester = models.PositiveSmallIntegerField(null=True, blank=True)
-    state = models.CharField(max_length=10, choices=STATE_CHOICES, default=STATE_OFFERED)
+    academic_year = models.ForeignKey(AcademicYear, on_delete=models.CASCADE, related_name='offerings', verbose_name='curso académico')
+    subject = models.ForeignKey(Asignatura, on_delete=models.PROTECT, related_name='offerings', verbose_name='asignatura')
+    curricular_year = models.PositiveSmallIntegerField('curso', null=True, blank=True)
+    semester = models.PositiveSmallIntegerField('semestre', null=True, blank=True)
+    state = models.CharField('estado', max_length=10, choices=STATE_CHOICES, default=STATE_OFFERED)
 
     class Meta:
+        verbose_name = 'asignatura ofertada'
+        verbose_name_plural = 'asignaturas ofertadas'
         ordering = ['academic_year', 'subject__titulacion__nombre', 'curricular_year', 'semester', 'subject__nombre']
         constraints = [
             models.UniqueConstraint(
@@ -172,11 +184,13 @@ class SubjectOffering(models.Model):
 
 
 class TeachingAssignment(models.Model):
-    teacher = models.ForeignKey('users.CustomUser', on_delete=models.CASCADE, related_name='teaching_assignments')
-    offering = models.ForeignKey(SubjectOffering, on_delete=models.CASCADE, related_name='teaching_assignments')
-    active = models.BooleanField(default=True)
+    teacher = models.ForeignKey('users.CustomUser', on_delete=models.CASCADE, related_name='teaching_assignments', verbose_name='profesor/a')
+    offering = models.ForeignKey(SubjectOffering, on_delete=models.CASCADE, related_name='teaching_assignments', verbose_name='asignatura ofertada')
+    active = models.BooleanField('activa', default=True)
 
     class Meta:
+        verbose_name = 'asignación docente'
+        verbose_name_plural = 'asignaciones docentes'
         constraints = [
             models.UniqueConstraint(
                 fields=['teacher', 'offering'],
@@ -192,20 +206,23 @@ class CatalogueImport(models.Model):
     STATE_DRAFT = 'draft'
     STATE_APPLIED = 'applied'
     STATE_CHOICES = [
-        (STATE_DRAFT, 'Draft'),
-        (STATE_APPLIED, 'Applied'),
+        (STATE_DRAFT, 'Borrador'),
+        (STATE_APPLIED, 'Aplicada'),
     ]
 
-    academic_year = models.ForeignKey(AcademicYear, on_delete=models.CASCADE, related_name='catalogue_imports')
-    source_filename = models.CharField(max_length=255, blank=True)
+    academic_year = models.ForeignKey(AcademicYear, on_delete=models.CASCADE, related_name='catalogue_imports', verbose_name='curso académico')
+    source_filename = models.CharField('fichero de origen', max_length=255, blank=True)
     created_by = models.ForeignKey(
-        'users.CustomUser', on_delete=models.SET_NULL, null=True, blank=True, related_name='catalogue_imports'
+        'users.CustomUser', on_delete=models.SET_NULL, null=True, blank=True, related_name='catalogue_imports',
+        verbose_name='creada por',
     )
-    created_at = models.DateTimeField(auto_now_add=True)
-    state = models.CharField(max_length=10, choices=STATE_CHOICES, default=STATE_DRAFT)
-    applied_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField('fecha de creación', auto_now_add=True)
+    state = models.CharField('estado', max_length=10, choices=STATE_CHOICES, default=STATE_DRAFT)
+    applied_at = models.DateTimeField('fecha de aplicación', null=True, blank=True)
 
     class Meta:
+        verbose_name = 'importación de catálogo'
+        verbose_name_plural = 'importaciones de catálogo'
         ordering = ['-created_at']
 
     def incomplete_rows(self):
@@ -221,44 +238,47 @@ class CatalogueImportRow(models.Model):
     MATCH_NEW = 'new'
     MATCH_MANUAL = 'manual'
     MATCH_CHOICES = [
-        (MATCH_CODE, 'Matched by code'),
-        (MATCH_NAME, 'Matched by name'),
-        (MATCH_NEW, 'New'),
-        (MATCH_MANUAL, 'Manual mapping'),
+        (MATCH_CODE, 'Coincidencia por código'),
+        (MATCH_NAME, 'Coincidencia por nombre'),
+        (MATCH_NEW, 'Nueva'),
+        (MATCH_MANUAL, 'Asociación manual'),
     ]
 
-    catalogue_import = models.ForeignKey(CatalogueImport, on_delete=models.CASCADE, related_name='rows')
-    line_number = models.PositiveIntegerField(null=True, blank=True)
-    plan_code = models.CharField(max_length=32)
-    plan_name = models.CharField(max_length=255)
-    subject_code = models.CharField(max_length=32)
-    subject_name = models.CharField(max_length=255)
-    credits = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
-    curricular_year = models.PositiveSmallIntegerField(null=True, blank=True)
-    semester = models.PositiveSmallIntegerField(null=True, blank=True)
+    catalogue_import = models.ForeignKey(CatalogueImport, on_delete=models.CASCADE, related_name='rows', verbose_name='importación de catálogo')
+    line_number = models.PositiveIntegerField('número de línea', null=True, blank=True)
+    plan_code = models.CharField('código del plan', max_length=32)
+    plan_name = models.CharField('nombre del plan', max_length=255)
+    subject_code = models.CharField('código de asignatura', max_length=32)
+    subject_name = models.CharField('nombre de la asignatura', max_length=255)
+    credits = models.DecimalField('créditos', max_digits=5, decimal_places=2, null=True, blank=True)
+    curricular_year = models.PositiveSmallIntegerField('curso', null=True, blank=True)
+    semester = models.PositiveSmallIntegerField('semestre', null=True, blank=True)
     target_titulacion = models.ForeignKey(
-        Titulacion, on_delete=models.SET_NULL, null=True, blank=True, related_name='+'
+        Titulacion, on_delete=models.SET_NULL, null=True, blank=True, related_name='+', verbose_name='titulación de destino'
     )
     target_asignatura = models.ForeignKey(
-        Asignatura, on_delete=models.SET_NULL, null=True, blank=True, related_name='+'
+        Asignatura, on_delete=models.SET_NULL, null=True, blank=True, related_name='+', verbose_name='asignatura de destino'
     )
     ROLE_PRIMARY = 'primary'
     ROLE_ALIAS = 'alias'
     ROLE_CHOICES = [
-        (ROLE_PRIMARY, 'Primary plan code'),
-        (ROLE_ALIAS, 'Alias plan code'),
+        (ROLE_PRIMARY, 'Código de plan principal'),
+        (ROLE_ALIAS, 'Código de plan adicional'),
     ]
 
-    match_status = models.CharField(max_length=10, choices=MATCH_CHOICES, default=MATCH_NEW)
-    plan_match_status = models.CharField(max_length=10, choices=MATCH_CHOICES, default=MATCH_NEW)
-    plan_role = models.CharField(max_length=10, choices=ROLE_CHOICES, default=ROLE_PRIMARY)
+    match_status = models.CharField('coincidencia de la asignatura', max_length=10, choices=MATCH_CHOICES, default=MATCH_NEW)
+    plan_match_status = models.CharField('coincidencia del plan', max_length=10, choices=MATCH_CHOICES, default=MATCH_NEW)
+    plan_role = models.CharField('papel del código de plan', max_length=10, choices=ROLE_CHOICES, default=ROLE_PRIMARY)
     plan_group = models.CharField(
+        'grupo de planes',
         max_length=64,
         blank=True,
-        help_text='Rows sharing this key land in the same Titulacion: "t:<pk>" or "new:<primary plan code>".',
+        help_text='Las filas con esta misma clave se asignan a la misma titulación: "t:<pk>" o "new:<código del plan principal>".',
     )
 
     class Meta:
+        verbose_name = 'fila de importación de catálogo'
+        verbose_name_plural = 'filas de importación de catálogo'
         ordering = ['plan_code', 'curricular_year', 'semester', 'subject_code']
         constraints = [
             models.UniqueConstraint(
@@ -283,13 +303,15 @@ class CatalogueImportPlanOverride(models.Model):
     Deleting the Titulacion deletes the override (back to automatic).
     """
 
-    catalogue_import = models.ForeignKey(CatalogueImport, on_delete=models.CASCADE, related_name='plan_overrides')
-    plan_code = models.CharField(max_length=32)
+    catalogue_import = models.ForeignKey(CatalogueImport, on_delete=models.CASCADE, related_name='plan_overrides', verbose_name='importación de catálogo')
+    plan_code = models.CharField('código del plan', max_length=32)
     titulacion = models.ForeignKey(
-        Titulacion, on_delete=models.CASCADE, null=True, blank=True, related_name='+'
+        Titulacion, on_delete=models.CASCADE, null=True, blank=True, related_name='+', verbose_name='titulación'
     )
 
     class Meta:
+        verbose_name = 'asociación manual de plan'
+        verbose_name_plural = 'asociaciones manuales de plan'
         constraints = [
             models.UniqueConstraint(
                 fields=['catalogue_import', 'plan_code'],
@@ -298,4 +320,4 @@ class CatalogueImportPlanOverride(models.Model):
         ]
 
     def __str__(self):
-        return f'{self.catalogue_import_id} · {self.plan_code} → {self.titulacion or "new"}'
+        return f'{self.catalogue_import_id} · {self.plan_code} → {self.titulacion or "nueva titulación"}'

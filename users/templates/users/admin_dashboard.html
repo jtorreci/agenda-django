@@ -1,51 +1,51 @@
 {% extends 'base.html' %}
 
-{% block title %}Admin Dashboard{% endblock %}
+{% block title %}Panel de administración{% endblock %}
 
 {% block content %}
 <div class="container-fluid">
     <div class="row">
         <div class="col-md-12">
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-3">
-                <h2 class="mb-0">Admin Dashboard</h2>
+                <h2 class="mb-0">Panel de administración</h2>
                 <div class="d-flex flex-wrap gap-2 w-100 w-md-auto justify-content-start justify-content-md-end">
                     <div class="dropdown">
                         <button class="btn btn-outline-success dropdown-toggle btn-sm" type="button" id="pdfReportSelector" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="bi bi-file-pdf"></i> <span class="d-none d-sm-inline">Generate PDF Report</span><span class="d-inline d-sm-none">PDF</span>
+                            <i class="bi bi-file-pdf"></i> <span class="d-none d-sm-inline">Generar informe PDF</span><span class="d-inline d-sm-none">PDF</span>
                         </button>
                         <ul class="dropdown-menu" aria-labelledby="pdfReportSelector">
                             {% for titulacion in all_titulaciones %}
                                 <li><a class="dropdown-item" href="{% url 'generate_agenda_report_titulacion' titulacion.id %}">{{ titulacion.nombre }}</a></li>
                             {% endfor %}
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="{% url 'generate_agenda_report_all' %}"><strong>All Titulaciones</strong></a></li>
+                            <li><a class="dropdown-item" href="{% url 'generate_agenda_report_all' %}"><strong>Todas las titulaciones</strong></a></li>
                         </ul>
                     </div>
                     <a href="{% url 'ical_management' %}" class="btn btn-outline-warning btn-sm">
-                        <i class="bi bi-calendar-event"></i> <span class="d-none d-sm-inline">Manage iCal</span><span class="d-inline d-sm-none">iCal</span>
+                        <i class="bi bi-calendar-event"></i> <span class="d-none d-sm-inline">Gestionar iCal</span><span class="d-inline d-sm-none">iCal</span>
                     </a>
                     <a href="{% url 'catalogue_import_list' %}" class="btn btn-outline-primary btn-sm">
                         <i class="bi bi-upload"></i> <span class="d-none d-sm-inline">Importar catálogo</span><span class="d-inline d-sm-none">Catálogo</span>
                     </a>
                     <a href="{% url 'login_attempts' %}" class="btn btn-outline-info btn-sm">
-                        <i class="bi bi-shield-check"></i> <span class="d-none d-sm-inline">Login Attempts</span><span class="d-inline d-sm-none">Logins</span>
+                        <i class="bi bi-shield-check"></i> <span class="d-none d-sm-inline">Intentos de inicio de sesión</span><span class="d-inline d-sm-none">Accesos</span>
                     </a>
                     <a href="{% url 'admin:index' %}" class="btn btn-outline-secondary btn-sm" target="_blank">
-                        <i class="bi bi-gear"></i> <span class="d-none d-sm-inline">Django Admin</span><span class="d-inline d-sm-none">Admin</span>
+                        <i class="bi bi-gear"></i> <span class="d-none d-sm-inline">Administración de Django</span><span class="d-inline d-sm-none">Admin</span>
                     </a>
                     <div class="dropdown">
                         <button class="btn btn-outline-primary dropdown-toggle btn-sm" type="button" id="roleSelector" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="bi bi-person-gear"></i> <span class="d-none d-sm-inline">Switch Role</span><span class="d-inline d-sm-none">Role</span>
+                            <i class="bi bi-person-gear"></i> <span class="d-none d-sm-inline">Cambiar de rol</span><span class="d-inline d-sm-none">Rol</span>
                         </button>
                         <ul class="dropdown-menu" aria-labelledby="roleSelector">
                             <li><a class="dropdown-item" href="{% url 'admin_dashboard' %}">
-                                <i class="bi bi-shield-check"></i> Admin Dashboard
+                                <i class="bi bi-shield-check"></i> Panel de administración
                             </a></li>
                             <li><a class="dropdown-item" href="{% url 'coordinator_dashboard' %}">
-                                <i class="bi bi-person-workspace"></i> Coordinator View
+                                <i class="bi bi-person-workspace"></i> Vista de coordinador/a
                             </a></li>
                             <li><a class="dropdown-item" href="{% url 'teacher_dashboard' %}">
-                                <i class="bi bi-book"></i> Teacher View
+                                <i class="bi bi-book"></i> Vista de profesor/a
                             </a></li>
                         </ul>
                     </div>
@@ -56,7 +56,7 @@
             <div class="card mb-4">
                 <div class="card-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#kpiCard" aria-expanded="true">
                     <h5 class="mb-0">
-                        <i class="bi bi-graph-up"></i> KPI Report
+                        <i class="bi bi-graph-up"></i> Informe de indicadores (KPI)
                     </h5>
                     <button class="btn btn-sm btn-outline-secondary toggle-card">
                         <i class="bi bi-chevron-up"></i>
@@ -69,7 +69,7 @@
                                 <div class="card bg-light">
                                     <div class="card-body text-center">
                                         <h3 class="text-primary">{{ total_users }}</h3>
-                                        <p class="mb-0 small">Total Users</p>
+                                        <p class="mb-0 small">Total de usuarios</p>
                                     </div>
                                 </div>
                             </div>
@@ -77,7 +77,7 @@
                                 <div class="card bg-light">
                                     <div class="card-body text-center">
                                         <h3 class="text-success">{{ total_teachers }}</h3>
-                                        <p class="mb-0 small">Teachers</p>
+                                        <p class="mb-0 small">Profesores</p>
                                     </div>
                                 </div>
                             </div>
@@ -85,7 +85,7 @@
                                 <div class="card bg-light">
                                     <div class="card-body text-center">
                                         <h3 class="text-info">{{ total_students }}</h3>
-                                        <p class="mb-0 small">Students</p>
+                                        <p class="mb-0 small">Estudiantes</p>
                                     </div>
                                 </div>
                             </div>
@@ -93,7 +93,7 @@
                                 <div class="card bg-light">
                                     <div class="card-body text-center">
                                         <h3 class="text-warning">{{ total_activities }}</h3>
-                                        <p class="mb-0 small">Total Activities</p>
+                                        <p class="mb-0 small">Total de actividades</p>
                                     </div>
                                 </div>
                             </div>
@@ -101,8 +101,8 @@
                                 <div class="card bg-light">
                                     <div class="card-body text-center">
                                         <h3 class="text-success">{{ active_activities }}</h3>
-                                        <p class="mb-0 small">Active Activities</p>
-                                        <p class="mb-0 small text-muted">Curso {{ active_academic_year.code|default:"sin curso activo" }}: {{ active_year_activities }}</p>
+                                        <p class="mb-0 small">Actividades activas</p>
+                                        <p class="mb-0 small text-muted">Curso académico {{ active_academic_year.code|default:"sin curso académico activo" }}: {{ active_year_activities }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -133,7 +133,7 @@
             <div class="card mb-4">
                 <div class="card-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#activityTypesCard" aria-expanded="false">
                     <h5 class="mb-0">
-                        <i class="bi bi-tags"></i> Manage Activity Types
+                        <i class="bi bi-tags"></i> Gestionar tipos de actividad
                     </h5>
                     <button class="btn btn-sm btn-outline-secondary toggle-card">
                         <i class="bi bi-chevron-down"></i>
@@ -142,24 +142,24 @@
                 <div id="activityTypesCard" class="collapse">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h6>Current Activity Types</h6>
+                            <h6>Tipos de actividad actuales</h6>
                             <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#createActivityTypeModal">
-                                <i class="bi bi-plus-circle"></i> Create New Type
+                                <i class="bi bi-plus-circle"></i> Crear nuevo tipo
                             </button>
                         </div>
                         
                         <!-- Alert for messages -->
                         <div id="activityTypeAlert" class="alert alert-dismissible fade" role="alert" style="display: none;">
                             <span id="activityTypeAlertMessage"></span>
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
                         </div>
                         
                         <div class="table-responsive">
                             <table class="table table-sm">
                                 <thead>
                                     <tr>
-                                        <th>Name</th>
-                                        <th>Actions</th>
+                                        <th>Nombre</th>
+                                        <th>Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody id="activityTypesTableBody">
@@ -168,16 +168,16 @@
                                         <td class="tipo-name">{{ tipo.nombre }}</td>
                                         <td>
                                             <button class="btn btn-sm btn-outline-primary edit-tipo-btn" data-tipo-id="{{ tipo.id }}" data-tipo-name="{{ tipo.nombre }}">
-                                                <i class="bi bi-pencil"></i> Edit
+                                                <i class="bi bi-pencil"></i> Editar
                                             </button>
                                             <button class="btn btn-sm btn-outline-danger delete-tipo-btn" data-tipo-id="{{ tipo.id }}" data-tipo-name="{{ tipo.nombre }}">
-                                                <i class="bi bi-trash"></i> Delete
+                                                <i class="bi bi-trash"></i> Eliminar
                                             </button>
                                         </td>
                                     </tr>
                                     {% empty %}
                                     <tr id="noActivityTypesRow">
-                                        <td colspan="2" class="text-center text-muted">No activity types found</td>
+                                        <td colspan="2" class="text-center text-muted">No se han encontrado tipos de actividad</td>
                                     </tr>
                                     {% endfor %}
                                 </tbody>
@@ -189,7 +189,7 @@
                             <div class="card-header bg-warning">
                                 <h6 class="mb-0">
                                     <i class="bi bi-exclamation-triangle"></i> 
-                                    Confirm Deletion: <span id="deleteTypeName"></span>
+                                    Confirmar eliminación: <span id="deleteTypeName"></span>
                                 </h6>
                             </div>
                             <div class="card-body">
@@ -198,10 +198,10 @@
                                 </div>
                                 <div class="mt-3">
                                     <button id="confirmDeleteBtn" class="btn btn-danger me-2">
-                                        <i class="bi bi-trash"></i> Confirm Delete
+                                        <i class="bi bi-trash"></i> Confirmar eliminación
                                     </button>
                                     <button id="cancelDeleteBtn" class="btn btn-secondary">
-                                        <i class="bi bi-x-circle"></i> Cancel
+                                        <i class="bi bi-x-circle"></i> Cancelar
                                     </button>
                                 </div>
                             </div>
@@ -214,7 +214,7 @@
             <div class="card mb-4">
                 <div class="card-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#profileTypesCard" aria-expanded="false">
                     <h5 class="mb-0">
-                        <i class="bi bi-person-badge"></i> Gestión de Tipos de Perfil
+                        <i class="bi bi-person-badge"></i> Gestión de tipos de perfil
                     </h5>
                     <button class="btn btn-sm btn-outline-secondary toggle-card">
                         <i class="bi bi-chevron-down"></i>
@@ -223,16 +223,16 @@
                 <div id="profileTypesCard" class="collapse">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h6>Tipos de Perfil Disponibles</h6>
+                            <h6>Tipos de perfil disponibles</h6>
                             <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#createProfileTypeModal">
-                                <i class="bi bi-plus-circle"></i> Crear Nuevo Tipo
+                                <i class="bi bi-plus-circle"></i> Crear nuevo tipo
                             </button>
                         </div>
                         
                         <!-- Alert for messages -->
                         <div id="profileTypeAlert" class="alert alert-dismissible fade" role="alert" style="display: none;">
                             <span id="profileTypeAlertMessage"></span>
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
                         </div>
                         
                         <div class="row" id="profileTypesContainer">
@@ -287,7 +287,7 @@
             <div class="card mb-4">
                 <div class="card-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#settingsCard" aria-expanded="false">
                     <h5 class="mb-0">
-                        <i class="bi bi-sliders"></i> Agenda Settings
+                        <i class="bi bi-sliders"></i> Configuración de la agenda
                     </h5>
                     <button class="btn btn-sm btn-outline-secondary toggle-card">
                         <i class="bi bi-chevron-down"></i>
@@ -298,25 +298,25 @@
                         <!-- Alert for agenda settings messages -->
                         <div id="agendaSettingsAlert" class="alert alert-dismissible fade" role="alert" style="display: none;">
                             <span id="agendaSettingsAlertMessage"></span>
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
                         </div>
                         
                         <div class="d-flex justify-content-between align-items-center">
                             {% if settings %}
                                 <div>
-                                    <p class="mb-1"><strong>Closing Date:</strong></p>
+                                    <p class="mb-1"><strong>Fecha de cierre:</strong></p>
                                     <p class="mb-0 text-muted" id="currentClosingDate">{{ settings.closing_date|date:"d/m/Y" }}</p>
                                 </div>
                                 <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#agendaSettingsModal" 
                                         data-current-date="{{ settings.closing_date|date:'Y-m-d' }}">
-                                    <i class="bi bi-calendar-edit"></i> Change Date
+                                    <i class="bi bi-calendar-edit"></i> Cambiar fecha
                                 </button>
                             {% else %}
                                 <div>
-                                    <p class="text-muted mb-0">No closing date configured yet.</p>
+                                    <p class="text-muted mb-0">Todavía no se ha configurado una fecha de cierre.</p>
                                 </div>
                                 <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#agendaSettingsModal">
-                                    <i class="bi bi-calendar-plus"></i> Set Date
+                                    <i class="bi bi-calendar-plus"></i> Establecer fecha
                                 </button>
                             {% endif %}
                         </div>
@@ -324,7 +324,7 @@
                         <div class="mt-3">
                             <small class="text-muted">
                                 <i class="bi bi-info-circle"></i> 
-                                Activities before this date are marked as past events in the calendar.
+                                Las actividades anteriores a esta fecha se marcan como eventos pasados en el calendario.
                             </small>
                         </div>
                     </div>
@@ -335,7 +335,7 @@
             <div class="card mb-4">
                 <div class="card-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#coordinatorsCard" aria-expanded="false">
                     <h5 class="mb-0">
-                        <i class="bi bi-person-plus"></i> Assign Coordinators
+                        <i class="bi bi-person-plus"></i> Asignar coordinadores
                     </h5>
                     <button class="btn btn-sm btn-outline-secondary toggle-card">
                         <i class="bi bi-chevron-down"></i>
@@ -344,16 +344,16 @@
                 <div id="coordinatorsCard" class="collapse">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h6>Coordinator Assignments</h6>
+                            <h6>Asignación de coordinadores</h6>
                             <div class="text-muted small">
-                                <i class="bi bi-info-circle"></i> Click edit to assign coordinators
+                                <i class="bi bi-info-circle"></i> Pulsa editar para asignar coordinadores
                             </div>
                         </div>
                         
                         <!-- Alert for coordinator messages -->
                         <div id="coordinatorAlert" class="alert alert-dismissible fade" role="alert" style="display: none;">
                             <span id="coordinatorAlertMessage"></span>
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
                         </div>
                         
                         <div class="table-responsive">
@@ -361,8 +361,8 @@
                                 <thead>
                                     <tr>
                                         <th style="width: 60%;">Titulación</th>
-                                        <th style="width: 30%;">Coordinator</th>
-                                        <th style="width: 10%;">Actions</th>
+                                        <th style="width: 30%;">Coordinador/a</th>
+                                        <th style="width: 10%;">Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody id="coordinatorsTableBody">
@@ -375,7 +375,7 @@
                                             {% if titulacion.coordinador %}
                                                 <span class="badge bg-success">{{ titulacion.coordinador.username }}</span>
                                             {% else %}
-                                                <span class="badge bg-secondary">Not assigned</span>
+                                                <span class="badge bg-secondary">Sin asignar</span>
                                             {% endif %}
                                         </td>
                                         <td>
@@ -390,7 +390,7 @@
                                     </tr>
                                     {% empty %}
                                     <tr id="noCoordinatorsRow">
-                                        <td colspan="3" class="text-center text-muted">No titulaciones found</td>
+                                        <td colspan="3" class="text-center text-muted">No se han encontrado titulaciones</td>
                                     </tr>
                                     {% endfor %}
                                 </tbody>
@@ -404,7 +404,7 @@
             <div class="card mb-4">
                 <div class="card-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#logsCard" aria-expanded="false">
                     <h5 class="mb-0">
-                        <i class="bi bi-journal-text"></i> Activity Logs
+                        <i class="bi bi-journal-text"></i> Registro de actividades
                     </h5>
                     <button class="btn btn-sm btn-outline-secondary toggle-card">
                         <i class="bi bi-chevron-down"></i>
@@ -413,20 +413,20 @@
                 <div id="logsCard" class="collapse">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h6>Recent Activity (Last 50 entries)</h6>
+                            <h6>Actividad reciente (últimas 50 entradas)</h6>
                             <a href="{% url 'activity_logs' %}" class="btn btn-primary">
-                                <i class="bi bi-journal-text"></i> View All Logs
+                                <i class="bi bi-journal-text"></i> Ver todo el registro
                             </a>
                         </div>
                         <div class="table-responsive">
                             <table class="table table-sm">
                                 <thead>
                                     <tr>
-                                        <th>Object Type</th>
-                                        <th>Object</th>
-                                        <th>User</th>
-                                        <th>Action</th>
-                                        <th>Timestamp</th>
+                                        <th>Tipo de objeto</th>
+                                        <th>Objeto</th>
+                                        <th>Usuario</th>
+                                        <th>Acción</th>
+                                        <th>Fecha y hora</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -434,13 +434,13 @@
                                     <tr>
                                         <td>
                                             {% if log.object_type == 'actividad' %}
-                                                <span class="badge bg-primary">Activity</span>
+                                                <span class="badge bg-primary">Actividad</span>
                                             {% elif log.object_type == 'tipo_actividad' %}
-                                                <span class="badge bg-secondary">Activity Type</span>
+                                                <span class="badge bg-secondary">Tipo de actividad</span>
                                             {% elif log.object_type == 'coordinador' %}
-                                                <span class="badge bg-warning text-dark">Coordinator</span>
+                                                <span class="badge bg-warning text-dark">Coordinador/a</span>
                                             {% else %}
-                                                <span class="badge bg-light text-dark">{{ log.object_type|title }}</span>
+                                                <span class="badge bg-light text-dark">{{ log.get_object_type_display }}</span>
                                             {% endif %}
                                         </td>
                                         <td title="{% if log.details %}{{ log.details }}{% endif %}">
@@ -448,21 +448,23 @@
                                         </td>
                                         <td>{{ log.usuario.username }}</td>
                                         <td>
-                                            {% if log.tipo_log == 'Creación' or log.tipo_log == 'Asignación' %}
-                                                <span class="badge bg-success">{{ log.tipo_log }}</span>
-                                            {% elif log.tipo_log == 'Modificación' %}
-                                                <span class="badge bg-info text-dark">{{ log.tipo_log }}</span>
-                                            {% elif log.tipo_log == 'Eliminación' %}
-                                                <span class="badge bg-danger">{{ log.tipo_log }}</span>
+                                            {% with badge=log.tipo_log_badge %}
+                                            {% if badge == 'success' %}
+                                                <span class="badge bg-success">{{ log.tipo_log_label }}</span>
+                                            {% elif badge == 'info' %}
+                                                <span class="badge bg-info text-dark">{{ log.tipo_log_label }}</span>
+                                            {% elif badge == 'danger' %}
+                                                <span class="badge bg-danger">{{ log.tipo_log_label }}</span>
                                             {% else %}
-                                                <span class="badge bg-secondary">{{ log.tipo_log }}</span>
+                                                <span class="badge bg-secondary">{{ log.tipo_log_label }}</span>
                                             {% endif %}
+                                            {% endwith %}
                                         </td>
-                                        <td>{{ log.timestamp|date:"M d, H:i" }}</td>
+                                        <td>{{ log.timestamp|date:"d M, H:i" }}</td>
                                     </tr>
                                     {% empty %}
                                     <tr>
-                                        <td colspan="5" class="text-center text-muted">No activity logs found</td>
+                                        <td colspan="5" class="text-center text-muted">No se han encontrado registros de actividad</td>
                                     </tr>
                                     {% endfor %}
                                 </tbody>
@@ -481,23 +483,23 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="createActivityTypeModalLabel">
-                    <i class="bi bi-plus-circle"></i> Create New Activity Type
+                    <i class="bi bi-plus-circle"></i> Crear nuevo tipo de actividad
                 </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
             <div class="modal-body">
                 <form id="createActivityTypeForm">
                     <div class="mb-3">
-                        <label for="createActivityTypeName" class="form-label">Activity Type Name</label>
+                        <label for="createActivityTypeName" class="form-label">Nombre del tipo de actividad</label>
                         <input type="text" class="form-control" id="createActivityTypeName" required>
-                        <div class="form-text">Enter a unique name for the activity type.</div>
+                        <div class="form-text">Introduce un nombre único para el tipo de actividad.</div>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                 <button type="button" class="btn btn-success" id="saveActivityTypeBtn">
-                    <i class="bi bi-check-circle"></i> Create
+                    <i class="bi bi-check-circle"></i> Crear
                 </button>
             </div>
         </div>
@@ -510,23 +512,23 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="editActivityTypeModalLabel">
-                    <i class="bi bi-pencil"></i> Edit Activity Type
+                    <i class="bi bi-pencil"></i> Editar tipo de actividad
                 </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
             <div class="modal-body">
                 <form id="editActivityTypeForm">
                     <div class="mb-3">
-                        <label for="editActivityTypeName" class="form-label">Activity Type Name</label>
+                        <label for="editActivityTypeName" class="form-label">Nombre del tipo de actividad</label>
                         <input type="text" class="form-control" id="editActivityTypeName" required>
-                        <div class="form-text">Enter a unique name for the activity type.</div>
+                        <div class="form-text">Introduce un nombre único para el tipo de actividad.</div>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                 <button type="button" class="btn btn-primary" id="updateActivityTypeBtn">
-                    <i class="bi bi-check-circle"></i> Update
+                    <i class="bi bi-check-circle"></i> Actualizar
                 </button>
             </div>
         </div>
@@ -539,25 +541,25 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="agendaSettingsModalLabel">
-                    <i class="bi bi-calendar-edit"></i> Update Agenda Settings
+                    <i class="bi bi-calendar-edit"></i> Actualizar configuración de la agenda
                 </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
             <div class="modal-body">
                 <form id="agendaSettingsForm">
                     <div class="mb-3">
-                        <label for="closingDateInput" class="form-label">Closing Date</label>
+                        <label for="closingDateInput" class="form-label">Fecha de cierre</label>
                         <input type="date" class="form-control" id="closingDateInput" required>
                         <div class="form-text">
-                            Activities before this date will be marked as past events in calendars.
+                            Las actividades anteriores a esta fecha se marcarán como eventos pasados en los calendarios.
                         </div>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                 <button type="button" class="btn btn-success" id="saveAgendaSettingsBtn">
-                    <i class="bi bi-check-circle"></i> Update Date
+                    <i class="bi bi-check-circle"></i> Actualizar fecha
                 </button>
             </div>
         </div>
@@ -570,9 +572,9 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="assignCoordinatorModalLabel">
-                    <i class="bi bi-person-gear"></i> Assign Coordinator
+                    <i class="bi bi-person-gear"></i> Asignar coordinador/a
                 </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
             <div class="modal-body">
                 <form id="assignCoordinatorForm">
@@ -581,9 +583,9 @@
                         <input type="text" class="form-control" id="titulacionName" readonly>
                     </div>
                     <div class="mb-3">
-                        <label for="coordinatorSelect" class="form-label">Select Coordinator</label>
+                        <label for="coordinatorSelect" class="form-label">Seleccionar coordinador/a</label>
                         <select class="form-select" id="coordinatorSelect" required>
-                            <option value="">-- Remove coordinator --</option>
+                            <option value="">-- Quitar coordinador/a --</option>
                             {% for user in all_users %}
                                 <option value="{{ user.id }}">
                                     {{ user.username }} - {{ user.first_name }} {{ user.last_name }} ({{ user.get_role_display }})
@@ -591,20 +593,20 @@
                             {% endfor %}
                         </select>
                         <div class="form-text">
-                            Users assigned as coordinators will automatically get COORDINATOR role (unless they are ADMIN).
+                            Los usuarios asignados como coordinadores recibirán automáticamente el rol de coordinador/a (salvo que sean administradores).
                         </div>
                     </div>
                     <div class="mb-2" id="currentCoordinatorInfo" style="display: none;">
                         <small class="text-muted">
-                            <strong>Current coordinator:</strong> <span id="currentCoordinatorName"></span>
+                            <strong>Coordinador/a actual:</strong> <span id="currentCoordinatorName"></span>
                         </small>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                 <button type="button" class="btn btn-success" id="saveCoordinatorBtn">
-                    <i class="bi bi-check-circle"></i> Assign
+                    <i class="bi bi-check-circle"></i> Asignar
                 </button>
             </div>
         </div>
@@ -617,15 +619,15 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="createProfileTypeModalLabel">
-                    <i class="bi bi-plus-circle"></i> Crear Nuevo Tipo de Perfil
+                    <i class="bi bi-plus-circle"></i> Crear nuevo tipo de perfil
                 </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
             <div class="modal-body">
                 <form id="createProfileTypeForm">
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label for="createProfileName" class="form-label">Nombre del Perfil</label>
+                            <label for="createProfileName" class="form-label">Nombre del perfil</label>
                             <input type="text" class="form-control" id="createProfileName" required>
                             <div class="form-text">Nombre descriptivo (ej: Comisión Docencia)</div>
                         </div>
@@ -670,15 +672,15 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="editProfileTypeModalLabel">
-                    <i class="bi bi-pencil"></i> Editar Tipo de Perfil
+                    <i class="bi bi-pencil"></i> Editar tipo de perfil
                 </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
             <div class="modal-body">
                 <form id="editProfileTypeForm">
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label for="editProfileName" class="form-label">Nombre del Perfil</label>
+                            <label for="editProfileName" class="form-label">Nombre del perfil</label>
                             <input type="text" class="form-control" id="editProfileName" required>
                         </div>
                         <div class="col-md-6 mb-3">
@@ -771,7 +773,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const name = document.getElementById('createActivityTypeName').value.trim();
         
         if (!name) {
-            showAlert('Please enter a name for the activity type', 'danger');
+            showAlert('Introduce un nombre para el tipo de actividad', 'danger');
             return;
         }
 
@@ -800,10 +802,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     <td class="tipo-name">${data.nombre}</td>
                     <td>
                         <button class="btn btn-sm btn-outline-primary edit-tipo-btn" data-tipo-id="${data.id}" data-tipo-name="${data.nombre}">
-                            <i class="bi bi-pencil"></i> Edit
+                            <i class="bi bi-pencil"></i> Editar
                         </button>
                         <button class="btn btn-sm btn-outline-danger delete-tipo-btn" data-tipo-id="${data.id}" data-tipo-name="${data.nombre}">
-                            <i class="bi bi-trash"></i> Delete
+                            <i class="bi bi-trash"></i> Eliminar
                         </button>
                     </td>
                 `;
@@ -814,13 +816,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 const modal = bootstrap.Modal.getInstance(document.getElementById('createActivityTypeModal'));
                 modal.hide();
                 
-                showAlert(`Activity type "${data.nombre}" created successfully!`, 'success');
+                showAlert(`¡Tipo de actividad "${data.nombre}" creado correctamente!`, 'success');
             } else {
                 showAlert(data.error, 'danger');
             }
         })
         .catch(error => {
-            showAlert('Error creating activity type', 'danger');
+            showAlert('Error al crear el tipo de actividad', 'danger');
             console.error('Error:', error);
         });
     });
@@ -845,12 +847,12 @@ document.addEventListener('DOMContentLoaded', function() {
         const name = document.getElementById('editActivityTypeName').value.trim();
         
         if (!name) {
-            showAlert('Please enter a name for the activity type', 'danger');
+            showAlert('Introduce un nombre para el tipo de actividad', 'danger');
             return;
         }
 
         if (!currentEditingTipoId) {
-            showAlert('No activity type selected for editing', 'danger');
+            showAlert('No se ha seleccionado ningún tipo de actividad para editar', 'danger');
             return;
         }
 
@@ -882,14 +884,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 const modal = bootstrap.Modal.getInstance(document.getElementById('editActivityTypeModal'));
                 modal.hide();
                 
-                showAlert(`Activity type updated to "${data.nombre}" successfully!`, 'success');
+                showAlert(`¡Tipo de actividad actualizado a "${data.nombre}" correctamente!`, 'success');
                 currentEditingTipoId = null;
             } else {
                 showAlert(data.error, 'danger');
             }
         })
         .catch(error => {
-            showAlert('Error updating activity type', 'danger');
+            showAlert('Error al actualizar el tipo de actividad', 'danger');
             console.error('Error:', error);
         });
     });
@@ -915,12 +917,12 @@ document.addEventListener('DOMContentLoaded', function() {
                         container.innerHTML = `
                             <p class="text-warning">
                                 <i class="bi bi-exclamation-triangle"></i>
-                                This activity type has <strong>${data.activities_count} associated activities</strong>.
+                                Este tipo de actividad tiene <strong>${data.activities_count} actividades asociadas</strong>.
                             </p>
                             <div class="form-check mb-2">
                                 <input class="form-check-input" type="radio" name="deleteAction" id="reassignAction" value="reassign" checked>
                                 <label class="form-check-label" for="reassignAction">
-                                    Reassign activities to another type:
+                                    Reasignar las actividades a otro tipo:
                                 </label>
                             </div>
                             <select class="form-select mb-3" id="reassignToSelect">
@@ -930,7 +932,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <input class="form-check-input" type="radio" name="deleteAction" id="cascadeAction" value="cascade">
                                 <label class="form-check-label text-danger" for="cascadeAction">
                                     <i class="bi bi-exclamation-triangle"></i>
-                                    Delete all associated activities (CASCADE DELETE - IRREVERSIBLE)
+                                    Eliminar todas las actividades asociadas (ELIMINACIÓN EN CASCADA - IRREVERSIBLE)
                                 </label>
                             </div>
                         `;
@@ -938,7 +940,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         container.innerHTML = `
                             <p class="text-success">
                                 <i class="bi bi-check-circle"></i>
-                                This activity type has no associated activities and can be safely deleted.
+                                Este tipo de actividad no tiene actividades asociadas y se puede eliminar sin riesgo.
                             </p>
                         `;
                     }
@@ -956,7 +958,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             })
             .catch(error => {
-                showAlert('Error loading deletion options', 'danger');
+                showAlert('Error al cargar las opciones de eliminación', 'danger');
                 console.error('Error:', error);
             });
         }
@@ -971,7 +973,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Confirm delete
     document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
         if (!currentDeletingTipoId) {
-            showAlert('No activity type selected for deletion', 'danger');
+            showAlert('No se ha seleccionado ningún tipo de actividad para eliminar', 'danger');
             return;
         }
 
@@ -983,7 +985,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (reassignAction && reassignAction.checked) {
             const reassignSelect = document.getElementById('reassignToSelect');
             if (!reassignSelect.value) {
-                showAlert('Please select a type to reassign activities to', 'danger');
+                showAlert('Selecciona un tipo al que reasignar las actividades', 'danger');
                 return;
             }
             deleteData = {
@@ -1018,11 +1020,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (tableBody.children.length === 0) {
                         const noDataRow = document.createElement('tr');
                         noDataRow.id = 'noActivityTypesRow';
-                        noDataRow.innerHTML = '<td colspan="2" class="text-center text-muted">No activity types found</td>';
+                        noDataRow.innerHTML = '<td colspan="2" class="text-center text-muted">No se han encontrado tipos de actividad</td>';
                         tableBody.appendChild(noDataRow);
                     }
                     
-                    showAlert(`Activity type "${typeName}" deleted successfully!`, 'success');
+                    showAlert(`¡Tipo de actividad "${typeName}" eliminado correctamente!`, 'success');
                 }
                 
                 // Hide the delete form
@@ -1033,7 +1035,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         })
         .catch(error => {
-            showAlert('Error deleting activity type', 'danger');
+            showAlert('Error al eliminar el tipo de actividad', 'danger');
             console.error('Error:', error);
         });
     });
@@ -1068,7 +1070,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const closingDate = document.getElementById('closingDateInput').value.trim();
         
         if (!closingDate) {
-            showAgendaAlert('Please select a closing date', 'danger');
+            showAgendaAlert('Selecciona una fecha de cierre', 'danger');
             return;
         }
 
@@ -1096,21 +1098,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Update button text and icon if it was a first-time setup
                 const buttonIcon = button.querySelector('i');
                 const buttonText = button.innerHTML;
-                if (buttonText.includes('Set Date')) {
-                    button.innerHTML = '<i class="bi bi-calendar-edit"></i> Change Date';
+                if (buttonText.includes('Establecer fecha')) {
+                    button.innerHTML = '<i class="bi bi-calendar-edit"></i> Cambiar fecha';
                 }
                 
                 // Close modal
                 const modal = bootstrap.Modal.getInstance(document.getElementById('agendaSettingsModal'));
                 modal.hide();
                 
-                showAgendaAlert(`Closing date updated to ${data.closing_date_display} successfully!`, 'success');
+                showAgendaAlert(`¡Fecha de cierre actualizada a ${data.closing_date_display} correctamente!`, 'success');
             } else {
                 showAgendaAlert(data.error, 'danger');
             }
         })
         .catch(error => {
-            showAgendaAlert('Error updating agenda settings', 'danger');
+            showAgendaAlert('Error al actualizar la configuración de la agenda', 'danger');
             console.error('Error:', error);
         });
     });
@@ -1173,7 +1175,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const coordinatorId = document.getElementById('coordinatorSelect').value || null;
         
         if (!currentTitulacionId) {
-            showCoordinatorAlert('No titulación selected', 'danger');
+            showCoordinatorAlert('No se ha seleccionado ninguna titulación', 'danger');
             return;
         }
 
@@ -1204,7 +1206,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         editBtn.setAttribute('data-current-coordinator-name', data.coordinator.username);
                     } else {
                         // Coordinator removed
-                        coordinatorCell.innerHTML = `<span class="badge bg-secondary">Not assigned</span>`;
+                        coordinatorCell.innerHTML = `<span class="badge bg-secondary">Sin asignar</span>`;
                         editBtn.setAttribute('data-current-coordinator', '');
                         editBtn.setAttribute('data-current-coordinator-name', '');
                     }
@@ -1214,9 +1216,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 const modal = bootstrap.Modal.getInstance(document.getElementById('assignCoordinatorModal'));
                 modal.hide();
                 
-                const action = data.coordinator ? 'assigned' : 'removed';
+                const action = data.coordinator ? 'asignado/a' : 'quitado/a';
                 const coordinatorName = data.coordinator ? data.coordinator.username : '';
-                showCoordinatorAlert(`Coordinator ${action} successfully${coordinatorName ? ' (' + coordinatorName + ')' : ''}!`, 'success');
+                showCoordinatorAlert(`¡Coordinador/a ${action} correctamente${coordinatorName ? ' (' + coordinatorName + ')' : ''}!`, 'success');
                 
                 currentTitulacionId = null;
             } else {
@@ -1224,7 +1226,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         })
         .catch(error => {
-            showCoordinatorAlert('Error updating coordinator assignment', 'danger');
+            showCoordinatorAlert('Error al actualizar la asignación de coordinador/a', 'danger');
             console.error('Error:', error);
         });
     });
@@ -1257,7 +1259,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const icono = document.getElementById('createProfileIcon').value.trim();
         
         if (!nombre || !codigo) {
-            showProfileAlert('Por favor complete el nombre y código del perfil', 'danger');
+            showProfileAlert('Completa el nombre y el código del perfil', 'danger');
             return;
         }
 
@@ -1324,13 +1326,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 const modal = bootstrap.Modal.getInstance(document.getElementById('createProfileTypeModal'));
                 modal.hide();
                 
-                showProfileAlert(`Tipo de perfil "${data.nombre}" creado exitosamente!`, 'success');
+                showProfileAlert(`¡Tipo de perfil "${data.nombre}" creado correctamente!`, 'success');
             } else {
                 showProfileAlert(data.error, 'danger');
             }
         })
         .catch(error => {
-            showProfileAlert('Error creando tipo de perfil', 'danger');
+            showProfileAlert('Error al crear el tipo de perfil', 'danger');
             console.error('Error:', error);
         });
     });
@@ -1367,7 +1369,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const icono = document.getElementById('editProfileIcon').value.trim();
         
         if (!nombre || !codigo) {
-            showProfileAlert('Por favor complete el nombre y código del perfil', 'danger');
+            showProfileAlert('Completa el nombre y el código del perfil', 'danger');
             return;
         }
 
@@ -1422,14 +1424,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 const modal = bootstrap.Modal.getInstance(document.getElementById('editProfileTypeModal'));
                 modal.hide();
                 
-                showProfileAlert(`Tipo de perfil "${data.nombre}" actualizado exitosamente!`, 'success');
+                showProfileAlert(`¡Tipo de perfil "${data.nombre}" actualizado correctamente!`, 'success');
                 currentEditingProfileId = null;
             } else {
                 showProfileAlert(data.error, 'danger');
             }
         })
         .catch(error => {
-            showProfileAlert('Error actualizando tipo de perfil', 'danger');
+            showProfileAlert('Error al actualizar el tipo de perfil', 'danger');
             console.error('Error:', error);
         });
     });
@@ -1458,13 +1460,13 @@ document.addEventListener('DOMContentLoaded', function() {
                             card.remove();
                         }
                         
-                        showProfileAlert(`Tipo de perfil "${profileName}" eliminado exitosamente!`, 'success');
+                        showProfileAlert(`¡Tipo de perfil "${profileName}" eliminado correctamente!`, 'success');
                     } else {
                         showProfileAlert(data.error, 'danger');
                     }
                 })
                 .catch(error => {
-                    showProfileAlert('Error eliminando tipo de perfil', 'danger');
+                    showProfileAlert('Error al eliminar el tipo de perfil', 'danger');
                     console.error('Error:', error);
                 });
             }

@@ -210,7 +210,7 @@ class MultiGroupActivityForm(forms.Form):
         try:
             grupos = json.loads(grupos_data)
             if not grupos:
-                raise forms.ValidationError("Debe añadir al menos un grupo.")
+                raise forms.ValidationError("Añade al menos un grupo.")
 
             # Process and localize datetime fields for each group
             for grupo in grupos:
@@ -340,7 +340,7 @@ class UnifiedActivityForm(forms.Form):
         try:
             grupos = json.loads(grupos_data) if grupos_data else []
             if not grupos:
-                raise forms.ValidationError("Debe añadir al menos un grupo.")
+                raise forms.ValidationError("Añade al menos un grupo.")
 
             # Process and localize datetime fields for each group
             for grupo in grupos:

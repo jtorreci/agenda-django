@@ -7,6 +7,10 @@ import uuid
 class TipoActividad(models.Model):
     nombre = models.CharField(max_length=255)
 
+    class Meta:
+        verbose_name = 'tipo de actividad'
+        verbose_name_plural = 'tipos de actividad'
+
     def __str__(self):
         return self.nombre
 
@@ -26,8 +30,8 @@ class ActividadGrupo(models.Model):
     class Meta:
         ordering = ['orden', 'fecha_inicio']
         unique_together = ['actividad', 'nombre_grupo']
-        verbose_name = "Grupo de Actividad"
-        verbose_name_plural = "Grupos de Actividades"
+        verbose_name = "grupo de actividad"
+        verbose_name_plural = "grupos de actividades"
     
     def __str__(self):
         return f"{self.actividad.nombre} - Grupo {self.nombre_grupo}"
@@ -87,15 +91,15 @@ class Actividad(models.Model):
 
     nombre = models.CharField(max_length=255)
     asignaturas = models.ManyToManyField(Asignatura)
-    tipo_actividad = models.ForeignKey(TipoActividad, on_delete=models.CASCADE)
+    tipo_actividad = models.ForeignKey(TipoActividad, on_delete=models.CASCADE, verbose_name='tipo de actividad')
     # Every activity belongs to exactly one academic year. Only activities of the
     # active year are editable; new activities always get the active year.
     academic_year = models.ForeignKey(
-        AcademicYear, on_delete=models.PROTECT, related_name='activities'
+        AcademicYear, on_delete=models.PROTECT, related_name='activities', verbose_name='curso académico'
     )
     # Source activity when this one was imported from a previous academic year.
     copied_from = models.ForeignKey(
-        'self', on_delete=models.SET_NULL, null=True, blank=True, related_name='copies'
+        'self', on_delete=models.SET_NULL, null=True, blank=True, related_name='copies', verbose_name='copiada de'
     )
 
     # Campo estado principal
@@ -107,11 +111,11 @@ class Actividad(models.Model):
     )
 
     # Campos que se migrarán a ActividadGrupo - mantener temporalmente
-    fecha_inicio = models.DateTimeField()
-    fecha_fin = models.DateTimeField()
-    descripcion = models.TextField(blank=True, null=True)
+    fecha_inicio = models.DateTimeField('fecha de inicio')
+    fecha_fin = models.DateTimeField('fecha de fin')
+    descripcion = models.TextField('descripción', blank=True, null=True)
     evaluable = models.BooleanField(default=False)
-    porcentaje_evaluacion = models.DecimalField(max_digits=5, decimal_places=2, default=0.0)
+    porcentaje_evaluacion = models.DecimalField('porcentaje de evaluación', max_digits=5, decimal_places=2, default=0.0)
     no_recuperable = models.BooleanField(default=False)
     aprobada = models.BooleanField(default=False)  # Mantiene lógica de workflow independiente
 
@@ -123,6 +127,8 @@ class Actividad(models.Model):
     objects = ActividadManager()
 
     class Meta:
+        verbose_name = 'actividad'
+        verbose_name_plural = 'actividades'
         constraints = [
             models.UniqueConstraint(
                 fields=['copied_from', 'academic_year'],
@@ -185,7 +191,7 @@ class Actividad(models.Model):
         self.aprobada = approved_status
         if modified_by:
             self._modified_by = modified_by
-            self._version_comment = f'Approval status changed to {approved_status}'
+            self._version_comment = f'Estado de aprobación cambiado a {"aprobada" if approved_status else "no aprobada"}'
         self.save()
 
     # Métodos para gestión de estados
@@ -280,26 +286,61 @@ class Actividad(models.Model):
 
 class LogActividad(models.Model):
     OBJECT_TYPE_CHOICES = [
-        ('actividad', 'Activity'),
-        ('tipo_actividad', 'Activity Type'),
-        ('coordinador', 'Coordinator Assignment'),
+        ('actividad', 'Actividad'),
+        ('tipo_actividad', 'Tipo de actividad'),
+        ('coordinador', 'Asignación de coordinador'),
     ]
+
+    # tipo_log stores historical values (some in English, some in Spanish).
+    # Stored values must not change; these maps only drive the Spanish display.
+    TIPO_LOG_LABELS = {
+        'Creation': 'Creación',
+        'Modification': 'Modificación',
+        'Deletion': 'Eliminación',
+        'Reactivation': 'Reactivación',
+        'Restoration': 'Restauración',
+        'Archive': 'Archivado',
+        'Version Restore': 'Restauración de versión',
+        'Report Generation': 'Generación de informe',
+        'iCal Generation': 'Generación de iCal',
+        'iCal Deletion': 'Eliminación de iCal',
+        'Aprobación desde Dashboard': 'Aprobación desde el panel',
+        'Desaprobación desde Dashboard': 'Desaprobación desde el panel',
+    }
+    TIPO_LOG_BADGES = {
+        'Creación': 'success',
+        'Asignación': 'success',
+        'Modificación': 'info',
+        'Eliminación': 'danger',
+    }
     
     id_log = models.AutoField(primary_key=True)
     # Keep actividad field for backward compatibility, but make it optional
     actividad = models.ForeignKey(Actividad, on_delete=models.CASCADE, null=True, blank=True)
     # New fields for generic logging
-    object_type = models.CharField(max_length=20, choices=OBJECT_TYPE_CHOICES, default='actividad')
-    object_name = models.CharField(max_length=255)  # Name of the object being logged
-    object_id = models.PositiveIntegerField(null=True, blank=True)  # ID of the object being logged
+    object_type = models.CharField('tipo de objeto', max_length=20, choices=OBJECT_TYPE_CHOICES, default='actividad')
+    object_name = models.CharField('nombre del objeto', max_length=255)  # Name of the object being logged
+    object_id = models.PositiveIntegerField('id del objeto', null=True, blank=True)  # ID of the object being logged
     
-    timestamp = models.DateTimeField(auto_now_add=True)
+    timestamp = models.DateTimeField('fecha y hora', auto_now_add=True)
     usuario = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    tipo_log = models.CharField(max_length=50)
-    details = models.TextField(blank=True, null=True)  # Additional details about the action
+    tipo_log = models.CharField('tipo de registro', max_length=50)
+    details = models.TextField('detalles', blank=True, null=True)  # Additional details about the action
 
     class Meta:
+        verbose_name = 'registro de actividad'
+        verbose_name_plural = 'registros de actividad'
         ordering = ['-timestamp']
+
+    @property
+    def tipo_log_label(self):
+        """Spanish label for the stored log type."""
+        return self.TIPO_LOG_LABELS.get(self.tipo_log, self.tipo_log)
+
+    @property
+    def tipo_log_badge(self):
+        """Bootstrap badge colour for the log type."""
+        return self.TIPO_LOG_BADGES.get(self.tipo_log_label, 'secondary')
 
     def __str__(self):
         return f"Log {self.tipo_log} for {self.object_type}: {self.object_name} by {self.usuario.username} at {self.timestamp}"
@@ -308,8 +349,12 @@ class VistaCalendario(models.Model):
     nombre = models.CharField(max_length=255)
     usuario = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     asignaturas = models.ManyToManyField(Asignatura)
-    tipos_actividad = models.ManyToManyField(TipoActividad)
+    tipos_actividad = models.ManyToManyField(TipoActividad, verbose_name='tipos de actividad')
     token = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+
+    class Meta:
+        verbose_name = 'calendario'
+        verbose_name_plural = 'calendarios'
 
     def __str__(self):
         return self.nombre
@@ -342,6 +387,8 @@ class ActividadVersion(models.Model):
     tipo_actividad_snapshot = models.JSONField(default=dict)  # Store tipo_actividad ID and name
 
     class Meta:
+        verbose_name = 'versión de actividad'
+        verbose_name_plural = 'versiones de actividad'
         ordering = ['-fecha_modificacion']
         unique_together = ['actividad_original', 'version_numero']
 
@@ -352,4 +399,4 @@ class ActividadVersion(models.Model):
         """Return comma-separated list of asignatura names from snapshot"""
         if self.asignaturas_snapshot:
             return ', '.join([asig['nombre'] for asig in self.asignaturas_snapshot])
-        return 'N/A'
+        return 'N/D'

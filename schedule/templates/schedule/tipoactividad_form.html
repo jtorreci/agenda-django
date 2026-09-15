@@ -1,11 +1,13 @@
 {% extends 'base.html' %}
 
+{% block title %}Tipo de actividad{% endblock %}
+
 {% block content %}
-  <h2>{% if object %}Editar{% else %}Crear{% endif %} Tipo de Actividad</h2>
+  <h2>{% if object %}Editar{% else %}Crear{% endif %} tipo de actividad</h2>
   <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
     <button type="submit" class="btn btn-success">Guardar</button>
-    <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+    <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">Volver al panel</a>
   </form>
 {% endblock %}

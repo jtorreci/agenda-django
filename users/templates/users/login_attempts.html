@@ -1,14 +1,16 @@
 {% extends 'base.html' %}
 
+{% block title %}Intentos de inicio de sesión{% endblock %}
+
 {% block content %}
-  <h2>Login Attempts</h2>
+  <h2>Intentos de inicio de sesión</h2>
   <table class="table">
     <thead>
       <tr>
-        <th>Timestamp</th>
-        <th>Username</th>
-        <th>IP Address</th>
-        <th>Result</th>
+        <th>Fecha y hora</th>
+        <th>Nombre de usuario</th>
+        <th>Dirección IP</th>
+        <th>Resultado</th>
       </tr>
     </thead>
     <tbody>
@@ -17,7 +19,7 @@
           <td>{{ attempt.timestamp }}</td>
           <td>{{ attempt.username }}</td>
           <td>{{ attempt.ip_address }}</td>
-          <td>{% if attempt.success %}Success{% else %}Failed{% endif %}</td>
+          <td>{% if attempt.success %}Correcto{% else %}Fallido{% endif %}</td>
         </tr>
       {% endfor %}
     </tbody>
