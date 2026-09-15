@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load widget_tweaks %}
 
-{% block title %}{% if is_edit %}Editar{% else %}Crear{% endif %} Actividad Multi-Grupo{% endblock %}
+{% block title %}{% if is_edit %}Editar{% else %}Crear{% endif %} actividad multigrupo{% endblock %}
 
 {% block extra_head %}
     <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.bootstrap5.min.css" rel="stylesheet">
@@ -39,16 +39,16 @@
                 <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
                     <h3 class="mb-0">
                         {% if is_edit %}
-                            <i class="bi bi-pencil"></i> Editar Actividad Multi-Grupo
+                            <i class="bi bi-pencil"></i> Editar actividad multigrupo
                         {% else %}
-                            <i class="bi bi-plus-circle"></i> Crear Actividad Multi-Grupo
+                            <i class="bi bi-plus-circle"></i> Crear actividad multigrupo
                         {% endif %}
                     </h3>
                 </div>
                 <div class="card-body">
                     <div class="alert alert-info">
                         <i class="bi bi-info-circle"></i>
-                        <strong>¿Qué es una actividad multi-grupo?</strong><br>
+                        <strong>¿Qué es una actividad multigrupo?</strong><br>
                         Use este formulario cuando la misma actividad se realice en diferentes grupos de la misma asignatura, 
                         cada uno con fechas/horarios específicos. La aplicación creará automáticamente actividades 
                         individuales para cada grupo.
@@ -72,12 +72,12 @@
                         <!-- Datos comunes de la actividad -->
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="{{ form.nombre.id_for_label }}" class="form-label">Nombre de la Actividad</label>
-                                {% render_field form.nombre class="form-control" placeholder="ej. Examen Final" %}
+                                <label for="{{ form.nombre.id_for_label }}" class="form-label">Nombre de la actividad</label>
+                                {% render_field form.nombre class="form-control" placeholder="p. ej., Examen final" %}
                             </div>
                             
                             <div class="col-md-6 mb-3">
-                                <label for="{{ form.tipo_actividad.id_for_label }}" class="form-label">Tipo de Actividad</label>
+                                <label for="{{ form.tipo_actividad.id_for_label }}" class="form-label">Tipo de actividad</label>
                                 {% render_field form.tipo_actividad class="form-select" %}
                             </div>
                         </div>
@@ -107,7 +107,7 @@
                             <div class="col-md-4 mb-3">
                                 <div class="form-check">
                                     {% render_field form.no_recuperable class="form-check-input" %}
-                                    <label for="{{ form.no_recuperable.id_for_label }}" class="form-check-label">No Recuperable</label>
+                                    <label for="{{ form.no_recuperable.id_for_label }}" class="form-check-label">No recuperable</label>
                                 </div>
                             </div>
                         </div>
@@ -116,9 +116,9 @@
 
                         <!-- Sección de grupos -->
                         <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h5><i class="bi bi-people"></i> Grupos y Horarios</h5>
+                            <h5><i class="bi bi-people"></i> Grupos y horarios</h5>
                             <button type="button" id="add-group-btn" class="btn btn-success btn-sm">
-                                <i class="bi bi-plus"></i> Añadir Grupo
+                                <i class="bi bi-plus"></i> Añadir grupo
                             </button>
                         </div>
 
@@ -133,7 +133,7 @@
                                 <i class="bi bi-arrow-left"></i> Cancelar
                             </a>
                             <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-check"></i> {% if is_edit %}Actualizar{% else %}Crear{% endif %} Actividades
+                                <i class="bi bi-check"></i> {% if is_edit %}Actualizar{% else %}Crear{% endif %} actividades
                             </button>
                         </div>
                     </form>
@@ -249,19 +249,19 @@ input[type="datetime-local"].group-end {
                     
                     <div class="row">
                         <div class="col-md-2 mb-3">
-                            <label class="form-label">Nombre del Grupo</label>
+                            <label class="form-label">Nombre del grupo</label>
                             <input type="text" class="form-control group-name"
-                                   placeholder="ej. A, B, 1, 2" value="${data.grupo || ''}">
+                                   placeholder="p. ej., A, B, 1, 2" value="${data.grupo || ''}">
                         </div>
 
                         <div class="col-md-4 mb-3">
-                            <label class="form-label">Fecha/Hora Inicio</label>
+                            <label class="form-label">Fecha y hora de inicio</label>
                             <input type="datetime-local" class="form-control group-start"
                                    value="${data.fecha_inicio || ''}">
                         </div>
 
                         <div class="col-md-4 mb-3">
-                            <label class="form-label">Fecha/Hora Fin</label>
+                            <label class="form-label">Fecha y hora de fin</label>
                             <input type="datetime-local" class="form-control group-end"
                                    value="${data.fecha_fin || ''}">
                         </div>
@@ -269,7 +269,7 @@ input[type="datetime-local"].group-end {
                         <div class="col-md-2 mb-3">
                             <label class="form-label">Lugar</label>
                             <input type="text" class="form-control group-lugar"
-                                   placeholder="ej. Aula A1, Lab. Informática" value="${data.lugar || ''}">
+                                   placeholder="p. ej., Aula A1, Lab. Informática" value="${data.lugar || ''}">
                         </div>
                         
                         <div class="col-md-12 mb-3">
@@ -285,7 +285,7 @@ input[type="datetime-local"].group-end {
                                     <div class="form-check">
                                         <input class="form-check-input sync-prefix" type="checkbox" checked>
                                         <label class="form-check-label">
-                                            <i class="bi bi-arrow-down-square"></i> Copiar prefijo de descripción del Grupo #1
+                                            <i class="bi bi-arrow-down-square"></i> Copiar prefijo de descripción del grupo #1
                                         </label>
                                         <div class="form-text">Se copiará la descripción del primer grupo como prefijo, manteniendo el resto del texto.</div>
                                     </div>
@@ -294,7 +294,7 @@ input[type="datetime-local"].group-end {
                                     <div class="form-check">
                                         <input class="form-check-input sync-full" type="checkbox" checked>
                                         <label class="form-check-label">
-                                            <i class="bi bi-arrow-repeat"></i> Sincronizar completamente con Grupo #1
+                                            <i class="bi bi-arrow-repeat"></i> Sincronizar completamente con el grupo #1
                                         </label>
                                         <div class="form-text">Se copiarán fechas, lugar y descripción completa del primer grupo.</div>
                                     </div>

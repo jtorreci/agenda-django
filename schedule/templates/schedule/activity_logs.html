@@ -1,17 +1,19 @@
 {% extends 'base.html' %} {# Assuming a base.html exists for common layout #}
 
+{% block title %}Registro de actividades{% endblock %}
+
 {% block content %}
 <div class="container mt-4">
-    <h2>Activity Logs</h2>
+    <h2>Registro de actividades</h2>
     <table class="table table-striped">
         <thead>
             <tr>
-                <th>Object Type</th>
-                <th>Object</th>
-                <th>User</th>
-                <th>Action</th>
-                <th>Details</th>
-                <th>Timestamp</th>
+                <th>Tipo de objeto</th>
+                <th>Objeto</th>
+                <th>Usuario</th>
+                <th>Acción</th>
+                <th>Detalles</th>
+                <th>Fecha y hora</th>
             </tr>
         </thead>
         <tbody>
@@ -19,55 +21,57 @@
             <tr>
                 <td>
                     {% if log.object_type == 'actividad' %}
-                        <span class="badge bg-primary">Activity</span>
+                        <span class="badge bg-primary">Actividad</span>
                     {% elif log.object_type == 'tipo_actividad' %}
-                        <span class="badge bg-secondary">Activity Type</span>
+                        <span class="badge bg-secondary">Tipo de actividad</span>
                     {% elif log.object_type == 'coordinador' %}
-                        <span class="badge bg-warning text-dark">Coordinator</span>
+                        <span class="badge bg-warning text-dark">Coordinador/a</span>
                     {% else %}
-                        <span class="badge bg-light text-dark">{{ log.object_type|title }}</span>
+                        <span class="badge bg-light text-dark">{{ log.get_object_type_display }}</span>
                     {% endif %}
                 </td>
                 <td>{{ log.object_name }}</td>
                 <td>{{ log.usuario.username }}</td>
                 <td>
-                    {% if log.tipo_log == 'Creación' or log.tipo_log == 'Asignación' %}
-                        <span class="badge bg-success">{{ log.tipo_log }}</span>
-                    {% elif log.tipo_log == 'Modificación' %}
-                        <span class="badge bg-info text-dark">{{ log.tipo_log }}</span>
-                    {% elif log.tipo_log == 'Eliminación' %}
-                        <span class="badge bg-danger">{{ log.tipo_log }}</span>
+                    {% with badge=log.tipo_log_badge %}
+                    {% if badge == 'success' %}
+                        <span class="badge bg-success">{{ log.tipo_log_label }}</span>
+                    {% elif badge == 'info' %}
+                        <span class="badge bg-info text-dark">{{ log.tipo_log_label }}</span>
+                    {% elif badge == 'danger' %}
+                        <span class="badge bg-danger">{{ log.tipo_log_label }}</span>
                     {% else %}
-                        <span class="badge bg-secondary">{{ log.tipo_log }}</span>
+                        <span class="badge bg-secondary">{{ log.tipo_log_label }}</span>
                     {% endif %}
+                    {% endwith %}
                 </td>
                 <td>
                     {% if log.details %}
                         {{ log.details|truncatechars:100 }}
                     {% elif log.actividad %}
                         <!-- Backward compatibility for old logs -->
-                        Activity: {{ log.actividad.nombre }}
+                        Actividad: {{ log.actividad.nombre }}
                         {% if log.actividad.asignaturas.exists %}
                             <br><small class="text-muted">
-                                Subjects: {% for asignatura in log.actividad.asignaturas.all %}{{ asignatura.nombre }}{% if not forloop.last %}, {% endif %}{% endfor %}
+                                Asignaturas: {% for asignatura in log.actividad.asignaturas.all %}{{ asignatura.nombre }}{% if not forloop.last %}, {% endif %}{% endfor %}
                             </small>
                         {% endif %}
                     {% else %}
                         -
                     {% endif %}
                 </td>
-                <td>{{ log.timestamp|date:"M d, Y H:i" }}</td>
+                <td>{{ log.timestamp|date:"d M Y, H:i" }}</td>
             </tr>
             {% empty %}
             <tr>
-                <td colspan="6" class="text-center text-muted">No activity logs found.</td>
+                <td colspan="6" class="text-center text-muted">No se han encontrado registros de actividad.</td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
     <div class="mt-3">
         <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">
-            <i class="bi bi-arrow-left"></i> Back to Dashboard
+            <i class="bi bi-arrow-left"></i> Volver al panel
         </a>
     </div>
 </div>

@@ -1,7 +1,6 @@
 {% extends 'base.html' %}
-{% load i18n %}
 
-{% block title %}{% trans "Logged Out" %} - Agenda Académica{% endblock %}
+{% block title %}Sesión cerrada - Agenda Académica{% endblock %}
 
 {% block extra_head %}
 <style>
@@ -183,9 +182,9 @@
         <div class="logout-header">
             <h2>
                 <i class="bi bi-check-circle me-2"></i>
-                {% trans "Session Ended" %}
+                Sesión finalizada
             </h2>
-            <p>{% trans "You have been logged out successfully" %}</p>
+            <p>Has cerrado sesión correctamente</p>
         </div>
         
         <div class="logout-body">
@@ -194,21 +193,21 @@
             </div>
             
             <div class="logout-message">
-                {% trans "Thank you for using Agenda Académica" %}
+                Gracias por usar Agenda Académica
             </div>
             
             <div class="logout-submessage">
-                {% trans "Your session has been securely closed. All your data is safe." %}
+                Tu sesión se ha cerrado de forma segura. Todos tus datos están a salvo.
             </div>
             
             <div class="d-flex justify-content-center flex-wrap">
                 <a href="{% url 'login' %}" class="btn-login-again">
                     <i class="bi bi-box-arrow-in-right me-2"></i>
-                    {% trans "Login Again" %}
+                    Volver a iniciar sesión
                 </a>
                 <a href="{% url 'home' %}" class="btn-home">
                     <i class="bi bi-house me-2"></i>
-                    {% trans "Go to Home" %}
+                    Ir al inicio
                 </a>
             </div>
         </div>

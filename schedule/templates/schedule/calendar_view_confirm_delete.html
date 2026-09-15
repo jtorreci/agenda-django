@@ -1,15 +1,15 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-    <title>Confirm Delete Calendar View</title>
+    <title>Confirmar eliminación del calendario</title>
 </head>
 <body>
-    <h2>Confirm Delete Calendar View</h2>
-    <p>Are you sure you want to delete "{{ calendar_view.nombre }}"?</p>
+    <h2>Confirmar eliminación del calendario</h2>
+    <p>¿Seguro que quieres eliminar «{{ calendar_view.nombre }}»?</p>
     <form method="post">
         {% csrf_token %}
-        <button type="submit">Yes, delete</button>
+        <button type="submit">Sí, eliminar</button>
     </form>
-    <p><a href="{% url 'calendar_view_panel' %}">Cancel</a></p>
+    <p><a href="{% url 'calendar_view_panel' %}">Cancelar</a></p>
 </body>
 </html>

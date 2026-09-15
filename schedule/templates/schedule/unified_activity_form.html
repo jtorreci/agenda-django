@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load widget_tweaks %}
 
-{% block title %}{% if is_edit %}Editar{% else %}Crear{% endif %} Actividad{% endblock %}
+{% block title %}{% if is_edit %}Editar{% else %}Crear{% endif %} actividad{% endblock %}
 
 {% block extra_head %}
     <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.bootstrap5.min.css" rel="stylesheet">
@@ -69,9 +69,9 @@
                 <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
                     <h3 class="mb-0">
                         {% if is_edit %}
-                            <i class="bi bi-pencil"></i> Editar Actividad
+                            <i class="bi bi-pencil"></i> Editar actividad
                         {% else %}
-                            <i class="bi bi-plus-circle"></i> Crear Actividad
+                            <i class="bi bi-plus-circle"></i> Crear actividad
                         {% endif %}
                     </h3>
                 </div>
@@ -94,12 +94,12 @@
                         <!-- Datos comunes de la actividad -->
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="{{ form.nombre.id_for_label }}" class="form-label">Nombre de la Actividad</label>
-                                {% render_field form.nombre class="form-control" placeholder="ej. Examen Final" %}
+                                <label for="{{ form.nombre.id_for_label }}" class="form-label">Nombre de la actividad</label>
+                                {% render_field form.nombre class="form-control" placeholder="p. ej., Examen final" %}
                             </div>
                             
                             <div class="col-md-6 mb-3">
-                                <label for="{{ form.tipo_actividad.id_for_label }}" class="form-label">Tipo de Actividad</label>
+                                <label for="{{ form.tipo_actividad.id_for_label }}" class="form-label">Tipo de actividad</label>
                                 {% render_field form.tipo_actividad class="form-select" %}
                             </div>
                         </div>
@@ -129,7 +129,7 @@
                             <div class="col-md-4 mb-3">
                                 <div class="form-check">
                                     {% render_field form.no_recuperable class="form-check-input" %}
-                                    <label for="{{ form.no_recuperable.id_for_label }}" class="form-check-label">No Recuperable</label>
+                                    <label for="{{ form.no_recuperable.id_for_label }}" class="form-check-label">No recuperable</label>
                                 </div>
                             </div>
                         </div>
@@ -138,16 +138,16 @@
 
                         <!-- Selector de tipo de actividad -->
                         <div class="mb-3">
-                            <h5><i class="bi bi-gear"></i> Configuración de Grupos</h5>
+                            <h5><i class="bi bi-gear"></i> Configuración de grupos</h5>
                             <div class="btn-group w-100" role="group" aria-label="Tipo de actividad">
                                 <input type="radio" class="btn-check" name="activity_type" id="individual_type" value="individual" checked>
                                 <label class="btn btn-outline-primary" for="individual_type">
-                                    <i class="bi bi-person"></i> Actividad Individual
+                                    <i class="bi bi-person"></i> Actividad individual
                                 </label>
 
                                 <input type="radio" class="btn-check" name="activity_type" id="multi_group_type" value="multi_group">
                                 <label class="btn btn-outline-warning" for="multi_group_type">
-                                    <i class="bi bi-people"></i> Actividad Multi-Grupo
+                                    <i class="bi bi-people"></i> Actividad multigrupo
                                 </label>
                             </div>
                         </div>
@@ -155,12 +155,12 @@
                         <!-- Información del tipo seleccionado -->
                         <div id="individual-info" class="activity-type-info individual-info">
                             <i class="bi bi-info-circle"></i>
-                            <strong>Actividad Individual:</strong> Se creará una actividad con un solo grupo y horario.
+                            <strong>Actividad individual:</strong> Se creará una actividad con un solo grupo y horario.
                         </div>
 
                         <div id="multi-group-info" class="activity-type-info multi-group-info" style="display: none;">
                             <i class="bi bi-info-circle"></i>
-                            <strong>Actividad Multi-Grupo:</strong> Misma actividad para diferentes grupos con horarios específicos.
+                            <strong>Actividad multigrupo:</strong> Misma actividad para diferentes grupos con horarios específicos.
                         </div>
 
                         <!-- Contenedor para grupos (siempre presente) -->
@@ -168,7 +168,7 @@
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <h5 id="groups-title"><i class="bi bi-calendar"></i> Horario</h5>
                                 <button type="button" id="add-group-btn" class="btn btn-success btn-sm" style="display: none;">
-                                    <i class="bi bi-plus"></i> Añadir Grupo
+                                    <i class="bi bi-plus"></i> Añadir grupo
                                 </button>
                             </div>
 
@@ -184,7 +184,7 @@
                                 <i class="bi bi-arrow-left"></i> Cancelar
                             </a>
                             <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-check"></i> {% if is_edit %}Actualizar{% else %}Crear{% endif %} Actividad
+                                <i class="bi bi-check"></i> {% if is_edit %}Actualizar{% else %}Crear{% endif %} actividad
                             </button>
                         </div>
                     </form>
@@ -241,7 +241,7 @@
                 if (isMultiGroup) {
                     // Multi-group mode
                     addGroupBtn.style.display = 'inline-block';
-                    groupsTitle.innerHTML = '<i class="bi bi-people"></i> Grupos y Horarios';
+                    groupsTitle.innerHTML = '<i class="bi bi-people"></i> Grupos y horarios';
                     individualInfo.style.display = 'none';
                     multiGroupInfo.style.display = 'block';
                     
@@ -293,19 +293,19 @@
                     
                     <div class="row">
                         <div class="col-md-${isMultiGroup ? '2' : '3'} mb-3" ${isMultiGroup ? '' : 'style="display: none;"'}>
-                            <label class="form-label">Nombre del Grupo</label>
+                            <label class="form-label">Nombre del grupo</label>
                             <input type="text" class="form-control group-name"
-                                   placeholder="ej. A, B, 1, 2" value="${groupName || data.grupo || ''}">
+                                   placeholder="p. ej., A, B, 1, 2" value="${groupName || data.grupo || ''}">
                         </div>
 
                         <div class="col-md-${isMultiGroup ? '4' : '4'} mb-3">
-                            <label class="form-label">Fecha/Hora Inicio</label>
+                            <label class="form-label">Fecha y hora de inicio</label>
                             <input type="datetime-local" class="form-control group-start"
                                    value="${data.fecha_inicio || ''}" required>
                         </div>
 
                         <div class="col-md-${isMultiGroup ? '4' : '4'} mb-3">
-                            <label class="form-label">Fecha/Hora Fin</label>
+                            <label class="form-label">Fecha y hora de fin</label>
                             <input type="datetime-local" class="form-control group-end"
                                    value="${data.fecha_fin || ''}" required>
                         </div>
@@ -313,7 +313,7 @@
                         <div class="col-md-${isMultiGroup ? '2' : '4'} mb-3">
                             <label class="form-label">Lugar</label>
                             <input type="text" class="form-control group-lugar"
-                                   placeholder="ej. Aula A1, Lab. Informática" value="${data.lugar || ''}">
+                                   placeholder="p. ej., Aula A1, Lab. Informática" value="${data.lugar || ''}">
                         </div>
                         
                         <div class="col-md-12 mb-3">
@@ -329,7 +329,7 @@
                                     <div class="form-check">
                                         <input class="form-check-input sync-prefix" type="checkbox">
                                         <label class="form-check-label">
-                                            <i class="bi bi-arrow-down-square"></i> Copiar prefijo de descripción del Grupo #1
+                                            <i class="bi bi-arrow-down-square"></i> Copiar prefijo de descripción del grupo #1
                                         </label>
                                         <div class="form-text">Se copiará la descripción del primer grupo como prefijo, manteniendo el resto del texto.</div>
                                     </div>
@@ -338,7 +338,7 @@
                                     <div class="form-check">
                                         <input class="form-check-input sync-full" type="checkbox">
                                         <label class="form-check-label">
-                                            <i class="bi bi-arrow-repeat"></i> Sincronizar completamente con Grupo #1
+                                            <i class="bi bi-arrow-repeat"></i> Sincronizar completamente con el grupo #1
                                         </label>
                                         <div class="form-text">Se copiarán fechas, lugar y descripción completa del primer grupo.</div>
                                     </div>

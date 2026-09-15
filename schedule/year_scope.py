@@ -13,8 +13,8 @@ from academics.models import AcademicYear
 YEAR_PARAM = 'academic_year'
 
 READ_ONLY_MESSAGE = (
-    'La actividad "%(name)s" pertenece al curso %(year)s, que no es el curso activo. '
-    'Las actividades de cursos anteriores son de solo lectura.'
+    'La actividad "%(name)s" pertenece al curso académico %(year)s, que no es el curso académico activo. '
+    'Las actividades de cursos académicos anteriores son de solo lectura.'
 )
 
 

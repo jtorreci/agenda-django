@@ -1,71 +1,71 @@
 {% extends 'base.html' %}
 
-{% block title %}Version {{ version.version_numero }} - {{ activity.nombre }}{% endblock %}
+{% block title %}Versión {{ version.version_numero }} - {{ activity.nombre }}{% endblock %}
 
 {% block content %}
 <div class="container mt-4">
     <div class="row">
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2><i class="bi bi-archive"></i> Version {{ version.version_numero }} Details</h2>
+                <h2><i class="bi bi-archive"></i> Detalles de la versión {{ version.version_numero }}</h2>
                 <div>
                     {% if not activity.is_read_only %}
                     <a href="{% url 'activity_restore_version' activity.pk version.pk %}" class="btn btn-warning">
-                        <i class="bi bi-arrow-clockwise"></i> Restore This Version
+                        <i class="bi bi-arrow-clockwise"></i> Restaurar esta versión
                     </a>
                     {% endif %}
                     <a href="{% url 'activity_version_history' activity.pk %}" class="btn btn-secondary">
-                        <i class="bi bi-arrow-left"></i> Back to History
+                        <i class="bi bi-arrow-left"></i> Volver al historial
                     </a>
                 </div>
             </div>
 
             <div class="card">
                 <div class="card-header">
-                    <h5 class="mb-0">{{ version.nombre }} - Version {{ version.version_numero }}</h5>
+                    <h5 class="mb-0">{{ version.nombre }} - Versión {{ version.version_numero }}</h5>
                     <small class="text-muted">
-                        Modified by {{ version.modificada_por.username }} on {{ version.fecha_modificacion|date:"M d, Y H:i" }}
+                        Modificada por {{ version.modificada_por.username }} el {{ version.fecha_modificacion|date:"d M Y, H:i" }}
                     </small>
                 </div>
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-6">
-                            <h6>Basic Information</h6>
+                            <h6>Información básica</h6>
                             <table class="table table-sm">
                                 <tr>
-                                    <th>Name:</th>
+                                    <th>Nombre:</th>
                                     <td>{{ version.nombre }}</td>
                                 </tr>
                                 <tr>
-                                    <th>Description:</th>
-                                    <td>{{ version.descripcion|default:"No description"|linebreaks }}</td>
+                                    <th>Descripción:</th>
+                                    <td>{{ version.descripcion|default:"Sin descripción"|linebreaks }}</td>
                                 </tr>
                                 <tr>
-                                    <th>Start Date:</th>
-                                    <td>{{ version.fecha_inicio|date:"M d, Y H:i" }}</td>
+                                    <th>Fecha de inicio:</th>
+                                    <td>{{ version.fecha_inicio|date:"d M Y, H:i" }}</td>
                                 </tr>
                                 <tr>
-                                    <th>End Date:</th>
-                                    <td>{{ version.fecha_fin|date:"M d, Y H:i" }}</td>
+                                    <th>Fecha de fin:</th>
+                                    <td>{{ version.fecha_fin|date:"d M Y, H:i" }}</td>
                                 </tr>
                             </table>
                         </div>
                         <div class="col-md-6">
-                            <h6>Activity Settings</h6>
+                            <h6>Configuración de la actividad</h6>
                             <table class="table table-sm">
                                 <tr>
-                                    <th>Type:</th>
-                                    <td>{{ version.tipo_actividad_snapshot.nombre|default:"N/A" }}</td>
+                                    <th>Tipo:</th>
+                                    <td>{{ version.tipo_actividad_snapshot.nombre|default:"N/D" }}</td>
                                 </tr>
                                 <tr>
-                                    <th>Subjects:</th>
+                                    <th>Asignaturas:</th>
                                     <td>
                                         {% if version.asignaturas_snapshot %}
                                             {% for asignatura in version.asignaturas_snapshot %}
                                                 <span class="badge bg-primary">{{ asignatura.nombre }}</span>
                                             {% endfor %}
                                         {% else %}
-                                            No subjects assigned
+                                            Sin asignaturas asignadas
                                         {% endif %}
                                     </td>
                                 </tr>
@@ -73,7 +73,7 @@
                                     <th>Evaluable:</th>
                                     <td>
                                         {% if version.evaluable %}
-                                            <span class="badge bg-warning">Yes</span>
+                                            <span class="badge bg-warning">Sí</span>
                                             <span class="badge bg-info">{{ version.porcentaje_evaluacion }}%</span>
                                         {% else %}
                                             <span class="badge bg-secondary">No</span>
@@ -81,10 +81,10 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th>Non-recoverable:</th>
+                                    <th>No recuperable:</th>
                                     <td>
                                         {% if version.no_recuperable %}
-                                            <span class="badge bg-danger">Yes</span>
+                                            <span class="badge bg-danger">Sí</span>
                                         {% else %}
                                             <span class="badge bg-success">No</span>
                                         {% endif %}
@@ -96,17 +96,17 @@
                     
                     <div class="row mt-4">
                         <div class="col-12">
-                            <h6>Status at This Version</h6>
+                            <h6>Estado en esta versión</h6>
                             <div class="d-flex gap-2">
                                 {% if version.aprobada %}
-                                    <span class="badge bg-success">Approved</span>
+                                    <span class="badge bg-success">Aprobada</span>
                                 {% else %}
-                                    <span class="badge bg-danger">Pending Approval</span>
+                                    <span class="badge bg-danger">Pendiente de aprobación</span>
                                 {% endif %}
                                 {% if version.activa %}
-                                    <span class="badge bg-info">Active</span>
+                                    <span class="badge bg-info">Activa</span>
                                 {% else %}
-                                    <span class="badge bg-dark">Inactive</span>
+                                    <span class="badge bg-dark">Inactiva</span>
                                 {% endif %}
                             </div>
                         </div>
@@ -115,7 +115,7 @@
                     {% if version.comentario_version %}
                     <div class="row mt-4">
                         <div class="col-12">
-                            <h6>Version Comment</h6>
+                            <h6>Comentario de la versión</h6>
                             <div class="alert alert-info">
                                 <i class="bi bi-chat-text"></i> {{ version.comentario_version }}
                             </div>
@@ -128,31 +128,31 @@
             <!-- Comparison with Current Version -->
             <div class="card mt-4">
                 <div class="card-header">
-                    <h6 class="mb-0"><i class="bi bi-arrow-left-right"></i> Compare with Current Version</h6>
+                    <h6 class="mb-0"><i class="bi bi-arrow-left-right"></i> Comparar con la versión actual</h6>
                 </div>
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-6">
-                            <h6 class="text-primary">Version {{ version.version_numero }} (Selected)</h6>
+                            <h6 class="text-primary">Versión {{ version.version_numero }} (seleccionada)</h6>
                             <ul class="list-unstyled">
-                                <li><strong>Name:</strong> {{ version.nombre }}</li>
-                                <li><strong>Description:</strong> {{ version.descripcion|default:"No description"|truncatechars:100 }}</li>
-                                <li><strong>Start:</strong> {{ version.fecha_inicio|date:"M d, Y H:i" }}</li>
-                                <li><strong>End:</strong> {{ version.fecha_fin|date:"M d, Y H:i" }}</li>
+                                <li><strong>Nombre:</strong> {{ version.nombre }}</li>
+                                <li><strong>Descripción:</strong> {{ version.descripcion|default:"Sin descripción"|truncatechars:100 }}</li>
+                                <li><strong>Inicio:</strong> {{ version.fecha_inicio|date:"d M Y, H:i" }}</li>
+                                <li><strong>Fin:</strong> {{ version.fecha_fin|date:"d M Y, H:i" }}</li>
                                 <li><strong>Evaluable:</strong> 
-                                    {% if version.evaluable %}Yes ({{ version.porcentaje_evaluacion }}%){% else %}No{% endif %}
+                                    {% if version.evaluable %}Sí ({{ version.porcentaje_evaluacion }}%){% else %}No{% endif %}
                                 </li>
                             </ul>
                         </div>
                         <div class="col-md-6">
-                            <h6 class="text-success">Current Version</h6>
+                            <h6 class="text-success">Versión actual</h6>
                             <ul class="list-unstyled">
-                                <li><strong>Name:</strong> {{ activity.nombre }}</li>
-                                <li><strong>Description:</strong> {{ activity.descripcion|default:"No description"|truncatechars:100 }}</li>
-                                <li><strong>Start:</strong> {{ activity.fecha_inicio|date:"M d, Y H:i" }}</li>
-                                <li><strong>End:</strong> {{ activity.fecha_fin|date:"M d, Y H:i" }}</li>
+                                <li><strong>Nombre:</strong> {{ activity.nombre }}</li>
+                                <li><strong>Descripción:</strong> {{ activity.descripcion|default:"Sin descripción"|truncatechars:100 }}</li>
+                                <li><strong>Inicio:</strong> {{ activity.fecha_inicio|date:"d M Y, H:i" }}</li>
+                                <li><strong>Fin:</strong> {{ activity.fecha_fin|date:"d M Y, H:i" }}</li>
                                 <li><strong>Evaluable:</strong> 
-                                    {% if activity.evaluable %}Yes ({{ activity.porcentaje_evaluacion }}%){% else %}No{% endif %}
+                                    {% if activity.evaluable %}Sí ({{ activity.porcentaje_evaluacion }}%){% else %}No{% endif %}
                                 </li>
                             </ul>
                         </div>

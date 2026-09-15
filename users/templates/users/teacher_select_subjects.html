@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Select Your Subjects{% endblock %}
+{% block title %}Selecciona tus asignaturas{% endblock %}
 
 {% block content %}
 <div class="container my-5">
@@ -8,18 +8,18 @@
         <div class="col-lg-10">
 
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2 class="mb-0">Select Your Subjects</h2>
+                <h2 class="mb-0">Selecciona tus asignaturas</h2>
                 <a href="{% url 'teacher_dashboard' %}" class="btn btn-secondary">
-                    <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                    <i class="fas fa-arrow-left me-2"></i>Volver al panel
                 </a>
             </div>
 
             <div class="card shadow-sm mb-4">
                 <div class="card-body">
                     <form id="titulacionForm" method="get" action="{% url 'teacher_select_subjects' %}">
-                        <label for="titulacion" class="form-label fs-5">Titulacion:</label>
+                        <label for="titulacion" class="form-label fs-5">Titulación:</label>
                         <select name="titulacion" id="titulacion" class="form-select form-select-lg">
-                            <option value="">-- Select a Titulacion --</option>
+                            <option value="">-- Selecciona una titulación --</option>
                             {% for titulacion in titulaciones %}
                                 <option value="{{ titulacion.id }}" {% if titulacion.id|stringformat:"s" == selected_titulacion_id %}selected{% endif %}>{{ titulacion.nombre }}</option>
                             {% endfor %}
@@ -41,7 +41,7 @@
                             <div class="card-body">
                                 <div class="row">
                                     <div class="col-md-6 border-end">
-                                        <h5>Primer Semestre</h5>
+                                        <h5>Primer semestre</h5>
                                         <hr>
                                         {% for a in semestres.primer_semestre %}
                                         <div class="form-check my-2">
@@ -49,11 +49,11 @@
                                             <label class="form-check-label" for="subject_{{ a.id }}">{{ a.nombre }}</label>
                                         </div>
                                         {% empty %}
-                                        <p class="text-muted">No subjects for this semester.</p>
+                                        <p class="text-muted">No hay asignaturas en este semestre.</p>
                                         {% endfor %}
                                     </div>
                                     <div class="col-md-6">
-                                        <h5>Segundo Semestre</h5>
+                                        <h5>Segundo semestre</h5>
                                         <hr>
                                         {% for a in semestres.segundo_semestre %}
                                         <div class="form-check my-2">
@@ -61,7 +61,7 @@
                                             <label class="form-check-label" for="subject_{{ a.id }}">{{ a.nombre }}</label>
                                         </div>
                                         {% empty %}
-                                        <p class="text-muted">No subjects for this semester.</p>
+                                        <p class="text-muted">No hay asignaturas en este semestre.</p>
                                         {% endfor %}
                                     </div>
                                 </div>
@@ -85,12 +85,12 @@
                     {% endfor %}
                     
                     <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-primary btn-lg">Save All Selections</button>
+                        <button type="submit" class="btn btn-primary btn-lg">Guardar toda la selección</button>
                     </div>
                 </form>
             {% elif selected_titulacion_id %}
                 <div class="alert alert-info">
-                    No subjects found for the selected Titulacion.
+                    No se han encontrado asignaturas para la titulación seleccionada.
                 </div>
             {% endif %}
 

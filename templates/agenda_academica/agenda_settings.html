@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
 
 {% block content %}
-  <h2>Agenda Settings</h2>
+  <h2>Configuración de la agenda</h2>
   <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
-    <button type="submit" class="btn btn-success">Save</button>
-    <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+    <button type="submit" class="btn btn-success">Guardar</button>
+    <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">Volver al panel</a>
   </form>
 {% endblock %}

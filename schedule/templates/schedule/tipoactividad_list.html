@@ -1,10 +1,12 @@
 {% extends 'base.html' %}
 
+{% block title %}Tipos de actividad{% endblock %}
+
 {% block content %}
-  <h2>Tipos de Actividad</h2>
+  <h2>Tipos de actividad</h2>
   <div class="mb-3">
-    <a href="{% url 'tipoactividad_create' %}" class="btn btn-success">Crear Nuevo Tipo de Actividad</a>
-    <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+    <a href="{% url 'tipoactividad_create' %}" class="btn btn-success">Crear nuevo tipo de actividad</a>
+    <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">Volver al panel</a>
   </div>
   <ul class="list-group">
     {% for tipoactividad in object_list %}

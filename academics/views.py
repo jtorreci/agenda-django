@@ -265,8 +265,8 @@ def catalogue_import_apply(request, pk):
     else:
         messages.success(
             request,
-            f'Importación aplicada al curso {catalogue_import.academic_year}. '
-            'El curso no se activa automáticamente.',
+            f'Importación aplicada al curso académico {catalogue_import.academic_year}. '
+            'El curso académico no se activa automáticamente.',
         )
     return redirect('catalogue_import_detail', pk=pk)
 
@@ -293,11 +293,11 @@ def academic_year_activate(request, pk):
             year.activate()
     except ValidationError as error:
         for message in _validation_messages(error):
-            messages.error(request, f'No se puede activar el curso {year}: {message}')
+            messages.error(request, f'No se puede activar el curso académico {year}: {message}')
     except IntegrityError:
-        messages.error(request, f'No se puede activar el curso {year}: ya hay otro curso activo.')
+        messages.error(request, f'No se puede activar el curso académico {year}: ya hay otro curso académico activo.')
     else:
-        messages.success(request, f'Curso {year} activado.')
+        messages.success(request, f'Curso académico {year} activado.')
     if next_url and url_has_allowed_host_and_scheme(next_url, allowed_hosts={request.get_host()}, require_https=request.is_secure()):
         return redirect(next_url)
     return redirect('catalogue_import_list')

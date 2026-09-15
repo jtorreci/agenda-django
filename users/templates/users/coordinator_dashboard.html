@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Coordinator Dashboard{% endblock %}
+{% block title %}Panel de coordinación{% endblock %}
 
 {% block extra_head %}
     <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css' rel='stylesheet' />
@@ -62,23 +62,23 @@
 {% endblock %}
 
 {% block content %}
-    <h2 class="my-4">Coordinator Dashboard</h2>
+    <h2 class="my-4">Panel de coordinación</h2>
     {% include 'academics/_messages.html' %}
 
     {% if show_no_titulaciones_message %}
         <div class="alert alert-warning" role="alert">
-            You are not assigned to any titulaciones. Please contact an administrator.
+            No tienes ninguna titulación asignada. Contacta con un administrador.
         </div>
     {% else %}
     <div class="row">
         <div class="col-md-3">
             <div class="sidebar p-3 bg-light rounded">
-                <h3 class="mb-3">Filter Activities</h3>
+                <h3 class="mb-3">Filtrar actividades</h3>
                 <form method="get" action="{% url 'coordinator_dashboard' %}" id="filter-form">
                     {% include 'schedule/_academic_year_filter.html' %}
 
                     <div class="mb-3">
-                        <label for="titulacion" class="form-label">Titulacion:</label>
+                        <label for="titulacion" class="form-label">Titulación:</label>
                         <select name="titulacion" id="titulacion" multiple>
                             {% for titulacion in titulaciones %}
                                 <option value="{{ titulacion.id }}" {% if titulacion.id|stringformat:"s" in selected_titulaciones %}selected{% endif %}>{{ titulacion.nombre }}</option>
@@ -113,7 +113,7 @@
                         <div class="accordion-item">
                             <h2 class="accordion-header" id="headingAcademicos">
                                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAcademicos" aria-expanded="false" aria-controls="collapseAcademicos">
-                                    Detalles Académicos
+                                    Detalles académicos
                                 </button>
                             </h2>
                             <div id="collapseAcademicos" class="accordion-collapse collapse" aria-labelledby="headingAcademicos" data-bs-parent="#advancedFilters">
@@ -127,7 +127,7 @@
                                         </select>
                                     </div>
                                     <div class="mb-3">
-                                        <label for="tipo_actividad" class="form-label">Activity Type:</label>
+                                        <label for="tipo_actividad" class="form-label">Tipo de actividad:</label>
                                         <select name="tipo_actividad" id="tipo_actividad" multiple class="form-select">
                                             {% for tipo in tipos_actividad %}
                                                 <option value="{{ tipo.id }}" {% if tipo.id|stringformat:"s" in selected_tipos_actividad %}selected{% endif %}>{{ tipo.nombre }}</option>
@@ -140,25 +140,25 @@
                         <div class="accordion-item">
                             <h2 class="accordion-header" id="headingEvaluacion">
                                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEvaluacion" aria-expanded="false" aria-controls="collapseEvaluacion">
-                                    Atributos y Estado
+                                    Atributos y estado
                                 </button>
                             </h2>
                             <div id="collapseEvaluacion" class="accordion-collapse collapse" aria-labelledby="headingEvaluacion" data-bs-parent="#advancedFilters">
                                 <div class="accordion-body">
                                     <div class="form-check mb-3">
                                         <input type="checkbox" id="filter_evaluable" name="filter_evaluable" class="form-check-input" {% if filter_evaluable %}checked{% endif %}>
-                                        <label for="filter_evaluable" class="form-check-label">Show Evaluable Activities</label>
+                                        <label for="filter_evaluable" class="form-check-label">Mostrar actividades evaluables</label>
                                     </div>
                                     <div class="mb-3">
-                                        <label for="min_percentage" class="form-label">Min. Percentage:</label>
+                                        <label for="min_percentage" class="form-label">Porcentaje mínimo:</label>
                                         <input type="number" id="min_percentage" name="min_percentage" value="{{ min_percentage|default:'' }}" step="0.01" min="0" max="100" class="form-control">
                                     </div>
                                     <div class="mb-3">
-                                        <label for="approval_status" class="form-label">Approval Status:</label>
+                                        <label for="approval_status" class="form-label">Estado de aprobación:</label>
                                         <select name="approval_status" id="approval_status" class="form-select">
-                                            <option value="all" {% if approval_status == 'all' %}selected{% endif %}>All</option>
-                                            <option value="approved" {% if approval_status == 'approved' %}selected{% endif %}>Approved</option>
-                                            <option value="unapproved" {% if approval_status == 'unapproved' %}selected{% endif %}>Unapproved</option>
+                                            <option value="all" {% if approval_status == 'all' %}selected{% endif %}>Todas</option>
+                                            <option value="approved" {% if approval_status == 'approved' %}selected{% endif %}>Aprobadas</option>
+                                            <option value="unapproved" {% if approval_status == 'unapproved' %}selected{% endif %}>No aprobadas</option>
                                         </select>
                                     </div>
                                 </div>
@@ -167,16 +167,16 @@
                     </div>
                     
                     <div class="d-flex mt-4">
-                        <button type="submit" class="btn btn-primary w-100">Filter</button>
-                        <a href="{% url 'coordinator_dashboard' %}" class="btn btn-outline-secondary ms-2" title="Clear Filters">✖</a>
+                        <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+                        <a href="{% url 'coordinator_dashboard' %}" class="btn btn-outline-secondary ms-2" title="Limpiar filtros">✖</a>
                     </div>
                 </form>
                 <hr class="my-4">
                 <div class="d-grid gap-2">
-                    <a href="{% url 'activity_logs' %}" class="btn btn-outline-info">View Activity Logs</a>
+                    <a href="{% url 'activity_logs' %}" class="btn btn-outline-info">Ver registro de actividades</a>
                     <div class="dropdown">
                         <button class="btn btn-outline-success dropdown-toggle w-100" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="bi bi-file-pdf"></i> Generate PDF Report
+                            <i class="bi bi-file-pdf"></i> Generar informe PDF
                         </button>
                         <ul class="dropdown-menu w-100">
                             {% for titulacion in titulaciones %}
@@ -184,12 +184,12 @@
                             {% endfor %}
                             {% if titulaciones|length > 1 %}
                                 <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="{% url 'generate_agenda_report_all' %}"><strong>All Titulaciones</strong></a></li>
+                                <li><a class="dropdown-item" href="{% url 'generate_agenda_report_all' %}"><strong>Todas las titulaciones</strong></a></li>
                             {% endif %}
                         </ul>
                     </div>
                     <a href="{% url 'ical_management' %}" class="btn btn-outline-warning">
-                        <i class="bi bi-calendar-event"></i> Manage iCal Feeds
+                        <i class="bi bi-calendar-event"></i> Gestionar suscripciones iCal
                     </a>
                 </div>
             </div>
@@ -197,10 +197,10 @@
         <div class="col-md-9">
              <ul class="nav nav-tabs" id="myTab" role="tablist">
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="list-tab" data-bs-toggle="tab" data-bs-target="#list-view" type="button" role="tab" aria-controls="list-view" aria-selected="true">Activity List</button>
+                    <button class="nav-link active" id="list-tab" data-bs-toggle="tab" data-bs-target="#list-view" type="button" role="tab" aria-controls="list-view" aria-selected="true">Lista de actividades</button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="calendar-tab" data-bs-toggle="tab" data-bs-target="#calendar-view" type="button" role="tab" aria-controls="calendar-view" aria-selected="false">Calendar View</button>
+                    <button class="nav-link" id="calendar-tab" data-bs-toggle="tab" data-bs-target="#calendar-view" type="button" role="tab" aria-controls="calendar-view" aria-selected="false">Vista de calendario</button>
                 </li>
             </ul>
 
@@ -208,15 +208,15 @@
                 <div class="tab-pane fade show active" id="list-view" role="tabpanel" aria-labelledby="list-tab">
                     <div class="p-3">
                         <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h3 class="mb-0">Filtered Activities</h3>
-                            <span class="badge bg-secondary rounded-pill">{{ activities|length }} found</span>
+                            <h3 class="mb-0">Actividades filtradas</h3>
+                            <span class="badge bg-secondary rounded-pill">{{ activities|length }} encontradas</span>
                         </div>
                         <div class="table-responsive">
-                            <h4 class="mt-4">Active Activities</h4>
+                            <h4 class="mt-4">Actividades activas</h4>
                             <table class="table table-striped table-bordered table-hover">
                                 <thead class="table-dark">
                                     <tr>
-                                        <th>Activity Name</th><th>Curso</th><th>Subjects</th><th>Type</th><th>Start Date</th><th>End Date</th><th>Evaluable</th><th>Percentage</th><th>Approved</th><th>Actions</th>
+                                        <th>Nombre de la actividad</th><th>Curso académico</th><th>Asignaturas</th><th>Tipo</th><th>Fecha de inicio</th><th>Fecha de fin</th><th>Evaluable</th><th>Porcentaje</th><th>Aprobada</th><th>Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -251,16 +251,16 @@
                                         </td>
                                     </tr>
                                     {% empty %}
-                                    <tr><td colspan="10" class="text-center">No active activities found.</td></tr>
+                                    <tr><td colspan="10" class="text-center">No se han encontrado actividades activas.</td></tr>
                                     {% endfor %}
                                 </tbody>
                             </table>
 
-                            <h4 class="mt-5">Deleted Activities</h4>
+                            <h4 class="mt-5">Actividades eliminadas</h4>
                             <table class="table table-striped table-bordered table-hover">
                                 <thead class="table-secondary">
                                     <tr>
-                                        <th>Activity Name</th><th>Curso</th><th>Subjects</th><th>Type</th><th>Start Date</th><th>End Date</th><th>Actions</th>
+                                        <th>Nombre de la actividad</th><th>Curso académico</th><th>Asignaturas</th><th>Tipo</th><th>Fecha de inicio</th><th>Fecha de fin</th><th>Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -289,7 +289,7 @@
                                         </td>
                                     </tr>
                                     {% empty %}
-                                    <tr><td colspan="7" class="text-center">No deleted activities found.</td></tr>
+                                    <tr><td colspan="7" class="text-center">No se han encontrado actividades eliminadas.</td></tr>
                                     {% endfor %}
                                 </tbody>
                             </table>
@@ -298,7 +298,7 @@
                 </div>
                 <div class="tab-pane fade" id="calendar-view" role="tabpanel" aria-labelledby="calendar-tab">
                     <div class="p-3">
-                         <h3 class="mb-3">Calendar</h3>
+                         <h3 class="mb-3">Calendario</h3>
                         <div id='calendar'></div>
                     </div>
                 </div>
@@ -310,7 +310,7 @@
     <p class="mt-4">
         <form action="{% url 'logout' %}" method="post" class="d-inline">
             {% csrf_token %}
-            <button type="submit" class="btn btn-secondary">Logout</button>
+            <button type="submit" class="btn btn-secondary">Cerrar sesión</button>
         </form>
     </p>
 {% endblock %}
@@ -320,23 +320,23 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="activityDetailModalLabel">Activity Details</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <h5 class="modal-title" id="activityDetailModalLabel">Detalles de la actividad</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
             <div class="modal-body">
-                <p><strong>Title:</strong> <span id="modalActivityTitle"></span></p>
-                <p><strong>Description:</strong> <span id="modalActivityDescription"></span></p>
-                <p><strong>Type:</strong> <span id="modalActivityType"></span></p>
-                <p><strong>Subjects:</strong> <span id="modalActivitySubjects"></span></p>
-                <p><strong>Start:</strong> <span id="modalActivityStart"></span></p>
-                <p><strong>End:</strong> <span id="modalActivityEnd"></span></p>
-                <p><strong>Approved:</strong> <span id="modalActivityApproved"></span></p>
-                <p><strong>Active:</strong> <span id="modalActivityActive"></span></p>
+                <p><strong>Título:</strong> <span id="modalActivityTitle"></span></p>
+                <p><strong>Descripción:</strong> <span id="modalActivityDescription"></span></p>
+                <p><strong>Tipo:</strong> <span id="modalActivityType"></span></p>
+                <p><strong>Asignaturas:</strong> <span id="modalActivitySubjects"></span></p>
+                <p><strong>Inicio:</strong> <span id="modalActivityStart"></span></p>
+                <p><strong>Fin:</strong> <span id="modalActivityEnd"></span></p>
+                <p><strong>Aprobada:</strong> <span id="modalActivityApproved"></span></p>
+                <p><strong>Activa:</strong> <span id="modalActivityActive"></span></p>
                 <p><strong>Evaluable:</strong> <span id="modalActivityEvaluable"></span></p>
-                <p><strong>Percentage:</strong> <span id="modalActivityPercentage"></span></p>
+                <p><strong>Porcentaje:</strong> <span id="modalActivityPercentage"></span></p>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
             </div>
         </div>
     </div>
@@ -344,6 +344,7 @@
 
 {% block extra_js %}
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'></script>
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/es.js'></script>
     <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
     
     <script>
@@ -372,7 +373,15 @@
         var calendarEl = document.getElementById('calendar');
         var isCalendarRendered = false;
         var calendar = new FullCalendar.Calendar(calendarEl, {
+            locale: 'es',
             initialView: 'dayGridMonth',
+            buttonText: {
+                today: 'Hoy',
+                month: 'Mes',
+                week: 'Semana',
+                day: 'Día',
+                list: 'Lista'
+            },
             headerToolbar: { left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek,timeGridDay' },
             events: function(fetchInfo, successCallback, failureCallback) {
                 const params = new URLSearchParams(new FormData(document.getElementById('filter-form')));
@@ -382,15 +391,15 @@
             eventClick: function(info) {
                 // Populate modal with event details
                 document.getElementById('modalActivityTitle').innerText = info.event.title;
-                document.getElementById('modalActivityDescription').innerText = info.event.extendedProps.description || 'N/A';
-                document.getElementById('modalActivityType').innerText = info.event.extendedProps.activity_type || 'N/A';
-                document.getElementById('modalActivitySubjects').innerText = info.event.extendedProps.subjects || 'N/A';
-                document.getElementById('modalActivityStart').innerText = info.event.start ? formatDateTo24h(info.event.start) : 'N/A';
-                document.getElementById('modalActivityEnd').innerText = info.event.end ? formatDateTo24h(info.event.end) : 'N/A';
-                document.getElementById('modalActivityApproved').innerText = info.event.extendedProps.is_approved ? 'Yes' : 'No';
-                document.getElementById('modalActivityActive').innerText = info.event.extendedProps.is_active ? 'Yes' : 'No';
-                document.getElementById('modalActivityEvaluable').innerText = info.event.extendedProps.evaluable ? 'Yes' : 'No';
-                document.getElementById('modalActivityPercentage').innerText = info.event.extendedProps.percentage !== null ? info.event.extendedProps.percentage + '%' : 'N/A';
+                document.getElementById('modalActivityDescription').innerText = info.event.extendedProps.description || 'N/D';
+                document.getElementById('modalActivityType').innerText = info.event.extendedProps.activity_type || 'N/D';
+                document.getElementById('modalActivitySubjects').innerText = info.event.extendedProps.subjects || 'N/D';
+                document.getElementById('modalActivityStart').innerText = info.event.start ? formatDateTo24h(info.event.start) : 'N/D';
+                document.getElementById('modalActivityEnd').innerText = info.event.end ? formatDateTo24h(info.event.end) : 'N/D';
+                document.getElementById('modalActivityApproved').innerText = info.event.extendedProps.is_approved ? 'Sí' : 'No';
+                document.getElementById('modalActivityActive').innerText = info.event.extendedProps.is_active ? 'Sí' : 'No';
+                document.getElementById('modalActivityEvaluable').innerText = info.event.extendedProps.evaluable ? 'Sí' : 'No';
+                document.getElementById('modalActivityPercentage').innerText = info.event.extendedProps.percentage !== null ? info.event.extendedProps.percentage + '%' : 'N/D';
 
                 // Show the modal
                 var activityDetailModal = new bootstrap.Modal(document.getElementById('activityDetailModal'));
@@ -427,14 +436,14 @@
             if (checkbox && checkbox.dataset.readOnly === 'true') {
                 return {
                     canEdit: false,
-                    reason: 'Curso anterior: actividad de solo lectura'
+                    reason: 'Curso académico anterior: actividad de solo lectura'
                 };
             }
             // Admins can edit everything
             if (userRole === 'ADMIN') {
                 return {
                     canEdit: true,
-                    reason: 'Admin: Can approve/unapprove all activities'
+                    reason: 'Administración: puede aprobar o desaprobar todas las actividades'
                 };
             }
             
@@ -447,12 +456,12 @@
             if (hasPermission) {
                 return {
                     canEdit: true,
-                    reason: 'Coordinator: Can approve/unapprove activities in your coordinated titulaciones'
+                    reason: 'Coordinación: puede aprobar o desaprobar actividades de las titulaciones que coordinas'
                 };
             } else {
                 return {
                     canEdit: false,
-                    reason: 'Cannot edit: You don\'t coordinate any titulacion involved in this activity'
+                    reason: 'No editable: no coordinas ninguna titulación de esta actividad'
                 };
             }
         }
@@ -494,7 +503,7 @@
                     .then(response => response.json())
                     .then(data => {
                         if (!data.success) {
-                            alert('Failed to update approval status');
+                            alert('No se pudo actualizar el estado de aprobación');
                             this.checked = originalState; // Rollback
                         }
                         // Re-enable checkbox
@@ -502,7 +511,7 @@
                     })
                     .catch(error => {
                         console.error('Error toggling approval status:', error);
-                        alert('Error updating approval status.');
+                        alert('Error al actualizar el estado de aprobación.');
                         this.checked = originalState; // Rollback
                         this.disabled = false; // Re-enable
                     });
@@ -544,7 +553,7 @@
         document.getElementById('filter-form').addEventListener('submit', function() {
             const btn = this.querySelector('button[type="submit"]');
             btn.disabled = true;
-            btn.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Filtering...`;
+            btn.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Filtrando...`;
         });
 
         // Initialize tooltips for action buttons

@@ -19,7 +19,6 @@ from django.core import serializers
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.views.decorators.http import require_http_methods
-from django.utils.translation import gettext_lazy as _
 from django.template.loader import get_template
 from django.conf import settings
 from django.utils import formats
@@ -89,9 +88,9 @@ def activity_form(request, pk=None, read_only=False): # Added read_only paramete
                     object_id=activity.id,
                     actividad=activity,  # Keep for backward compatibility
                     usuario=request.user,
-                    tipo_log=_('Creation'),
-                    details=_('Activity "%(name)s" created for %(count)d subject(s)') % {
-                        'name': activity.nombre, 
+                    tipo_log='Creation',
+                    details='Actividad "%(name)s" creada para %(count)d asignatura(s)' % {
+                        'name': activity.nombre,
                         'count': activity.asignaturas.count()
                     }
                 )
@@ -102,8 +101,8 @@ def activity_form(request, pk=None, read_only=False): # Added read_only paramete
                     object_id=activity.id,
                     actividad=activity,  # Keep for backward compatibility
                     usuario=request.user,
-                    tipo_log=_('Modification'),
-                    details=_('Activity "%(name)s" modified') % {'name': activity.nombre}
+                    tipo_log='Modification',
+                    details='Actividad "%(name)s" modificada' % {'name': activity.nombre}
                 )
             return redirect(get_user_dashboard_url(request.user))
     else: # GET request or POST with read_only=True
@@ -132,7 +131,7 @@ def activity_delete(request, pk):
         LogActividad.objects.create(
             actividad=activity,
             usuario=request.user,
-            tipo_log=_('Deletion')
+            tipo_log='Deletion'
         )
         return redirect('teacher_dashboard')
     return render(request, 'schedule/activity_confirm_delete.html', {'activity': activity})
@@ -257,10 +256,10 @@ def activity_pdf_convocatoria(request, pk):
     )
 
     info_data = [
-        ['Nombre de la Actividad:', Paragraph(activity.nombre, info_cell_style)],
-        ['Tipo de Actividad:', activity.tipo_actividad.nombre],
-        ['Fecha de Inicio:', format_spanish_datetime(timezone.localtime(activity.fecha_inicio), 'long')],
-        ['Fecha de Fin:', format_spanish_datetime(timezone.localtime(activity.fecha_fin), 'long')],
+        ['Nombre de la actividad:', Paragraph(activity.nombre, info_cell_style)],
+        ['Tipo de actividad:', activity.tipo_actividad.nombre],
+        ['Fecha de inicio:', format_spanish_datetime(timezone.localtime(activity.fecha_inicio), 'long')],
+        ['Fecha de fin:', format_spanish_datetime(timezone.localtime(activity.fecha_fin), 'long')],
     ]
 
     # Add subjects
@@ -310,7 +309,7 @@ def activity_pdf_convocatoria(request, pk):
             alignment=TA_LEFT
         )
 
-        group_data = [['Grupo', 'Fecha/Hora Inicio', 'Fecha/Hora Fin', 'Lugar', 'Descripción']]
+        group_data = [['Grupo', 'Inicio', 'Fin', 'Lugar', 'Descripción']]
         for grupo in grupos:
             # Usar Paragraph para las celdas que pueden tener mucho texto
             lugar_text = Paragraph(grupo.lugar or 'No especificado', cell_style)
@@ -628,7 +627,7 @@ def reactivate_activity(request, pk):
             messages.error(
                 request,
                 f'No se puede restaurar "{activity.nombre}": la actividad de origen ya se volvió '
-                'a traer a este curso.',
+                'a traer a este curso académico.',
             )
             return redirect('coordinator_dashboard')
         # save() derives 'activa' from 'estado', so restoring must change 'estado'.
@@ -637,7 +636,7 @@ def reactivate_activity(request, pk):
         LogActividad.objects.create(
             actividad=activity,
             usuario=request.user,
-            tipo_log=_('Reactivation')
+            tipo_log='Reactivation'
         )
         return redirect('activity_logs')
     # If it's a GET request, render a confirmation page (optional, but good practice)
@@ -695,7 +694,7 @@ def ical_feed(request, token):
     calendar_view = get_object_or_404(VistaCalendario, token=token)
     
     cal = Calendar()
-    cal.add('prodid', '-//My Calendar App//mxm.dk//')
+    cal.add('prodid', '-//Agenda Académica//ES')
     cal.add('version', '2.0')
 
     # Feeds are published calendars: only the active academic year is exported.
@@ -757,7 +756,7 @@ def toggle_activity_approval_from_dashboard(request, pk):
                     break
         
         if not can_approve:
-            return JsonResponse({'success': False, 'error': 'You do not have permission to approve activities for this titulacion.'}, status=403)
+            return JsonResponse({'success': False, 'error': 'No tienes permiso para aprobar actividades de esta titulación.'}, status=403)
 
         activity.set_approval_manually(new_status, modified_by=request.user)
 
@@ -769,7 +768,7 @@ def toggle_activity_approval_from_dashboard(request, pk):
         )
         return JsonResponse({'success': True})
     except Actividad.DoesNotExist:
-        return JsonResponse({'success': False, 'error': 'Activity not found.'}, status=404)
+        return JsonResponse({'success': False, 'error': 'Actividad no encontrada.'}, status=404)
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)}, status=500)
 
@@ -1064,8 +1063,8 @@ def ajax_create_tipo_actividad(request):
             object_name=tipo.nombre,
             object_id=tipo.id,
             usuario=request.user,
-            tipo_log=_('Creation'),
-            details=_('Activity type "%(name)s" created') % {'name': tipo.nombre}
+            tipo_log='Creation',
+            details=f'Tipo de actividad "{tipo.nombre}" creado'
         )
         
         return JsonResponse({
@@ -1104,8 +1103,8 @@ def ajax_update_tipo_actividad(request, pk):
             object_name=tipo.nombre,
             object_id=tipo.id,
             usuario=request.user,
-            tipo_log=_('Modification'),
-            details=f'Activity type renamed from "{old_name}" to "{tipo.nombre}"'
+            tipo_log='Modification',
+            details=f'Tipo de actividad renombrado de "{old_name}" a "{tipo.nombre}"'
         )
         
         return JsonResponse({
@@ -1151,8 +1150,8 @@ def ajax_delete_tipo_actividad(request, pk):
                         object_name=tipo_name,
                         object_id=pk,
                         usuario=request.user,
-                        tipo_log=_('Deletion'),
-                        details=f'Activity type "{tipo_name}" deleted. {activities_count} activities reassigned to "{reassign_to_type.nombre}"'
+                        tipo_log='Deletion',
+                        details=f'Tipo de actividad "{tipo_name}" eliminado. {activities_count} actividades reasignadas a "{reassign_to_type.nombre}"'
                     )
                     
                 return JsonResponse({'success': True})
@@ -1169,7 +1168,7 @@ def ajax_delete_tipo_actividad(request, pk):
                 object_id=pk,
                 usuario=request.user,
                 tipo_log='Eliminación',
-                details=f'Activity type "{tipo_name}" deleted with cascade. {activities_count} activities also deleted'
+                details=f'Tipo de actividad "{tipo_name}" eliminado en cascada. También se eliminaron {activities_count} actividades'
             )
             
             return JsonResponse({'success': True})
@@ -1184,7 +1183,7 @@ def ajax_delete_tipo_actividad(request, pk):
                 object_id=pk,
                 usuario=request.user,
                 tipo_log='Eliminación',
-                details=f'Activity type "{tipo_name}" deleted (no associated activities)'
+                details=f'Tipo de actividad "{tipo_name}" eliminado (sin actividades asociadas)'
             )
             
             return JsonResponse({'success': True})
@@ -1284,7 +1283,7 @@ def activity_restore_version(request, pk, version_id):
     if request.method == 'POST':
         # Set version metadata before restoring
         activity._modified_by = request.user
-        activity._version_comment = f'Restored to version {version.version_numero} from {version.fecha_modificacion.strftime("%Y-%m-%d %H:%M")}'
+        activity._version_comment = f'Restaurada a la versión {version.version_numero} del {version.fecha_modificacion.strftime("%d/%m/%Y %H:%M")}'
         
         # Restore all fields from the version
         activity.nombre = version.nombre
@@ -1322,8 +1321,8 @@ def activity_restore_version(request, pk, version_id):
             object_id=activity.id,
             actividad=activity,
             usuario=request.user,
-            tipo_log=_('Version Restore'),
-            details=f'Activity restored to version {version.version_numero} from {version.fecha_modificacion.strftime("%Y-%m-%d %H:%M")}'
+            tipo_log='Version Restore',
+            details=f'Actividad restaurada a la versión {version.version_numero} del {version.fecha_modificacion.strftime("%d/%m/%Y %H:%M")}'
         )
         
         return redirect('activity_version_history', pk=activity.pk)
@@ -1341,7 +1340,7 @@ def generate_agenda_report(request, titulacion_id=None):
     """Generate PDF agenda report for coordinators (specific titulacion) or admins (all titulaciones)"""
     
     if not REPORTLAB_AVAILABLE:
-        return HttpResponse("PDF generation is not available. Please install reportlab.", status=500)
+        return HttpResponse("La generación de PDF no está disponible. Instala reportlab.", status=500)
     
     # Check permissions and get data
     if request.user.role == 'COORDINATOR':
@@ -1350,7 +1349,7 @@ def generate_agenda_report(request, titulacion_id=None):
             titulacion = get_object_or_404(Titulacion, pk=titulacion_id)
             user_coordinated_titulaciones = Titulacion.objects.filter(coordinador=request.user)
             if titulacion not in user_coordinated_titulaciones:
-                return HttpResponse("You don't have permission to generate reports for this titulacion.", status=403)
+                return HttpResponse("No tienes permiso para generar informes de esta titulación.", status=403)
             titulaciones = [titulacion]
         else:
             # If no specific titulacion, get all coordinated titulaciones
@@ -1362,7 +1361,7 @@ def generate_agenda_report(request, titulacion_id=None):
             titulaciones = Titulacion.objects.all()
     
     if not titulaciones:
-        return HttpResponse("No titulaciones found for report generation.", status=404)
+        return HttpResponse("No se han encontrado titulaciones para generar el informe.", status=404)
     
     # Create response
     response = HttpResponse(content_type='application/pdf')
@@ -1410,7 +1409,7 @@ def generate_agenda_report(request, titulacion_id=None):
         if len(titulaciones) == 1:
             title = f"Agenda de {titulacion.nombre}"
         else:
-            title = f"Agenda General del Centro"
+            title = "Agenda general del centro"
             if titulacion_idx == 0:
                 elements.append(Paragraph(title, title_style))
                 elements.append(Spacer(1, 20))
@@ -1533,10 +1532,10 @@ def generate_agenda_report(request, titulacion_id=None):
     # Log the action
     LogActividad.objects.create(
         object_type='actividad',
-        object_name=f"PDF Report: {filename}",
+        object_name=f"Informe PDF: {filename}",
         usuario=request.user,
-        tipo_log=_('Report Generation'),
-        details=f'PDF agenda report generated for {len(titulaciones)} titulacion(s)'
+        tipo_log='Report Generation',
+        details=f'Informe PDF de la agenda generado para {len(titulaciones)} titulación(es)'
     )
     
     return response
@@ -1611,10 +1610,10 @@ def create_automatic_icals(request):
     # Log the action
     LogActividad.objects.create(
         object_type='actividad',
-        object_name="Automatic iCal Creation",
+        object_name="Creación automática de iCal",
         usuario=request.user,
-        tipo_log=_('iCal Generation'),
-        details=f'Created {len(created_feeds)} new iCal feeds, {len(existing_feeds)} already existed'
+        tipo_log='iCal Generation',
+        details=f'Creadas {len(created_feeds)} suscripciones iCal nuevas; {len(existing_feeds)} ya existían'
     )
     
     return JsonResponse({
@@ -1668,10 +1667,10 @@ def delete_all_icals(request):
     # Log the action
     LogActividad.objects.create(
         object_type='actividad',
-        object_name="Delete All iCals",
+        object_name="Eliminación de todos los iCal",
         usuario=request.user,
-        tipo_log=_('iCal Deletion'),
-        details=f'Deleted {count} iCal feeds for user {request.user.username}'
+        tipo_log='iCal Deletion',
+        details=f'Eliminadas {count} suscripciones iCal del usuario {request.user.username}'
     )
     
     return JsonResponse({'success': True, 'deleted_count': count})
@@ -1783,8 +1782,8 @@ def multi_group_activity_form(request, grupo_id=None):
                                 object_id=activity.id,
                                 actividad=activity,
                                 usuario=request.user,
-                                tipo_log=_('Modification'),
-                                details=_('Multi-group activity updated - old version deactivated')
+                                tipo_log='Modification',
+                                details='Actividad multigrupo actualizada; versión anterior desactivada'
                             )
                     
                     actividades_creadas = form.save(user=request.user)
@@ -1796,8 +1795,8 @@ def multi_group_activity_form(request, grupo_id=None):
                             object_id=activity.id,
                             actividad=activity,
                             usuario=request.user,
-                            tipo_log=_('Creation') if not grupo_id else _('Modification'),
-                            details=_('Multi-group activity created/updated')
+                            tipo_log='Creation' if not grupo_id else 'Modification',
+                            details='Actividad multigrupo creada/actualizada'
                         )
                     
                     return redirect(get_user_dashboard_url(request.user))
@@ -1860,7 +1859,7 @@ def copy_activity_individual(request, activity_id):
                         actividad=activity,
                         usuario=request.user,
                         tipo_log='Creation',
-                        details=f'Activity copied from "{original_activity.nombre}"'
+                        details=f'Actividad copiada de "{original_activity.nombre}"'
                     )
                     
                     return redirect(get_user_dashboard_url(request.user))
@@ -1935,7 +1934,7 @@ def copy_activity_multi_group(request, activity_id):
                         actividad=activity,
                         usuario=request.user,
                         tipo_log='Creation',
-                        details=f'Multi-group activity copied from "{original_activity.nombre}"'
+                        details=f'Actividad multigrupo copiada de "{original_activity.nombre}"'
                     )
                     
                     return redirect(get_user_dashboard_url(request.user))
@@ -2083,7 +2082,7 @@ def unified_activity_form(request, pk=None):
                             object_id=activity.id,
                             actividad=activity,
                             usuario=request.user,
-                            tipo_log=_('Modification'),
+                            tipo_log='Modification',
                             details=f'Actividad actualizada con {len(grupos_data)} grupo(s) usando nuevo sistema'
                         )
                     else:
@@ -2097,7 +2096,7 @@ def unified_activity_form(request, pk=None):
                             object_id=activity.id,
                             actividad=activity,
                             usuario=request.user,
-                            tipo_log=_('Creation'),
+                            tipo_log='Creation',
                             details=f'Actividad creada con {activity.grupos.count()} grupo(s) usando nuevo sistema'
                         )
                     
@@ -2231,13 +2230,13 @@ def import_subject_activities(request, subject_id):
     if imported:
         messages.success(
             request,
-            f'{imported} actividad(es) de "{subject.nombre}" traída(s) al curso actual, '
+            f'{imported} actividad(es) de "{subject.nombre}" traída(s) al curso académico actual, '
             'pendientes de aprobación.',
         )
     if skipped:
         messages.info(request, f'{skipped} actividad(es) de "{subject.nombre}" ya se habían traído.')
     if not (imported or skipped or refusals):
-        messages.info(request, f'No hay actividades de cursos anteriores de "{subject.nombre}" que traer.')
+        messages.info(request, f'No hay actividades de cursos académicos anteriores de "{subject.nombre}" que traer.')
     for refusal in refusals:
         messages.warning(request, refusal)
     return redirect(_safe_next_url(request, get_user_dashboard_url(request.user)))

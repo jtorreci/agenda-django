@@ -910,6 +910,6 @@ class CatalogueImportViewTests(TestCase):
 
         response = self.client.post(reverse('academic_year_activate', args=[year.pk]), follow=True)
 
-        self.assertContains(response, 'No se puede activar el curso 2026-27')
+        self.assertContains(response, 'No se puede activar el curso académico 2026-27')
         year.refresh_from_db()
         self.assertEqual(year.state, AcademicYear.STATE_DRAFT)

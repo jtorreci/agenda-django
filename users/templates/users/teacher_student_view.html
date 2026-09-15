@@ -1,7 +1,6 @@
 {% extends 'base.html' %}
-{% load i18n %}
 
-{% block title %}{% trans "Student View Preview" %}{% endblock %}
+{% block title %}Vista previa como estudiante{% endblock %}
 
 {% block extra_head %}
     <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css' rel='stylesheet' />
@@ -37,12 +36,12 @@
     <div class="preview-banner">
         <h3 class="mb-2">
             <i class="bi bi-eye"></i>
-            {% trans "Student View Preview" %}
+            Vista previa como estudiante
         </h3>
         <p class="mb-0">
-            {% trans "This is how students would see activities from your subjects" %}
+            Así verían los estudiantes las actividades de tus asignaturas
             {% if show_context %}
-                {% trans "and related courses" %}
+                y cursos relacionados
             {% endif %}
         </p>
     </div>
@@ -50,26 +49,26 @@
     <!-- Context Information -->
     {% if show_context %}
     <div class="context-info">
-        <strong><i class="bi bi-info-circle"></i> {% trans "Context View Active" %}:</strong>
-        {% trans "Showing activities from the same degree programs and course levels as your subjects." %}
+        <strong><i class="bi bi-info-circle"></i> Vista de contexto activa:</strong>
+        Se muestran actividades de las mismas titulaciones y cursos que tus asignaturas.
     </div>
     {% endif %}
 
     <div class="row mt-4">
         <div class="col-md-3">
             <div class="sidebar p-3 bg-light rounded">
-                <h4 class="mb-3">{% trans "Preview Info" %}</h4>
+                <h4 class="mb-3">Información de la vista previa</h4>
                 <div class="alert alert-warning alert-sm">
                     <small>
                         <i class="bi bi-exclamation-triangle"></i>
-                        {% trans "This preview shows only active and approved activities, just like students see." %}
+                        Esta vista previa muestra solo las actividades activas y aprobadas, igual que las ven los estudiantes.
                     </small>
                 </div>
 
                 <hr class="my-4">
 
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h4 class="mb-0">{% trans "Simulated Enrolled Subjects" %}</h4>
+                    <h4 class="mb-0">Asignaturas matriculadas simuladas</h4>
                 </div>
 
                 {% if enrolled_subjects %}
@@ -93,14 +92,14 @@
                         </table>
                     </div>
                 {% else %}
-                    <p class="text-muted">{% trans "No subjects assigned." %}</p>
+                    <p class="text-muted">No hay asignaturas asignadas.</p>
                 {% endif %}
 
                 <hr class="my-4">
 
                 <div class="d-grid gap-2">
                     <a href="{% url 'teacher_dashboard' %}" class="btn btn-primary">
-                        <i class="bi bi-arrow-left"></i> {% trans "Back to Teacher Dashboard" %}
+                        <i class="bi bi-arrow-left"></i> Volver al panel de profesor/a
                     </a>
                 </div>
             </div>
@@ -110,31 +109,31 @@
             <ul class="nav nav-tabs" id="myTab" role="tablist">
                 <li class="nav-item" role="presentation">
                     <button class="nav-link active" id="activities-tab" data-bs-toggle="tab" data-bs-target="#activities-view" type="button" role="tab" aria-controls="activities-view" aria-selected="true">
-                        {% trans "Activities" %}
+                        Actividades
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" id="calendar-tab" data-bs-toggle="tab" data-bs-target="#calendar-view" type="button" role="tab" aria-controls="calendar-view" aria-selected="false">
-                        {% trans "Calendar" %}
+                        Calendario
                     </button>
                 </li>
             </ul>
 
             <div class="tab-content" id="myTabContent">
                 <div class="tab-pane fade show active p-3" id="activities-view" role="tabpanel" aria-labelledby="activities-tab">
-                    <h4>{% trans "Upcoming Activities" %}</h4>
+                    <h4>Próximas actividades</h4>
 
                     {% if activities %}
                         <div class="table-responsive">
                             <table class="table table-striped">
                                 <thead>
                                     <tr>
-                                        <th>{% trans "Activity" %}</th>
-                                        <th>{% trans "Subject(s)" %}</th>
-                                        <th>{% trans "Type" %}</th>
-                                        <th>{% trans "Start Date" %}</th>
-                                        <th>{% trans "End Date" %}</th>
-                                        <th>{% trans "Evaluable" %}</th>
+                                        <th>Actividad</th>
+                                        <th>Asignatura(s)</th>
+                                        <th>Tipo</th>
+                                        <th>Fecha de inicio</th>
+                                        <th>Fecha de fin</th>
+                                        <th>Evaluable</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -157,10 +156,10 @@
                                         <td>
                                             {% if activity.evaluable %}
                                                 <span class="badge bg-success">
-                                                    {% trans "Yes" %} ({{ activity.porcentaje_evaluacion }}%)
+                                                    Sí ({{ activity.porcentaje_evaluacion }}%)
                                                 </span>
                                             {% else %}
-                                                <span class="badge bg-secondary">{% trans "No" %}</span>
+                                                <span class="badge bg-secondary">No</span>
                                             {% endif %}
                                         </td>
                                     </tr>
@@ -171,13 +170,13 @@
                     {% else %}
                         <div class="alert alert-info">
                             <i class="bi bi-info-circle"></i>
-                            {% trans "No activities found for the selected subjects." %}
+                            No se han encontrado actividades para las asignaturas seleccionadas.
                         </div>
                     {% endif %}
                 </div>
 
                 <div class="tab-pane fade p-3" id="calendar-view" role="tabpanel" aria-labelledby="calendar-tab">
-                    <h4>{% trans "Calendar View" %}</h4>
+                    <h4>Vista de calendario</h4>
                     <div id='calendar'></div>
                 </div>
             </div>
@@ -202,11 +201,11 @@
                 right: 'dayGridMonth,timeGridWeek'
             },
             buttonText: {
-                today: '{% trans "Today" %}',
-                month: '{% trans "Month" %}',
-                week: '{% trans "Week" %}',
-                day: '{% trans "Day" %}',
-                list: '{% trans "List" %}'
+                today: 'Hoy',
+                month: 'Mes',
+                week: 'Semana',
+                day: 'Día',
+                list: 'Lista'
             },
             events: [
                 {% for activity in activities %}
@@ -226,10 +225,10 @@
                 {% endfor %}
             ],
             eventClick: function(info) {
-                alert('Activity: ' + info.event.title + '\n' +
-                      'Type: ' + info.event.extendedProps.type + '\n' +
-                      'Subjects: ' + info.event.extendedProps.subjects + '\n' +
-                      'Description: ' + (info.event.extendedProps.description || 'No description'));
+                alert('Actividad: ' + info.event.title + '\n' +
+                      'Tipo: ' + info.event.extendedProps.type + '\n' +
+                      'Asignaturas: ' + info.event.extendedProps.subjects + '\n' +
+                      'Descripción: ' + (info.event.extendedProps.description || 'Sin descripción'));
             }
         });
 

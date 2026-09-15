@@ -70,7 +70,7 @@
   <div class="card-header">Cursos académicos</div>
   <div class="table-responsive">
     <table class="table table-sm align-middle mb-0">
-      <thead><tr><th>Curso</th><th>Inicio</th><th>Fin</th><th>Estado</th><th>Ofertas</th><th></th></tr></thead>
+      <thead><tr><th>Curso académico</th><th>Inicio</th><th>Fin</th><th>Estado</th><th>Ofertas</th><th></th></tr></thead>
       <tbody>
         {% for year in years %}
           <tr>
@@ -86,9 +86,9 @@
             <td class="text-end">
               {% if year.state == 'draft' %}
                 <form method="post" action="{% url 'academic_year_activate' year.pk %}" class="d-inline"
-                      onsubmit="return confirm('¿Activar el curso {{ year.code }}? El curso activo actual pasará a archivado.');">
+                      onsubmit="return confirm('¿Activar el curso académico {{ year.code }}? El curso académico activo actual pasará a archivado.');">
                   {% csrf_token %}
-                  <button type="submit" class="btn btn-outline-success btn-sm">Activar curso</button>
+                  <button type="submit" class="btn btn-outline-success btn-sm">Activar curso académico</button>
                 </form>
               {% endif %}
             </td>
@@ -105,7 +105,7 @@
   <div class="card-header">Importaciones</div>
   <div class="table-responsive">
     <table class="table table-sm table-hover align-middle mb-0">
-      <thead><tr><th>Curso</th><th>Fichero</th><th>Asignaturas</th><th>Incompletas</th><th>Estado</th><th>Creada</th><th></th></tr></thead>
+      <thead><tr><th>Curso académico</th><th>Fichero</th><th>Asignaturas</th><th>Incompletas</th><th>Estado</th><th>Creada</th><th></th></tr></thead>
       <tbody>
         {% for item in imports %}
           <tr>

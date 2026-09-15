@@ -36,7 +36,7 @@
   <div class="ms-auto d-flex flex-wrap gap-2">
     {% if is_draft %}
       <form method="post" action="{% url 'catalogue_import_apply' catalogue_import.pk %}"
-            onsubmit="return confirm('¿Aplicar la importación? Se crearán o actualizarán titulaciones, asignaturas y ofertas del curso.');">
+            onsubmit="return confirm('¿Aplicar la importación? Se crearán o actualizarán titulaciones, asignaturas y ofertas del curso académico.');">
         {% csrf_token %}
         <button type="submit" class="btn btn-success btn-sm" {% if not can_apply %}disabled title="Complete curso y semestre y resuelva los conflictos"{% endif %}>
           <i class="bi bi-check2-circle"></i> Aplicar importación
@@ -49,10 +49,10 @@
       </form>
     {% elif catalogue_import.academic_year.state == 'draft' %}
       <form method="post" action="{% url 'academic_year_activate' catalogue_import.academic_year.pk %}"
-            onsubmit="return confirm('¿Activar el curso {{ catalogue_import.academic_year.code }}? El curso activo actual pasará a archivado.');">
+            onsubmit="return confirm('¿Activar el curso académico {{ catalogue_import.academic_year.code }}? El curso académico activo actual pasará a archivado.');">
         {% csrf_token %}
         <input type="hidden" name="next" value="{{ request.get_full_path }}">
-        <button type="submit" class="btn btn-outline-success btn-sm">Activar curso {{ catalogue_import.academic_year.code }}</button>
+        <button type="submit" class="btn btn-outline-success btn-sm">Activar curso académico {{ catalogue_import.academic_year.code }}</button>
       </form>
     {% endif %}
   </div>
