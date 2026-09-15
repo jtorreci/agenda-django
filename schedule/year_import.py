@@ -13,7 +13,18 @@ YEAR_SHIFT = timedelta(weeks=52)
 
 
 class ImportRefused(Exception):
-    """The activity cannot be imported; the message is shown to the user."""
+    """The activity cannot be imported; the message is shown to the user.
+
+    ``status`` is ``'already_imported'`` when a non-deleted copy already exists in
+    the active year, and ``'refused'`` for every other reason.
+    """
+
+    REFUSED = 'refused'
+    ALREADY_IMPORTED = 'already_imported'
+
+    def __init__(self, message, status=REFUSED):
+        super().__init__(message)
+        self.status = status
 
 
 def shift_one_year(value):
@@ -67,7 +78,10 @@ def import_activity(source, user):
     if not source.es_visible():
         raise ImportRefused(f'La actividad "{source.nombre}" no está visible y no se puede traer.')
     if live_copies(target).filter(copied_from=source).exists():
-        raise ImportRefused(f'La actividad "{source.nombre}" ya se trajo al curso {target.code}.')
+        raise ImportRefused(
+            f'La actividad "{source.nombre}" ya se trajo al curso {target.code}.',
+            ImportRefused.ALREADY_IMPORTED,
+        )
 
     subjects = list(offered_subjects(target, source.asignaturas.all()))
     if not subjects:
@@ -120,5 +134,8 @@ def import_activity(source, user):
             )
     except IntegrityError:
         # A concurrent request imported the same source first.
-        raise ImportRefused(f'La actividad "{source.nombre}" ya se trajo al curso {target.code}.')
+        raise ImportRefused(
+            f'La actividad "{source.nombre}" ya se trajo al curso {target.code}.',
+            ImportRefused.ALREADY_IMPORTED,
+        )
     return copy

@@ -78,6 +78,9 @@
             <div class="sidebar p-3 bg-light rounded">
                 <form method="get" action="{% url 'teacher_dashboard' %}" id="year-filter-form" class="mb-3">
                     {% include 'schedule/_academic_year_filter.html' %}
+                    {# Kept in sync with the checkboxes by JS so the reload keeps the selection #}
+                    <input type="hidden" name="subjects" class="selection-subjects" value="{{ restored_subjects_param }}">
+                    <input type="hidden" name="context" class="selection-context" value="{% if restored_show_context %}1{% endif %}">
                     <button type="submit" class="btn btn-outline-primary btn-sm w-100">Mostrar cursos seleccionados</button>
                     {% if past_years_selected %}
                         <div class="form-text">Las actividades de cursos anteriores son de solo lectura; puedes traerlas al curso actual.</div>
@@ -95,7 +98,7 @@
                             <tr>
                                 <td class="align-middle">
                                     <div class="form-check">
-                                        <input class="form-check-input subject-checkbox" type="checkbox" name="selected_subjects" value="{{ subject.id }}" id="subject_{{ subject.id }}">
+                                        <input class="form-check-input subject-checkbox" type="checkbox" name="selected_subjects" value="{{ subject.id }}" id="subject_{{ subject.id }}"{% if subject.id in restored_subject_ids %} checked{% endif %}>
                                         <label class="form-check-label" for="subject_{{ subject.id }}">
                                             {{ subject.nombre }}
                                         </label>
@@ -108,7 +111,7 @@
                                           onsubmit="return confirm('¿Traer al curso actual todas las actividades visibles de «{{ subject.nombre|escapejs }}» de los cursos anteriores seleccionados?');">
                                         {% csrf_token %}
                                         {% for year in selected_academic_years %}{% if not year.is_active %}<input type="hidden" name="academic_year" value="{{ year.pk }}">{% endif %}{% endfor %}
-                                        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                                        <input type="hidden" name="next" class="selection-next" value="{{ request.get_full_path }}">
                                         <button type="submit" class="btn btn-outline-success btn-sm" title="Traer al curso actual las actividades de esta asignatura">
                                             <i class="bi bi-box-arrow-in-down"></i>
                                         </button>
@@ -122,7 +125,7 @@
                 </div>
 
                 <div class="form-check mt-2 mb-3">
-                    <input class="form-check-input" type="checkbox" id="show_context_activities">
+                    <input class="form-check-input" type="checkbox" id="show_context_activities"{% if restored_show_context %} checked{% endif %}>
                     <label class="form-check-label" for="show_context_activities">
                         Ver actividades de la misma titulación y curso
                     </label>
@@ -187,6 +190,8 @@
                             <i class="bi bi-eye"></i> <span id="toggleText">{% trans "Show Deleted Activities" %}</span>
                         </button>
                     </div>
+
+                    <div id="dashboardAlerts" aria-live="polite"></div>
 
                     <!-- Active Activities Table -->
                     <div id="activitiesTableContainer">
@@ -280,7 +285,7 @@
     <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
 
     {{ selected_academic_year_ids|json_script:"selected-academic-years" }}
-    {{ request.get_full_path|json_script:"dashboard-next-url" }}
+    {{ active_academic_year.pk|default_if_none:""|json_script:"active-academic-year-id" }}
     <script>
     // Utility function to format date in 24h format
     function formatDateTo24h(date) {
@@ -307,7 +312,7 @@
         const showContextCheckbox = document.getElementById('show_context_activities');
         const selectedAcademicYears = JSON.parse(document.getElementById('selected-academic-years').textContent);
         const yearQuery = selectedAcademicYears.map(id => `&academic_year=${encodeURIComponent(id)}`).join('');
-        const dashboardNextUrl = JSON.parse(document.getElementById('dashboard-next-url').textContent);
+        const activeAcademicYearId = JSON.parse(document.getElementById('active-academic-year-id').textContent);
         const csrfToken = '{{ csrf_token }}';
         let isCalendarRendered = false;
 
@@ -315,17 +320,114 @@
             new TomSelect('#academic_year', { plugins: ['remove_button'], create: false });
         }
 
-        function importForm(activityId) {
-            const action = urlWithId("{% url 'import_activity_to_current_year' 0 %}", activityId);
-            const next = dashboardNextUrl.replace(/"/g, '&quot;');
-            return `<form method="post" action="${action}" class="d-inline">
-                <input type="hidden" name="csrfmiddlewaretoken" value="${csrfToken}">
-                <input type="hidden" name="next" value="${next}">
-                <button type="submit" class="btn btn-outline-success btn-sm" title="Traer al curso actual">
+        function importButton(activityId) {
+            return `<button type="button" class="btn btn-outline-success btn-sm import-activity-btn" data-activity-id="${activityId}" title="Traer al curso actual">
                     <i class="bi bi-box-arrow-in-down"></i> Traer al curso actual
-                </button>
-            </form>`;
+                </button>`;
         }
+
+        // --- Selection persistence -------------------------------------------------
+        // The dashboard URL mirrors the checked subjects and the context toggle
+        // (subjects=1,2&context=1). The URL keeps the deployment prefix because it is
+        // derived from window.location, never from a hard-coded root path.
+        function syncSelectionToUrl() {
+            const params = new URLSearchParams(window.location.search);
+            const subjects = getSelectedSubjectIds().join(',');
+            const context = showContextCheckbox.checked ? '1' : '';
+            if (subjects) { params.set('subjects', subjects); } else { params.delete('subjects'); }
+            if (context) { params.set('context', context); } else { params.delete('context'); }
+            const query = params.toString();
+            const url = window.location.pathname + (query ? `?${query}` : '') + window.location.hash;
+            window.history.replaceState(null, '', url);
+            document.querySelectorAll('.selection-subjects').forEach(input => { input.value = subjects; });
+            document.querySelectorAll('.selection-context').forEach(input => { input.value = context; });
+            document.querySelectorAll('.selection-next').forEach(input => {
+                input.value = window.location.pathname + window.location.search;
+            });
+        }
+
+        function dashboardUrlWithActiveYear() {
+            const params = new URLSearchParams(window.location.search);
+            const years = params.getAll('academic_year');
+            if (years.length === 0) {
+                // No explicit selection means "active year only"; keep what is shown.
+                selectedAcademicYears.forEach(id => params.append('academic_year', id));
+            }
+            if (!params.getAll('academic_year').includes(String(activeAcademicYearId))) {
+                params.append('academic_year', activeAcademicYearId);
+            }
+            return window.location.pathname + '?' + params.toString();
+        }
+
+        function showDashboardAlert(kind, message, linkUrl, linkText) {
+            const alertEl = document.createElement('div');
+            alertEl.className = `alert alert-${kind} alert-dismissible fade show`;
+            alertEl.setAttribute('role', 'alert');
+            const text = document.createElement('span');
+            text.textContent = message;
+            alertEl.appendChild(text);
+            if (linkUrl) {
+                const link = document.createElement('a');
+                link.className = 'alert-link ms-2';
+                link.href = linkUrl;
+                link.textContent = linkText;
+                alertEl.appendChild(link);
+            }
+            const close = document.createElement('button');
+            close.type = 'button';
+            close.className = 'btn-close';
+            close.setAttribute('data-bs-dismiss', 'alert');
+            close.setAttribute('aria-label', 'Cerrar');
+            alertEl.appendChild(close);
+            document.getElementById('dashboardAlerts').prepend(alertEl);
+        }
+
+        function importActivity(button) {
+            const activityId = button.dataset.activityId;
+            button.disabled = true;
+            fetch(urlWithId("{% url 'import_activity_to_current_year' 0 %}", activityId), {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                },
+                credentials: 'same-origin'
+            })
+                .then(response => response.json().catch(() => ({ ok: false, status: 'refused', message: 'Error al traer la actividad.' })))
+                .then(data => {
+                    if (data.status === 'imported') {
+                        const activeSelected = activeAcademicYearId !== '' &&
+                            selectedAcademicYears.map(String).includes(String(activeAcademicYearId));
+                        showDashboardAlert(
+                            'success',
+                            `Actividad traída a ${data.target_year}.`,
+                            activeSelected ? null : dashboardUrlWithActiveYear(),
+                            `Mostrar también ${data.target_year}`
+                        );
+                    } else if (data.status === 'already_imported') {
+                        showDashboardAlert('info', data.message);
+                    } else {
+                        showDashboardAlert('danger', data.message || 'No se pudo traer la actividad.');
+                        button.disabled = false;
+                    }
+                    if (data.status === 'imported' || data.status === 'already_imported') {
+                        fetchData();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error importing activity:', error);
+                    showDashboardAlert('danger', 'Error al traer la actividad.');
+                    button.disabled = false;
+                });
+        }
+
+        activitiesTableContainer.addEventListener('click', function(event) {
+            const button = event.target.closest('.import-activity-btn');
+            if (button) {
+                importActivity(button);
+            }
+        });
 
         const calendar = new FullCalendar.Calendar(calendarEl, {
             locale: 'es', // Configurar idioma español
@@ -451,7 +553,7 @@
                                 <i class="bi bi-eye"></i>
                             </button>`;
                         if (props.can_import && isOwn) {
-                            buttons += importForm(actualActivityId);
+                            buttons += importButton(actualActivityId);
                         } else if (props.already_imported) {
                             buttons += '<span class="badge bg-secondary">Ya traída</span>';
                         }
@@ -575,6 +677,7 @@
         });
 
         document.querySelectorAll('.subject-checkbox, #show_context_activities').forEach(element => {
+            element.addEventListener('change', syncSelectionToUrl);
             element.addEventListener('change', fetchData);
         });
 
@@ -657,7 +760,8 @@
             window.location.href = url;
         });
 
-        // Initial load
+        // Initial load (checkboxes may have been restored from the URL)
+        syncSelectionToUrl();
         fetchData();
     });
     </script>

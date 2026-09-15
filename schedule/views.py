@@ -2133,6 +2133,14 @@ def unified_activity_form(request, pk=None):
 
 # ==================== IMPORT FROM PREVIOUS ACADEMIC YEARS ====================
 
+def _wants_json(request):
+    """True for fetch/XHR callers that asked for a JSON answer instead of a redirect."""
+    return (
+        'application/json' in request.headers.get('Accept', '')
+        or request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+    )
+
+
 def _safe_next_url(request, fallback):
     next_url = request.POST.get('next')
     if next_url and url_has_allowed_host_and_scheme(
@@ -2148,18 +2156,44 @@ def _safe_next_url(request, fallback):
 def import_activity_to_current_year(request, pk):
     """Copy one past-year activity into the active academic year ("Traer al curso actual")."""
     source = get_object_or_404(Actividad.objects.select_related('academic_year'), pk=pk)
+    as_json = _wants_json(request)
     if not user_can_import(request.user, source):
-        return HttpResponse('No tienes permiso para traer esta actividad.', status=403)
+        message = 'No tienes permiso para traer esta actividad.'
+        if as_json:
+            return JsonResponse({'ok': False, 'status': 'forbidden', 'message': message}, status=403)
+        return HttpResponse(message, status=403)
     try:
         copy = import_activity(source, request.user)
     except ImportRefused as refused:
+        if as_json:
+            active = AcademicYear.get_active()
+            return JsonResponse(
+                {
+                    'ok': False,
+                    'status': refused.status,
+                    'message': str(refused),
+                    'source_id': source.pk,
+                    'target_year': active.code if active else None,
+                    'target_year_id': active.pk if active else None,
+                },
+                status=409 if refused.status == ImportRefused.ALREADY_IMPORTED else 400,
+            )
         messages.error(request, str(refused))
     else:
-        messages.success(
-            request,
-            f'Actividad "{copy.nombre}" traída al curso {copy.academic_year.code}. '
-            'Queda pendiente de aprobación.',
-        )
+        approval = 'aprobada' if copy.aprobada else 'pendiente de aprobación'
+        message = f'Actividad "{copy.nombre}" traída a {copy.academic_year.code} ({approval}).'
+        if as_json:
+            return JsonResponse({
+                'ok': True,
+                'status': 'imported',
+                'message': message,
+                'activity_id': copy.pk,
+                'source_id': source.pk,
+                'target_year': copy.academic_year.code,
+                'target_year_id': copy.academic_year_id,
+                'approved': copy.aprobada,
+            })
+        messages.success(request, message)
     return redirect(_safe_next_url(request, get_user_dashboard_url(request.user)))
 
 

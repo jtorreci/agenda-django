@@ -483,6 +483,99 @@ class ImportActivityTests(YearFixtureMixin, TestCase):
         self.assertEqual(self.client.post(reverse('activity_delete', args=[copy.pk])).status_code, 302)
 
 
+class DashboardImportJsonTests(YearFixtureMixin, TestCase):
+    json_headers = {'HTTP_ACCEPT': 'application/json'}
+
+    def post_json(self, activity, **headers):
+        url = reverse('import_activity_to_current_year', args=[activity.pk])
+        return self.client.post(url, **(headers or self.json_headers))
+
+    def test_json_import_reports_imported_copy(self):
+        self.login(self.teacher)
+        response = self.post_json(self.past_activity)
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        copy = Actividad.objects.get(copied_from=self.past_activity)
+        self.assertEqual(data['ok'], True)
+        self.assertEqual(data['status'], 'imported')
+        self.assertEqual(data['activity_id'], copy.pk)
+        self.assertEqual(data['source_id'], self.past_activity.pk)
+        self.assertEqual(data['target_year'], '2026-27')
+        self.assertEqual(data['target_year_id'], self.active.pk)
+        self.assertIn('traída a 2026-27', data['message'])
+        # No redirect and no queued flash message for the next full page load.
+        dashboard = self.client.get(reverse('teacher_dashboard'))
+        self.assertEqual(list(dashboard.context['messages']), [])
+
+    def test_x_requested_with_also_selects_json(self):
+        self.login(self.teacher)
+        response = self.post_json(self.past_activity, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(response.json()['status'], 'imported')
+
+    def test_json_import_reports_already_imported(self):
+        self.login(self.teacher)
+        self.post_json(self.past_activity)
+        response = self.post_json(self.past_activity)
+        self.assertEqual(response.status_code, 409)
+        data = response.json()
+        self.assertEqual((data['ok'], data['status']), (False, 'already_imported'))
+        self.assertIn('ya se trajo', data['message'])
+        self.assertEqual(Actividad.objects.filter(copied_from=self.past_activity).count(), 1)
+
+    def test_json_import_reports_refusal(self):
+        source = self.make_activity(self.past, 'Only unoffered', self.unoffered)
+        self.login(self.teacher)
+        response = self.post_json(source)
+        self.assertEqual(response.status_code, 400)
+        data = response.json()
+        self.assertEqual((data['ok'], data['status']), (False, 'refused'))
+        self.assertIn('Ninguna asignatura', data['message'])
+
+    def test_json_import_permission_denied(self):
+        self.login(self.other_teacher)
+        response = self.post_json(self.past_activity)
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.json()['status'], 'forbidden')
+        self.assertFalse(Actividad.objects.filter(copied_from=self.past_activity).exists())
+
+    def test_form_post_still_redirects_to_safe_next(self):
+        self.login(self.teacher)
+        next_url = reverse('teacher_dashboard') + f'?academic_year={self.past.pk}&subjects={self.offered.pk}&context=1'
+        response = self.client.post(
+            reverse('import_activity_to_current_year', args=[self.past_activity.pk]), {'next': next_url}
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['Location'], next_url)
+
+    def test_dashboard_restores_subject_and_context_selection(self):
+        self.login(self.teacher)
+        foreign = Asignatura.objects.create(
+            nombre='Foreign', codigo_asignatura='S9', titulacion=self.plan, curso=2, semestre=1
+        )
+        response = self.client.get(reverse('teacher_dashboard'), {
+            'subjects': f'{self.offered.pk},x,{foreign.pk},{self.offered.pk}',
+            'context': '1',
+            'academic_year': self.past.pk,
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['restored_subject_ids'], [self.offered.pk])
+        self.assertTrue(response.context['restored_show_context'])
+        self.assertContains(response, f'id="subject_{self.offered.pk}" checked')
+        self.assertNotContains(response, f'id="subject_{self.unoffered.pk}" checked')
+        self.assertContains(response, 'id="show_context_activities" checked')
+        self.assertContains(response, f'name="subjects" class="selection-subjects" value="{self.offered.pk}"')
+        self.assertContains(response, 'name="context" class="selection-context" value="1"')
+        self.assertContains(response, 'class="selection-next"')
+
+    def test_dashboard_without_selection_params_renders_unchecked(self):
+        self.login(self.teacher)
+        response = self.client.get(reverse('teacher_dashboard'), {'subjects': '', 'context': '0'})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['restored_subject_ids'], [])
+        self.assertFalse(response.context['restored_show_context'])
+        self.assertNotContains(response, 'id="show_context_activities" checked')
+
+
 class StudentActiveYearTests(YearFixtureMixin, TestCase):
     def test_student_dashboard_and_calendar_only_show_active_year(self):
         self.login(self.student)
