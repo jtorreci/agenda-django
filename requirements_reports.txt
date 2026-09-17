@@ -1,3 +1,0 @@
-# Additional dependencies for PDF reports
-reportlab>=3.6.0
-Pillow>=9.0.0  # For image handling in PDFs
