@@ -1,30 +1,8 @@
 # Manual de Usuario - Sistema de Agenda Académica
 
-## Usuarios de Prueba
+## Usuarios de prueba
 
-Para probar el sistema, se han creado los siguientes usuarios de prueba. Para crearlos en tu base de datos, ejecuta: `python create_test_users.py`
-
-### 👨‍💼 **ADMINISTRADOR**
-- **Usuario:** `admin_test`
-- **Contraseña:** `admin123`
-- **Email:** admin@unex.es
-
-### 👨‍🎓 **COORDINADOR**
-- **Usuario:** `coord_test`
-- **Contraseña:** `coord123`
-- **Email:** coordinador@unex.es
-
-### 👨‍🏫 **PROFESORES**
-- **Usuario:** `prof_mate` | **Contraseña:** `mate123` | **Email:** matematicas@unex.es
-- **Usuario:** `prof_fisica` | **Contraseña:** `fisica123` | **Email:** fisica@unex.es  
-- **Usuario:** `prof_quimica` | **Contraseña:** `quimica123` | **Email:** quimica@unex.es
-
-### 👨‍🎓 **ESTUDIANTES**
-- **Usuario:** `alumno1` | **Contraseña:** `alumno123` | **Email:** estudiante1@alumnos.unex.es
-- **Usuario:** `alumno2` | **Contraseña:** `alumno123` | **Email:** estudiante2@alumnos.unex.es
-- **Usuario:** `alumno3` | **Contraseña:** `alumno123` | **Email:** estudiante3@alumnos.unex.es
-
----
+Las credenciales de prueba ya no se publican aquí. Crea las cuentas que necesites con `python manage.py createsuperuser` o desde el panel de administración de Django, y usa contraseñas propias.
 
 ## 🔐 Acceso al Sistema
 

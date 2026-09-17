@@ -55,3 +55,8 @@ security_audit.md
 usuarios_prueba_whatsapp.txt
 .env.garnocex
 .env.production
+
+# Local tooling and data dumps
+.claude/
+*.tmp.*
+db_dump*.json
