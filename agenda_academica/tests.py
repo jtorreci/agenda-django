@@ -214,6 +214,39 @@ class PrefixedUrlsTests(TestCase):
         self.assert_page_is_prefixed("/users/admin_dashboard/")
         self.assert_page_is_prefixed(f"/activity/list/{years}")
 
+    def test_ical_import_pages_are_prefixed(self):
+        from datetime import date
+
+        from academics.models import AcademicYear, Asignatura, SubjectOffering, Titulacion
+        from schedule.ical_import import build_draft, parse_calendar
+
+        year = AcademicYear.objects.create(
+            code="2026-27", starts_on=date(2026, 9, 1), ends_on=date(2027, 8, 31), state="active"
+        )
+        plan = Titulacion.objects.create(nombre="Plan", codigo_plan="P9")
+        subject = Asignatura.objects.create(
+            nombre="Asignatura", codigo_asignatura="S9", titulacion=plan, curso=1, semestre=1
+        )
+        SubjectOffering.objects.create(academic_year=year, subject=subject, curricular_year=1, semester=1)
+        teacher = self.users[CustomUser.ROLE_TEACHER]
+        teacher.subjects.set([subject])
+        parsed = parse_calendar(
+            "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Moodle//ES\r\n"
+            "BEGIN:VEVENT\r\nUID:1@campusvirtual.example.org\r\nSUMMARY:Asistencia clases\r\n"
+            "DTSTART:20261007T070000Z\r\nDTEND:20261007T090000Z\r\nCATEGORIES:99001\r\n"
+            "END:VEVENT\r\nEND:VCALENDAR\r\n"
+        )
+        draft = build_draft(parsed, subject, year, "icalexport.ics", teacher)
+
+        self.client.force_login(teacher)
+        self.assert_page_is_prefixed("/ical/imports/")
+        self.assert_page_is_prefixed(f"/ical/imports/{draft.pk}/")
+        self.assertEqual(
+            reverse("ical_import_detail", args=[draft.pk]),
+            f"{PREFIX}/ical/imports/{draft.pk}/",
+        )
+        self.assert_redirects_under_prefix(self.client.post(f"/ical/imports/{draft.pk}/delete/"))
+
     def test_admin_index_is_prefixed(self):
         self.client.force_login(self.superuser)
         response = self.client.get("/admin/")

@@ -1,0 +1,195 @@
+{% extends 'base.html' %}
+
+{% block title %}Importación del campus virtual {{ ical_import.subject }}{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+  <div>
+    <h2 class="mb-0">Importar desde el campus virtual · {{ ical_import.subject }}</h2>
+    <div class="text-muted small">
+      {{ ical_import.academic_year.code }} · {{ ical_import.source_filename }} ·
+      {{ ical_import.created_at|date:"d/m/Y H:i" }}
+      {% if ical_import.moodle_course_id %}· curso del campus virtual {{ ical_import.moodle_course_id }}{% endif %}
+      {% if is_draft %}<span class="badge bg-warning text-dark">Borrador</span>
+      {% else %}<span class="badge bg-success">Aplicada {{ ical_import.applied_at|date:"d/m/Y H:i" }}</span>{% endif %}
+    </div>
+  </div>
+  <a href="{% url 'ical_import_list' %}" class="btn btn-secondary btn-sm">Volver a importaciones</a>
+</div>
+
+{% include 'academics/_messages.html' %}
+
+<div class="row g-2 mb-3">
+  <div class="col-6 col-md"><div class="card text-center"><div class="card-body py-2"><div class="fs-4">{{ summary.total }}</div><div class="small text-muted">Eventos</div></div></div></div>
+  <div class="col-6 col-md"><div class="card text-center"><div class="card-body py-2"><div class="fs-4 text-primary">{{ summary.selected }}</div><div class="small text-muted">Seleccionados</div></div></div></div>
+  <div class="col-6 col-md"><div class="card text-center"><div class="card-body py-2"><div class="fs-4 text-success">{{ summary.created }}</div><div class="small text-muted">Creadas</div></div></div></div>
+  <div class="col-6 col-md"><div class="card text-center"><div class="card-body py-2"><div class="fs-4 text-secondary">{{ summary.duplicated }}</div><div class="small text-muted">Ya importadas</div></div></div></div>
+  <div class="col-6 col-md"><div class="card text-center"><div class="card-body py-2"><div class="fs-4 {% if summary.outside %}text-warning{% endif %}">{{ summary.outside }}</div><div class="small text-muted">Fuera del curso académico</div></div></div></div>
+  <div class="col-6 col-md"><div class="card text-center"><div class="card-body py-2"><div class="fs-4 {% if summary.missing_type %}text-danger{% endif %}">{{ summary.missing_type }}</div><div class="small text-muted">Sin tipo de actividad</div></div></div></div>
+</div>
+
+{% if summary.missing_type %}
+  <div class="alert alert-warning small">
+    Hay {{ summary.missing_type }} eventos seleccionados sin tipo de actividad. Elige un tipo en cada grupo
+    y guarda los cambios antes de aplicar.
+  </div>
+{% endif %}
+{% if summary.outside %}
+  <div class="alert alert-warning small">
+    Hay {{ summary.outside }} eventos fuera de las fechas del curso académico
+    {{ ical_import.academic_year.code }}. Puedes importarlos igualmente; están marcados en la lista.
+  </div>
+{% endif %}
+{% if summary.unsupported %}
+  <div class="alert alert-info small">
+    Hay {{ summary.unsupported }} eventos con repetición, que no se pueden importar.
+  </div>
+{% endif %}
+
+<form method="post" id="ical-import-form">
+  {% csrf_token %}
+  {% for group in groups %}
+    <div class="card mb-3" id="grupo-{{ group.group_id }}">
+      <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+        <div class="form-check mb-0">
+          <input class="form-check-input group-toggle" type="checkbox" id="grupo-check-{{ group.group_id }}"
+                 data-group="{{ group.group_id }}" {% if group.all_selected %}checked{% endif %}
+                 {% if not is_draft or not group.importable_count %}disabled{% endif %}>
+          <label class="form-check-label" for="grupo-check-{{ group.group_id }}">
+            <strong>{{ group.summary }}</strong>
+            <span class="badge bg-secondary ms-1">{{ group.count }}</span>
+          </label>
+        </div>
+        <div class="text-muted small">
+          Del {{ group.first_date|date:"d/m/Y H:i" }} al {{ group.last_date|date:"d/m/Y H:i" }}
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="row g-3 align-items-end">
+          <div class="col-md-4">
+            <label class="form-label" for="tipo-{{ group.group_id }}">Tipo de actividad</label>
+            <select class="form-select form-select-sm" name="tipo_{{ group.group_id }}" id="tipo-{{ group.group_id }}"
+                    {% if not is_draft %}disabled{% endif %}>
+              <option value="">— Elige un tipo —</option>
+              {% for tipo in activity_types %}
+                <option value="{{ tipo.pk }}" {% if group.tipo_actividad and group.tipo_actividad.pk == tipo.pk %}selected{% endif %}>{{ tipo.nombre }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-3">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" name="evaluable_{{ group.group_id }}"
+                     id="evaluable-{{ group.group_id }}" {% if group.evaluable %}checked{% endif %}
+                     {% if not is_draft %}disabled{% endif %}>
+              <label class="form-check-label" for="evaluable-{{ group.group_id }}">Evaluable</label>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label" for="porcentaje-{{ group.group_id }}">Porcentaje de evaluación</label>
+            <input type="number" class="form-control form-control-sm" min="0" max="100" step="0.01"
+                   name="porcentaje_{{ group.group_id }}" id="porcentaje-{{ group.group_id }}"
+                   value="{{ group.porcentaje_evaluacion|stringformat:'s' }}"
+                   {% if not is_draft %}disabled{% endif %}>
+          </div>
+          <div class="col-md-2 text-md-end">
+            <button class="btn btn-outline-secondary btn-sm" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#eventos-{{ group.group_id }}" aria-expanded="false"
+                    aria-controls="eventos-{{ group.group_id }}">
+              Ver eventos
+            </button>
+          </div>
+        </div>
+
+        <div class="collapse mt-3" id="eventos-{{ group.group_id }}">
+          <div class="table-responsive">
+            <table class="table table-sm align-middle mb-0">
+              <thead>
+                <tr><th></th><th>Inicio</th><th>Fin</th><th>Situación</th></tr>
+              </thead>
+              <tbody>
+                {% for event in group.events %}
+                  <tr>
+                    <td>
+                      <input class="form-check-input event-check" type="checkbox" name="event_{{ event.pk }}"
+                             data-group="{{ group.group_id }}"
+                             aria-label="Seleccionar el evento del {{ event.starts_at|date:'d/m/Y H:i' }}"
+                             {% if event.selected %}checked{% endif %}
+                             {% if not is_draft or not event.is_importable %}disabled{% endif %}>
+                    </td>
+                    <td>{{ event.starts_at|date:"d/m/Y H:i" }}</td>
+                    <td>{% if event.all_day %}Día completo{% elif event.zero_duration %}Sin duración{% else %}{{ event.ends_at|date:"d/m/Y H:i" }}{% endif %}</td>
+                    <td class="small">
+                      {% if event.status == 'duplicate' %}<span class="badge bg-secondary">Ya importada</span>
+                      {% elif event.status == 'created' %}<span class="badge bg-success">Creada</span>
+                      {% elif event.status == 'unsupported' %}<span class="badge bg-info text-dark">{{ event.status_detail }}</span>
+                      {% elif event.status == 'error' %}<span class="badge bg-danger">Con error</span>{% endif %}
+                      {% if event.outside_year %}<span class="badge bg-warning text-dark">Fuera del curso académico</span>{% endif %}
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% empty %}
+    <div class="alert alert-info">Esta importación no tiene eventos.</div>
+  {% endfor %}
+
+  {% if is_draft %}
+    <div class="d-flex flex-wrap gap-2 mb-4">
+      <button type="submit" class="btn btn-primary btn-sm"><i class="bi bi-save"></i> Guardar selección</button>
+    </div>
+  {% endif %}
+</form>
+
+{% if is_draft %}
+  <div class="d-flex flex-wrap gap-2">
+    <form method="post" action="{% url 'ical_import_apply' ical_import.pk %}"
+          onsubmit="return confirm('¿Seguro que quieres crear las actividades seleccionadas?');">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-success btn-sm" {% if not can_apply %}disabled title="Selecciona eventos y elige el tipo de actividad de cada grupo"{% endif %}>
+        <i class="bi bi-check2-circle"></i> Crear las actividades seleccionadas
+      </button>
+    </form>
+    <form method="post" action="{% url 'ical_import_delete' ical_import.pk %}"
+          onsubmit="return confirm('¿Seguro que quieres eliminar este borrador?');">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-outline-danger btn-sm"><i class="bi bi-trash"></i> Eliminar borrador</button>
+    </form>
+  </div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // The group checkbox is a shortcut: it selects or clears every event of its
+  // group that can still be imported. Individual checkboxes stay free.
+  document.querySelectorAll('.group-toggle').forEach(function (toggle) {
+    toggle.addEventListener('change', function () {
+      const group = toggle.dataset.group;
+      document.querySelectorAll('.event-check[data-group="' + group + '"]').forEach(function (check) {
+        if (!check.disabled) {
+          check.checked = toggle.checked;
+        }
+      });
+    });
+  });
+
+  document.querySelectorAll('.event-check').forEach(function (check) {
+    check.addEventListener('change', function () {
+      const group = check.dataset.group;
+      const events = Array.from(document.querySelectorAll('.event-check[data-group="' + group + '"]'))
+        .filter(function (item) { return !item.disabled; });
+      const toggle = document.getElementById('grupo-check-' + group);
+      if (!toggle) {
+        return;
+      }
+      const selected = events.filter(function (item) { return item.checked; }).length;
+      toggle.checked = events.length > 0 && selected === events.length;
+      toggle.indeterminate = selected > 0 && selected < events.length;
+    });
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block title %}Importar desde el campus virtual{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+  <h2 class="mb-0">Importar actividades desde el campus virtual</h2>
+  <a href="{% url 'teacher_dashboard' %}" class="btn btn-secondary btn-sm">Volver al panel</a>
+</div>
+
+{% include 'academics/_messages.html' %}
+
+{% if not active_year %}
+  <div class="alert alert-warning">No hay ningún curso académico activo. Contacta con la administración.</div>
+{% endif %}
+
+<div class="card mb-4">
+  <div class="card-header">Nueva importación</div>
+  <div class="card-body">
+    {% if form.non_field_errors %}
+      <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+    {% endif %}
+    <p class="text-muted small mb-3">
+      En el calendario del campus virtual, exporta los eventos de la asignatura a un fichero .ics
+      y súbelo aquí. Después eliges qué eventos quieres convertir en actividades de la agenda.
+      El fichero no puede ocupar más de 2 MB.
+    </p>
+    {% if not has_subjects %}
+      <div class="alert alert-info">
+        No tienes asignaturas ofertadas en el curso académico activo, así que todavía no puedes importar nada.
+      </div>
+    {% endif %}
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label" for="{{ form.subject.id_for_label }}">{{ form.subject.label }}</label>
+          {{ form.subject }}
+          {% for error in form.subject.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" for="{{ form.file.id_for_label }}">{{ form.file.label }}</label>
+          {{ form.file }}
+          {% for error in form.file.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary mt-3" {% if not has_subjects or not active_year %}disabled{% endif %}>
+        <i class="bi bi-upload"></i> Subir y previsualizar
+      </button>
+    </form>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">Importaciones</div>
+  <div class="table-responsive">
+    <table class="table table-sm table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th>Curso académico</th><th>Asignatura</th><th>Fichero</th>
+          <th>Eventos</th><th>Estado</th><th>Creada</th><th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in imports %}
+          <tr>
+            <td>{{ item.academic_year.code }}</td>
+            <td>{{ item.subject }}</td>
+            <td>{{ item.source_filename }}</td>
+            <td>{{ item.event_count }}</td>
+            <td>
+              {% if item.state == 'applied' %}<span class="badge bg-success">Aplicada</span>
+              {% else %}<span class="badge bg-warning text-dark">Borrador</span>{% endif %}
+            </td>
+            <td>{{ item.created_at|date:"d/m/Y H:i" }}{% if item.created_by %} · {{ item.created_by }}{% endif %}</td>
+            <td class="text-end">
+              <a href="{% url 'ical_import_detail' item.pk %}" class="btn btn-outline-primary btn-sm">Ver</a>
+            </td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="7" class="text-muted">Todavía no has importado ningún calendario.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

@@ -417,3 +417,32 @@ class UnifiedActivityForm(forms.Form):
                 )
             
             return actividad
+
+
+class IcalUploadForm(forms.Form):
+    """Upload of a Moodle course calendar export (.ics)."""
+
+    subject = forms.ModelChoiceField(
+        queryset=Asignatura.objects.none(),
+        required=False,
+        label='Asignatura',
+        empty_label='— Usar la asignatura de la última importación de este curso —',
+        widget=forms.Select(attrs={'class': 'form-select'}),
+    )
+    file = forms.FileField(
+        label='Fichero .ics del campus virtual',
+        widget=forms.ClearableFileInput(attrs={'class': 'form-control', 'accept': '.ics,text/calendar'}),
+    )
+
+    def __init__(self, *args, subjects=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        if subjects is not None:
+            self.fields['subject'].queryset = subjects
+
+    def clean_file(self):
+        from .ical_import import MAX_UPLOAD_BYTES
+
+        upload = self.cleaned_data['file']
+        if upload.size > MAX_UPLOAD_BYTES:
+            raise forms.ValidationError('El fichero supera el tamaño máximo de 2 MB.')
+        return upload
