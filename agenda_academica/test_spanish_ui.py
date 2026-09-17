@@ -27,6 +27,7 @@ from django.utils import timezone
 
 from academics.catalogue_import import build_draft, parse_catalogue
 from academics.models import AcademicYear, Asignatura, SubjectOffering, Titulacion
+from schedule.ical_import import build_draft as build_ical_draft, parse_calendar
 from schedule.models import Actividad, ActividadGrupo, LogActividad, TipoActividad, VistaCalendario
 from users.models import CustomUser
 
@@ -175,6 +176,16 @@ class SpanishOnlyUiTests(TestCase):
         assert errors == []
         cls.draft = build_draft(cls.year, rows, 'catalogo.csv', cls.users[CustomUser.ROLE_ADMIN])
 
+        cls.ical_draft = build_ical_draft(
+            parse_calendar(
+                'BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Moodle//ES\r\n'
+                'BEGIN:VEVENT\r\nUID:1@campusvirtual.example.org\r\nSUMMARY:Asistencia clases\r\n'
+                'DESCRIPTION:Aula 1\r\nDTSTART:20261007T070000Z\r\nDTEND:20261007T090000Z\r\n'
+                'CATEGORIES:99001\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n'
+            ),
+            cls.subject, cls.year, 'icalexport.ics', cls.users[CustomUser.ROLE_TEACHER],
+        )
+
     def assert_spanish(self, path, status=200):
         response = self.client.get(path, HTTP_ACCEPT_LANGUAGE='en-US,en;q=0.9')
         self.assertEqual(response.status_code, status, f'GET {path}')
@@ -216,6 +227,7 @@ class SpanishOnlyUiTests(TestCase):
             '/activity/unified/new/', f'/activity/unified/edit/{pk}/', '/activity/new/',
             f'/activity/edit/{pk}/', '/activity/multi-group/new/', f'/activity/view/{pk}/',
             f'/activity/{pk}/versions/', f'/activity/delete/{pk}/', '/activity/list/',
+            '/ical/imports/', f'/ical/imports/{self.ical_draft.pk}/',
         ])
 
     def test_coordinator_pages(self):

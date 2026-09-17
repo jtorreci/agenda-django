@@ -82,6 +82,7 @@ urlpatterns = [
     path('', agenda_views.home, name='home'),
     path('agenda_settings/', agenda_views.agenda_settings, name='agenda_settings'),
     path('catalogue/imports/', include('academics.urls')),
+    path('ical/imports/', include('schedule.urls')),
     path('ajax/agenda_settings/update/', agenda_views.ajax_update_agenda_settings, name='ajax_update_agenda_settings'),
 ]
 

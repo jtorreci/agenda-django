@@ -7,8 +7,15 @@ from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.db import transaction
 from django.http import HttpResponseRedirect
 from users.views import is_teacher, is_coordinator, is_coordinator_or_admin
-from .forms import ActividadForm, VistaCalendarioForm, MultiGroupActivityForm, UnifiedActivityForm
-from .models import Actividad, ActividadGrupo, VistaCalendario, LogActividad, TipoActividad, ActividadVersion
+from users.models import CustomUser
+from django.core.exceptions import PermissionDenied, ValidationError
+from django.db.models import Count
+from .forms import ActividadForm, VistaCalendarioForm, MultiGroupActivityForm, UnifiedActivityForm, IcalUploadForm
+from .models import (
+    Actividad, ActividadGrupo, VistaCalendario, LogActividad, TipoActividad, ActividadVersion,
+    IcalImport, IcalImportEvent,
+)
+from . import ical_import as ical_import_service
 from icalendar import Calendar, Event
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from agenda_academica.models import AgendaSettings
@@ -2241,3 +2248,167 @@ def import_subject_activities(request, subject_id):
     for refusal in refusals:
         messages.warning(request, refusal)
     return redirect(_safe_next_url(request, get_user_dashboard_url(request.user)))
+
+
+# -- Moodle calendar (.ics) import -------------------------------------------
+
+def _refusal_messages(error):
+    return error.messages if hasattr(error, 'messages') else [str(error)]
+
+
+@login_required
+@user_passes_test(is_teacher)
+def ical_import_list(request):
+    """Upload a Moodle calendar export and list the teacher's own imports."""
+    active_year = AcademicYear.get_active()
+    subjects = ical_import_service.importable_subjects(request.user, active_year)
+    form = IcalUploadForm(subjects=subjects)
+
+    if request.method == 'POST':
+        form = IcalUploadForm(request.POST, request.FILES, subjects=subjects)
+        if active_year is None:
+            form.add_error(None, 'No hay ningún curso académico activo. Contacta con la administración.')
+        elif form.is_valid():
+            upload = form.cleaned_data['file']
+            try:
+                parsed = ical_import_service.parse_calendar(upload.read())
+            except ValidationError as error:
+                for message in _refusal_messages(error):
+                    form.add_error('file', message)
+            else:
+                subject = form.cleaned_data['subject']
+                remembered = None
+                if subject is None:
+                    remembered = ical_import_service.mapped_subject(parsed.moodle_course_id)
+                    subject = remembered if remembered in list(subjects) else None
+                if subject is None:
+                    form.add_error('subject', 'Elige la asignatura en la que quieres importar las actividades.')
+                else:
+                    try:
+                        draft = ical_import_service.build_draft(
+                            parsed, subject, active_year, upload.name, request.user
+                        )
+                    except ValidationError as error:
+                        for message in _refusal_messages(error):
+                            form.add_error(None, message)
+                    else:
+                        if remembered is not None:
+                            messages.info(
+                                request,
+                                f'Se ha usado «{subject}», la asignatura de la última importación de este curso '
+                                'del campus virtual.',
+                            )
+                        messages.success(
+                            request,
+                            f'Borrador creado con {len(parsed.events)} eventos. Revísalo antes de aplicarlo.',
+                        )
+                        return redirect('ical_import_detail', pk=draft.pk)
+
+    imports = (
+        IcalImport.objects.select_related('academic_year', 'subject', 'created_by')
+        .annotate(event_count=Count('events'))
+    )
+    if not (request.user.role == CustomUser.ROLE_ADMIN or request.user.is_superuser):
+        imports = imports.filter(created_by=request.user)
+
+    return render(request, 'schedule/ical_import_list.html', {
+        'form': form,
+        'imports': imports,
+        'active_year': active_year,
+        'has_subjects': subjects.exists(),
+    })
+
+
+def _import_for_user(request, pk):
+    ical_import = get_object_or_404(
+        IcalImport.objects.select_related('academic_year', 'subject'), pk=pk
+    )
+    is_owner = ical_import.created_by_id == request.user.pk
+    allowed = is_owner or ical_import_service.can_import_into(
+        request.user, ical_import.subject, ical_import.academic_year
+    )
+    if not allowed:
+        raise PermissionDenied('No puedes acceder a esta importación.')
+    return ical_import
+
+
+@login_required
+@user_passes_test(is_teacher)
+def ical_import_detail(request, pk):
+    """Preview a draft import grouped by summary and edit its selection."""
+    ical_import = _import_for_user(request, pk)
+    activity_types = TipoActividad.objects.all().order_by('nombre')
+
+    if request.method == 'POST':
+        try:
+            saved = ical_import_service.save_selection(ical_import, request.POST, activity_types)
+        except ValidationError as error:
+            for message in _refusal_messages(error):
+                messages.error(request, message)
+        else:
+            messages.success(request, f'Cambios guardados en {saved} eventos.')
+        return redirect('ical_import_detail', pk=pk)
+
+    events = list(ical_import.events.select_related('tipo_actividad', 'created_activity'))
+    groups = ical_import_service.group_events(events)
+    academic_year = ical_import.academic_year
+    for event in events:
+        event.outside_year = event.is_outside(academic_year)
+
+    summary = {
+        'total': len(events),
+        'selected': sum(1 for event in events if event.selected),
+        'duplicated': sum(1 for event in events if event.status == IcalImportEvent.STATUS_DUPLICATE),
+        'created': sum(1 for event in events if event.status == IcalImportEvent.STATUS_CREATED),
+        'unsupported': sum(1 for event in events if event.status == IcalImportEvent.STATUS_UNSUPPORTED),
+        'outside': sum(1 for event in events if event.outside_year),
+        'missing_type': sum(
+            1 for event in events if event.selected and event.is_importable and event.tipo_actividad_id is None
+        ),
+    }
+
+    return render(request, 'schedule/ical_import_detail.html', {
+        'ical_import': ical_import,
+        'is_draft': ical_import.is_draft,
+        'groups': groups,
+        'summary': summary,
+        'activity_types': activity_types,
+        'can_apply': (
+            ical_import.is_draft
+            and academic_year.is_active
+            and summary['selected'] > 0
+            and summary['missing_type'] == 0
+        ),
+    })
+
+
+@login_required
+@user_passes_test(is_teacher)
+@require_POST
+def ical_import_apply(request, pk):
+    ical_import = _import_for_user(request, pk)
+    try:
+        result = ical_import_service.apply_import(ical_import, request.user)
+    except ValidationError as error:
+        for message in _refusal_messages(error):
+            messages.error(request, message)
+    else:
+        messages.success(
+            request,
+            f'Importación aplicada: {result.created} actividades creadas, '
+            f'{result.skipped} omitidas por duplicado, {result.failed} con error.',
+        )
+    return redirect('ical_import_detail', pk=pk)
+
+
+@login_required
+@user_passes_test(is_teacher)
+@require_POST
+def ical_import_delete(request, pk):
+    ical_import = _import_for_user(request, pk)
+    if not ical_import.is_draft:
+        messages.error(request, 'Solo se pueden eliminar importaciones en borrador.')
+        return redirect('ical_import_detail', pk=pk)
+    ical_import.delete()
+    messages.success(request, 'Borrador eliminado.')
+    return redirect('ical_import_list')
